@@ -64,6 +64,7 @@
   .classline .pct { width: 44px; text-align: right; font-size: 13px; font-weight: 700; color: var(--green); }
   .classline.top .name { font-weight:700; color:var(--green); }
   .sentiment { font-size: 30px; font-weight: 800; }
+  .summary { font-size: 14.5px; background:#f8faf9; border-left:3px solid var(--green-2); border-radius:0 8px 8px 0; padding:10px 14px; }
   .ent { display: inline-block; border-radius: 6px; padding: 2px 8px; margin: 3px 4px 3px 0; font-size: 13px; }
   .ent-PER { background: #e0ecff; color: #1e40af; }
   .ent-ORG { background: #e8f3ee; color: #0e3d2e; }
@@ -154,8 +155,17 @@
       <h3>🔍 Wichtige Begriffe (Personen, Firmen, Orte)</h3>
       <div id="entOut"></div>
     </div>
+    <div class="res" style="margin-top:18px">
+      <h3>📝 Zusammenfassung (Kernaussage)</h3>
+      <div id="sumOut" class="summary"></div>
+    </div>
+    <div class="res" style="margin-top:18px">
+      <h3>✍️ Antwort-Vorschlag <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">· Entwurf, bitte prüfen</span></h3>
+      <textarea id="replyOut" style="min-height:140px"></textarea>
+      <div class="tools"><button class="btn-sec" id="copyReply">📋 Antwort kopieren</button></div>
+    </div>
     <div class="tools">
-      <button class="btn-sec" id="copyBtn">📋 Ergebnis kopieren</button>
+      <button class="btn-sec" id="copyBtn">📋 Gesamt-Ergebnis kopieren</button>
     </div>
   </div>
 
@@ -232,6 +242,45 @@ async function ensureModels() {
   setStatus('Modelle bereit – analysiere …', 95);
 }
 
+const STOP = new Set("der die das und oder aber ein eine einen einem einer eines ist sind war waren hat haben wird werden wurde wurden auch nur noch schon sehr mit für von zu im in am an auf aus bei nach über unter vor als wie wenn dass dann denn weil ich du er sie es wir ihr mir mich uns ihnen ihre ihrem ihren unser unsere sich dem den des zur zum vom beim bitte danke sehr geehrte damen herren freundlichen grüßen".split(/\s+/));
+
+function summarize(text) {
+  const sents = text.replace(/\s+/g,' ').match(/[^.!?]+[.!?]+/g) || [text];
+  if (sents.length <= 2) return text.trim();
+  const freq = {};
+  text.toLowerCase().match(/[a-zäöüß0-9]{3,}/g)?.forEach(w => { if (!STOP.has(w)) freq[w] = (freq[w]||0)+1; });
+  const scored = sents.map((s, i) => {
+    let sc = 0; (s.toLowerCase().match(/[a-zäöüß0-9]{3,}/g)||[]).forEach(w => { if (!STOP.has(w)) sc += freq[w]||0; });
+    return { s: s.trim(), i, sc: sc / Math.max(1, (s.match(/\S+/g)||[]).length) };
+  });
+  const top = scored.slice().sort((a,b)=>b.sc-a.sc).slice(0, 2).sort((a,b)=>a.i-b.i);
+  return top.map(t=>t.s).join(' ');
+}
+
+function buildReply(topCat, sentLabel, ents) {
+  const cat = (topCat||'').toLowerCase();
+  const org = (ents.find(e=>e.type==='ORG')||{}).text;
+  const per = (ents.find(e=>e.type==='PER')||{}).text;
+  const anrede = per ? ('Sehr geehrte/r ' + per + ',') : 'Sehr geehrte Damen und Herren,';
+  let body;
+  if (/reklamation|beschwerde/.test(cat))
+    body = "vielen Dank für Ihre Nachricht und entschuldigen Sie bitte die entstandenen Unannehmlichkeiten. Wir nehmen Ihr Anliegen sehr ernst und prüfen den Vorgang umgehend. Wir melden uns schnellstmöglich mit einer Lösung bei Ihnen.";
+  else if (/rückgabe|umtausch/.test(cat))
+    body = "vielen Dank für Ihre Nachricht. Gerne wickeln wir die Rückgabe bzw. den Umtausch für Sie ab. Wir senden Ihnen in Kürze alle nötigen Schritte und Unterlagen zu.";
+  else if (/angebot|anfrage|mandatsanfrage|auftragsanfrage|kostenvoranschlag/.test(cat))
+    body = "vielen Dank für Ihr Interesse und Ihre Anfrage. Wir prüfen Ihr Anliegen und lassen Ihnen zeitnah ein passendes Angebot bzw. die gewünschten Informationen zukommen.";
+  else if (/termin|reservierung/.test(cat))
+    body = "vielen Dank für Ihre Terminanfrage. Wir prüfen die Verfügbarkeit und bestätigen Ihnen den Termin in Kürze. Sollten Sie einen Wunschtermin haben, teilen Sie uns diesen gerne mit.";
+  else if (/rechnung/.test(cat))
+    body = "vielen Dank für Ihre Nachricht bezüglich der Rechnung. Wir prüfen den Vorgang und melden uns zeitnah mit einer Rückmeldung bei Ihnen.";
+  else if (/lob/.test(cat) || sentLabel==='positive')
+    body = "ganz herzlichen Dank für Ihr positives Feedback – darüber freuen wir uns sehr! Wir geben Ihr Lob gerne an unser Team weiter und freuen uns darauf, Sie bald wieder begrüßen zu dürfen.";
+  else
+    body = "vielen Dank für Ihre Nachricht. Wir haben Ihr Anliegen erhalten und melden uns zeitnah bei Ihnen zurück.";
+  const gruss = "\n\nMit freundlichen Grüßen" + (org ? "\nIhr Team" : "");
+  return anrede + "\n\n" + body + gruss;
+}
+
 function renderClass(out) {
   const el = $('classOut'); el.innerHTML = '';
   out.labels.forEach((lab, i) => {
@@ -302,7 +351,10 @@ runBtn.addEventListener('click', async () => {
     const ents = parseEntities(entsRaw);
     renderEntities(ents);
     renderPriority(cls.labels[0], sentLabel);
-    lastResult = { topCat: cls.labels[0], topPct: Math.round(cls.scores[0]*100), sentiment: sen[0].label, entities: ents.map(e=>e.text) };
+    const summary = summarize(text);
+    $('sumOut').textContent = summary;
+    $('replyOut').value = buildReply(cls.labels[0], sentLabel, ents);
+    lastResult = { topCat: cls.labels[0], topPct: Math.round(cls.scores[0]*100), sentiment: sen[0].label, entities: ents.map(e=>e.text), summary };
     results.classList.add('show');
     setStatus('Fertig ✓', 100);
     setTimeout(() => statusEl.classList.remove('show'), 1200);
@@ -316,9 +368,16 @@ runBtn.addEventListener('click', async () => {
 
 $('copyBtn').addEventListener('click', () => {
   if (!lastResult) return;
-  const txt = `KI-Textanalyse\n----------------\nKategorie: ${lastResult.topCat} (${lastResult.topPct}%)\nStimmung: ${lastResult.sentiment}\nPriorität: ${$('prioText').textContent}\nBegriffe: ${lastResult.entities.join(', ') || '–'}`;
+  const txt = `KI-Textanalyse\n----------------\nKategorie: ${lastResult.topCat} (${lastResult.topPct}%)\nStimmung: ${lastResult.sentiment}\nPriorität: ${$('prioText').textContent}\nBegriffe: ${lastResult.entities.join(', ') || '–'}\n\nZusammenfassung:\n${lastResult.summary}\n\nAntwort-Vorschlag:\n${$('replyOut').value}`;
   navigator.clipboard.writeText(txt).then(() => {
     const b = $('copyBtn'); const o = b.textContent; b.textContent = '✓ Kopiert';
+    setTimeout(() => b.textContent = o, 1500);
+  });
+});
+
+$('copyReply').addEventListener('click', () => {
+  navigator.clipboard.writeText($('replyOut').value).then(() => {
+    const b = $('copyReply'); const o = b.textContent; b.textContent = '✓ Kopiert';
     setTimeout(() => b.textContent = o, 1500);
   });
 });
