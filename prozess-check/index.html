@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kostenlose Prozessanalyse · Doudouzi & Ergün</title>
+<meta name="description" content="Kostenlose Prozessanalyse & Optimierung für Unternehmen: In 2 Minuten den Automatisierungs-Score ermitteln, Einsparpotenzial schätzen und konkrete Empfehlungen erhalten.">
+<style>
+  :root {
+    --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
+    --ink:#1f2a24; --muted:#6b7a72; --line:#dfe6e1; --bg:#f6f8f7; --card:#fff;
+    --amber:#d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Inter","Segoe UI",system-ui,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+  .wrap { max-width:940px; margin:0 auto; padding:26px 16px 70px; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .logo { width:40px; height:40px; border-radius:11px; background:var(--green); color:#fff; display:grid; place-items:center; font-weight:800; font-size:15px; }
+  .brand small { color:var(--muted); display:block; font-size:12.5px; }
+  .hero { background:linear-gradient(135deg,#0e3d2e,#16a34a); color:#fff; border-radius:18px; padding:32px 26px; margin-bottom:20px; }
+  .hero h1 { font-size:29px; margin:0 0 10px; letter-spacing:-.02em; }
+  .hero p { margin:0 0 16px; font-size:16px; opacity:.95; max-width:650px; }
+  .hero .cta { display:inline-block; background:#fff; color:var(--green); font-weight:700; text-decoration:none; border-radius:10px; padding:12px 22px; font-size:15px; }
+  .badge { display:inline-block; background:rgba(255,255,255,.16); color:#fff; border-radius:999px; padding:4px 11px; font-size:12.5px; font-weight:600; margin:2px 6px 2px 0; }
+  h2 { font-size:21px; color:var(--green); margin:34px 0 14px; letter-spacing:-.01em; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  @media (max-width:720px){ .grid3,.grid4{ grid-template-columns:1fr; } }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:16px; }
+  .box .ic { font-size:22px; } .box b { display:block; color:var(--green); margin:6px 0 4px; font-size:15px; }
+  .box p { margin:0; font-size:13.5px; color:var(--muted); }
+  .step { display:flex; gap:12px; align-items:flex-start; margin:10px 0; }
+  .step .n { width:28px; height:28px; border-radius:50%; background:var(--green-soft); color:var(--green); font-weight:700; display:grid; place-items:center; flex-shrink:0; font-size:14px; }
+  .step div b { color:var(--ink); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; margin:14px 0; box-shadow:0 1px 3px rgba(16,61,46,.05); }
+  .q { margin:0 0 18px; }
+  .q label { font-weight:600; font-size:14.5px; display:block; margin-bottom:8px; }
+  select { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-size:15px; font-family:inherit; color:var(--ink); background:#fff; }
+  select:focus { outline:none; border-color:var(--green-2); box-shadow:0 0 0 3px rgba(22,163,74,.12); }
+  button.run { background:var(--green); color:#fff; border:0; border-radius:10px; padding:13px 26px; font-size:15.5px; font-weight:700; cursor:pointer; }
+  button.run:hover { background:#0b2e22; }
+  .result { display:none; } .result.show { display:block; }
+  .score-wrap { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
+  .gauge { --v:0; width:150px; height:150px; border-radius:50%; flex-shrink:0;
+    background:conic-gradient(var(--green-2) calc(var(--v)*1%), #eef2ef 0); display:grid; place-items:center; }
+  .gauge .inner { width:112px; height:112px; border-radius:50%; background:#fff; display:grid; place-items:center; text-align:center; }
+  .gauge .inner b { font-size:30px; color:var(--green); display:block; line-height:1; }
+  .gauge .inner span { font-size:11px; color:var(--muted); }
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:12px; flex:1; min-width:240px; }
+  .kpi { background:var(--green-soft); border-radius:11px; padding:12px 14px; }
+  .kpi b { font-size:22px; color:var(--green); display:block; } .kpi span { font-size:12.5px; color:var(--muted); }
+  .recs { margin-top:18px; } .recs h3 { font-size:14px; text-transform:uppercase; letter-spacing:.04em; color:var(--green); margin:0 0 10px; }
+  .rec { display:flex; gap:10px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:14px; }
+  .rec .ic { color:var(--green-2); flex-shrink:0; }
+  .finalcta { background:var(--green); color:#fff; border-radius:14px; padding:22px; margin-top:20px; text-align:center; }
+  .finalcta h3 { margin:0 0 8px; font-size:19px; } .finalcta p { margin:0 0 14px; opacity:.92; font-size:14.5px; }
+  .finalcta a { display:inline-block; background:#fff; color:var(--green); font-weight:700; text-decoration:none; border-radius:10px; padding:12px 24px; }
+  .disc { font-size:12px; color:var(--muted); margin-top:12px; }
+  .note { font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); margin-top:30px; padding-top:14px; }
+  a { color:var(--green-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">E&amp;A</div>
+    <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
+  </header>
+
+  <div class="hero">
+    <h1>Kostenlose Prozessanalyse für Ihr Unternehmen</h1>
+    <p>Wo verliert Ihr Betrieb jede Woche Zeit durch manuelle Abläufe? Machen Sie in 2 Minuten den Prozess-Check – Sie erhalten sofort Ihren Automatisierungs-Score, eine Schätzung Ihres Einsparpotenzials und konkrete Empfehlungen. <b>Kostenlos und unverbindlich.</b></p>
+    <a class="cta" href="#check">Jetzt Prozess-Check starten ↓</a>
+    <div style="margin-top:14px">
+      <span class="badge">✔ 100 % kostenlos</span>
+      <span class="badge">✔ Keine Anmeldung</span>
+      <span class="badge">✔ Ergebnis sofort</span>
+    </div>
+  </div>
+
+  <h2>Was Sie kostenlos von uns bekommen</h2>
+  <div class="grid4">
+    <div class="box"><div class="ic">🔍</div><b>Ist-Analyse</b><p>Wir schauen uns Ihre aktuellen Abläufe gemeinsam an und finden die Zeitfresser.</p></div>
+    <div class="box"><div class="ic">💡</div><b>Optimierungs-Vorschlag</b><p>Konkrete, umsetzbare Ideen – vom einfachen Handgriff bis zur KI-Lösung.</p></div>
+    <div class="box"><div class="ic">⏱️</div><b>Einsparpotenzial</b><p>Eine ehrliche Schätzung, wie viele Stunden und Euro pro Jahr drin sind.</p></div>
+    <div class="box"><div class="ic">☕</div><b>Erstgespräch</b><p>Ein kostenloses, unverbindliches Gespräch – Sie entscheiden, ob es passt.</p></div>
+  </div>
+
+  <h2>So läuft es ab</h2>
+  <div class="card">
+    <div class="step"><div class="n">1</div><div><b>Prozess-Check ausfüllen</b> – unten, in 2 Minuten. Sie bekommen sofort eine erste Auswertung.</div></div>
+    <div class="step"><div class="n">2</div><div><b>Kostenloses Erstgespräch</b> – wir besprechen Ihr Ergebnis und Ihre größten Zeitfresser (ca. 30 Min, per Telefon oder vor Ort).</div></div>
+    <div class="step"><div class="n">3</div><div><b>Optimierungs-Vorschlag</b> – Sie erhalten eine schriftliche Empfehlung mit Prioritäten. Ob Sie umsetzen, entscheiden Sie frei.</div></div>
+  </div>
+
+  <h2 id="check">Ihr Prozess-Check</h2>
+  <div class="card">
+    <div class="q"><label>1. Wie viele Mitarbeiter hat Ihr Unternehmen?</label>
+      <select id="q_emp"><option value="1">1–3</option><option value="7" selected>4–10</option><option value="20">11–30</option><option value="50">über 30</option></select></div>
+
+    <div class="q"><label>2. Wie viele E-Mails / Anfragen bearbeiten Sie pro Tag?</label>
+      <select id="q_mail"><option value="10">unter 20</option><option value="35" selected>20–50</option><option value="75">50–100</option><option value="120">über 100</option></select></div>
+
+    <div class="q"><label>3. Werden dieselben Daten mehrfach von Hand in verschiedene Systeme eingetippt?</label>
+      <select id="q_double"><option value="0">Nein, selten</option><option value="1">Manchmal</option><option value="2" selected>Oft</option><option value="3">Ständig</option></select></div>
+
+    <div class="q"><label>4. Wie erstellen Sie Angebote / Rechnungen?</label>
+      <select id="q_docs"><option value="0">Automatisiert aus System</option><option value="1" selected>Teils manuell, teils Vorlage</option><option value="2">Komplett von Hand</option></select></div>
+
+    <div class="q"><label>5. Wie koordinieren Sie Termine &amp; Aufgaben im Team?</label>
+      <select id="q_coord"><option value="0">Mit einer Software/Tool</option><option value="1" selected>Per E-Mail / Telefon</option><option value="2">Zettel, Zuruf, Excel</option></select></div>
+
+    <div class="q"><label>6. Wie viele Stunden pro Woche verbringt Ihr Team mit immer gleichen Routineaufgaben?</label>
+      <select id="q_rout"><option value="3">unter 5 Std</option><option value="8" selected>5–10 Std</option><option value="15">10–20 Std</option><option value="25">über 20 Std</option></select></div>
+
+    <div class="q"><label>7. Wie entstehen Auswertungen / Berichte (z. B. Umsatz, Lager)?</label>
+      <select id="q_report"><option value="0">Automatisch / per Klick</option><option value="1" selected>Teilweise manuell in Excel</option><option value="2">Komplett manuell zusammengesucht</option></select></div>
+
+    <div class="q"><label>8. Wie oft suchen Mitarbeiter länger nach Dokumenten oder Informationen?</label>
+      <select id="q_search"><option value="0">Selten, alles gut abgelegt</option><option value="1" selected>Gelegentlich</option><option value="2">Täglich, kostet viel Zeit</option></select></div>
+
+    <button class="run" id="run">📊 Mein Ergebnis anzeigen</button>
+  </div>
+
+  <div class="card result" id="result">
+    <div class="score-wrap">
+      <div class="gauge" id="gauge"><div class="inner"><b id="scoreNum">0</b><span>Optimierungs-<br>potenzial</span></div></div>
+      <div class="kpis">
+        <div class="kpi"><b id="kpiHours">0 h</b><span>geschätzt einsparbar / Woche</span></div>
+        <div class="kpi"><b id="kpiYear">0 h</b><span>pro Jahr</span></div>
+        <div class="kpi"><b id="kpiEuro">0 €</b><span>Kostenpotenzial / Jahr</span></div>
+        <div class="kpi"><b id="kpiLevel">–</b><span>Einstufung</span></div>
+      </div>
+    </div>
+
+    <div class="recs">
+      <h3>💡 Unsere Empfehlungen für Sie</h3>
+      <div id="recList"></div>
+    </div>
+
+    <div class="finalcta">
+      <h3>Holen Sie sich diese Stunden zurück</h3>
+      <p>Im kostenlosen Erstgespräch zeigen wir Ihnen, welche dieser Punkte sich am schnellsten umsetzen lassen.</p>
+      <a id="ctaMail" href="#">📅 Kostenloses Erstgespräch anfragen</a>
+    </div>
+    <div class="disc">Hinweis: Die Zahlen sind eine grobe, unverbindliche Schätzung auf Basis Ihrer Angaben (angenommener Stundensatz 40 €, 46 Arbeitswochen). Die genaue Analyse erfolgt im persönlichen Gespräch.</div>
+  </div>
+
+  <div class="note">
+    Entwickelt von <b>Doudouzi &amp; Ergün</b> · Prozessoptimierung &amp; KI für kleine und mittlere Unternehmen.
+    Probieren Sie auch unsere <a href="../">KI-Textanalyse →</a>
+  </div>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const CONTACT = "mailto:KONTAKT@IHRE-ADRESSE.de?subject=Kostenloses%20Erstgespr%C3%A4ch%20Prozessanalyse&body=Guten%20Tag%2C%0D%0A%0D%0Aich%20habe%20den%20Prozess-Check%20gemacht%20und%20m%C3%B6chte%20gern%20ein%20kostenloses%20Erstgespr%C3%A4ch%20vereinbaren.%0D%0A%0D%0AMein%20Unternehmen%3A%20%0D%0ATelefon%3A%20%0D%0A%0D%0AViele%20Gr%C3%BC%C3%9Fe";
+$('ctaMail').href = CONTACT;
+
+$('run').addEventListener('click', () => {
+  const v = (id) => parseFloat($(id).value);
+  const emp = v('q_emp'), mail = v('q_mail'), dbl = v('q_double'), docs = v('q_docs'),
+        coord = v('q_coord'), rout = v('q_rout'), report = v('q_report'), search = v('q_search');
+
+  // --- Optimierungs-Score (0–100): Anteil manueller/ineffizienter Antworten ---
+  const manualPts = dbl + docs + coord + report + search;        // 0..12
+  const maxManual = 3 + 2 + 2 + 2 + 2;                           // 11
+  const volumeBoost = Math.min(1, (mail/120)*0.5 + (rout/25)*0.5); // 0..1
+  let score = Math.round((manualPts / maxManual) * 70 + volumeBoost * 30);
+  score = Math.max(8, Math.min(97, score));
+
+  // --- geschätzte einsparbare Stunden / Woche ---
+  // Routineaufgaben sind grundlegend automatisierbar; E-Mail-Flut + Doppeleingabe + manuelle Reports addieren.
+  let hours = rout * (0.35 + 0.1*dbl)        // Routine, Automatisierbarkeit steigt mit Doppeleingabe
+            + (mail/60)                        // E-Mail-Handling (Vorsortierung/Vorlagen)
+            + dbl * 1.2                        // Doppeleingabe
+            + report * 1.3                     // manuelle Reports
+            + search * 1.1;                    // Suchzeiten
+  hours = Math.round(hours * 2) / 2;           // auf halbe Stunde
+  const yearH = Math.round(hours * 46);
+  const euro = Math.round(yearH * 40 / 100) * 100;
+
+  let level, lvlColor;
+  if (score >= 66) { level = 'Hoch'; lvlColor = '#dc2626'; }
+  else if (score >= 38) { level = 'Mittel'; lvlColor = '#d97706'; }
+  else { level = 'Gering'; lvlColor = '#16a34a'; }
+
+  // gauge animieren
+  const g = $('gauge'); let cur = 0;
+  const tick = setInterval(() => { cur += 2; if (cur >= score) { cur = score; clearInterval(tick); }
+    g.style.setProperty('--v', cur); $('scoreNum').textContent = cur; }, 14);
+  $('kpiHours').textContent = hours + ' h';
+  $('kpiYear').textContent = yearH.toLocaleString('de-DE') + ' h';
+  $('kpiEuro').textContent = euro.toLocaleString('de-DE') + ' €';
+  $('kpiLevel').textContent = level; $('kpiLevel').style.color = lvlColor;
+
+  // --- Empfehlungen ---
+  const recs = [];
+  if (dbl >= 2) recs.push('Ihre Systeme mehrfach von Hand zu befüllen kostet Zeit und erzeugt Fehler. <b>Schnittstellen / Automatisierung</b> übertragen Daten einmal – überall.');
+  if (mail >= 50) recs.push('Bei '+mail+' Mails/Tag lohnt sich eine <b>KI-gestützte Vorsortierung &amp; Antwort-Vorschläge</b> – genau wie in unserem <a href="../">KI-Textanalyse-Tool</a>.');
+  if (docs >= 2) recs.push('Angebote/Rechnungen komplett von Hand? <b>Vorlagen &amp; teil-automatische Erstellung</b> sparen pro Dokument mehrere Minuten.');
+  if (coord >= 2) recs.push('Termine über Zettel/Zuruf gehen unter. Ein einfaches <b>gemeinsames Aufgaben-/Terminboard</b> schafft Überblick.');
+  if (report >= 2) recs.push('Berichte manuell zusammenzusuchen bindet Zeit. <b>Automatische Auswertungen</b> liefern Zahlen auf Knopfdruck.');
+  if (search >= 2) recs.push('Tägliche Suche nach Dokumenten? Eine <b>klare Ablage-Struktur + Volltextsuche</b> holt viel Zeit zurück.');
+  if (rout >= 15) recs.push('Über '+rout+' Std/Woche Routine im Team ist der größte Hebel – hier lohnt sich <b>gezielte Automatisierung</b> am meisten.');
+  if (!recs.length) recs.push('Ihre Prozesse sind schon gut aufgestellt! Im Gespräch finden wir die letzten Feinheiten für noch mehr Effizienz.');
+
+  $('recList').innerHTML = recs.map(r => `<div class="rec"><span class="ic">➜</span><span>${r}</span></div>`).join('');
+
+  $('result').classList.add('show');
+  $('result').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+</script>
+</body>
+</html>
