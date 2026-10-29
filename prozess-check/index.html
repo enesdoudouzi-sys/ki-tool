@@ -3,65 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kostenlose Prozessanalyse · Doudouzi & Ergün</title>
-<meta name="description" content="Kostenlose Prozessanalyse & Optimierung für Unternehmen: In 2 Minuten den Automatisierungs-Score ermitteln, Einsparpotenzial schätzen und konkrete Empfehlungen erhalten.">
+<title>Prozess-Check (Lean & Six Sigma) · Doudouzi & Ergün</title>
+<meta name="description" content="Professioneller Prozess-Check nach Lean & Six Sigma: Wertstrom-Analyse, 7 Verschwendungsarten, DMAIC-Fahrplan und Aufwand/Nutzen-Matrix – kostenlos im Browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
-    --ink:#1f2a24; --muted:#6b7a72; --line:#dfe6e1; --bg:#f6f8f7; --card:#fff;
-    --amber:#d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2;
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:"Inter","Segoe UI",system-ui,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
-  .wrap { max-width:940px; margin:0 auto; padding:26px 16px 70px; }
-  header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
-  .logo { width:40px; height:40px; border-radius:11px; background:var(--green); color:#fff; display:grid; place-items:center; font-weight:800; font-size:15px; }
-  .brand small { color:var(--muted); display:block; font-size:12.5px; }
-  .hero { background:linear-gradient(135deg,#0e3d2e,#16a34a); color:#fff; border-radius:18px; padding:32px 26px; margin-bottom:20px; }
-  .hero h1 { font-size:29px; margin:0 0 10px; letter-spacing:-.02em; }
-  .hero p { margin:0 0 16px; font-size:16px; opacity:.95; max-width:650px; }
-  .hero .cta { display:inline-block; background:#fff; color:var(--green); font-weight:700; text-decoration:none; border-radius:10px; padding:12px 22px; font-size:15px; }
-  .badge { display:inline-block; background:rgba(255,255,255,.16); color:#fff; border-radius:999px; padding:4px 11px; font-size:12.5px; font-weight:600; margin:2px 6px 2px 0; }
-  h2 { font-size:21px; color:var(--green); margin:34px 0 14px; letter-spacing:-.01em; }
-  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-  @media (max-width:720px){ .grid3,.grid4{ grid-template-columns:1fr; } }
-  .box { background:var(--card); border:1px solid var(--line); border-radius:13px; padding:16px; }
-  .box .ic { font-size:22px; } .box b { display:block; color:var(--green); margin:6px 0 4px; font-size:15px; }
-  .box p { margin:0; font-size:13.5px; color:var(--muted); }
-  .step { display:flex; gap:12px; align-items:flex-start; margin:10px 0; }
-  .step .n { width:28px; height:28px; border-radius:50%; background:var(--green-soft); color:var(--green); font-weight:700; display:grid; place-items:center; flex-shrink:0; font-size:14px; }
-  .step div b { color:var(--ink); }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; margin:14px 0; box-shadow:0 1px 3px rgba(16,61,46,.05); }
-  .q { margin:0 0 18px; }
-  .q label { font-weight:600; font-size:14.5px; display:block; margin-bottom:8px; }
-  select { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-size:15px; font-family:inherit; color:var(--ink); background:#fff; }
-  select:focus { outline:none; border-color:var(--green-2); box-shadow:0 0 0 3px rgba(22,163,74,.12); }
-  button.run { background:var(--green); color:#fff; border:0; border-radius:10px; padding:13px 26px; font-size:15.5px; font-weight:700; cursor:pointer; }
-  button.run:hover { background:#0b2e22; }
-  .result { display:none; } .result.show { display:block; }
-  .score-wrap { display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
-  .gauge { --v:0; width:150px; height:150px; border-radius:50%; flex-shrink:0;
-    background:conic-gradient(var(--green-2) calc(var(--v)*1%), #eef2ef 0); display:grid; place-items:center; }
-  .gauge .inner { width:112px; height:112px; border-radius:50%; background:#fff; display:grid; place-items:center; text-align:center; }
-  .gauge .inner b { font-size:30px; color:var(--green); display:block; line-height:1; }
-  .gauge .inner span { font-size:11px; color:var(--muted); }
-  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:12px; flex:1; min-width:240px; }
-  .kpi { background:var(--green-soft); border-radius:11px; padding:12px 14px; }
-  .kpi b { font-size:22px; color:var(--green); display:block; } .kpi span { font-size:12.5px; color:var(--muted); }
-  .recs { margin-top:18px; } .recs h3 { font-size:14px; text-transform:uppercase; letter-spacing:.04em; color:var(--green); margin:0 0 10px; }
-  .rec { display:flex; gap:10px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:14px; }
-  .rec .ic { color:var(--green-2); flex-shrink:0; }
-  .finalcta { background:var(--green); color:#fff; border-radius:14px; padding:22px; margin-top:20px; text-align:center; }
-  .finalcta h3 { margin:0 0 8px; font-size:19px; } .finalcta p { margin:0 0 14px; opacity:.92; font-size:14.5px; }
-  .finalcta a { display:inline-block; background:#fff; color:var(--green); font-weight:700; text-decoration:none; border-radius:10px; padding:12px 24px; }
-  .disc { font-size:12px; color:var(--muted); margin-top:12px; }
-  .note { font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); margin-top:30px; padding-top:14px; }
-  a { color:var(--green-2); }
-  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-  .toolnav a{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;transition:.15s}
+  :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
+    --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
+    --amber:#d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2; --blue:#2563eb; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:26px 18px 70px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(14,61,46,.25)}
+  .brand small{color:var(--muted);display:block;font-size:12.5px;font-weight:500}
+  .brand strong{font-weight:800}
+  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+  .toolnav a{font-size:13px;font-weight:500;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;transition:.15s}
   .toolnav a:hover{border-color:var(--green-2);color:var(--green)}
   .toolnav a.active{background:var(--green);color:#fff;border-color:var(--green)}
+  .hero{position:relative;overflow:hidden;border-radius:22px;padding:38px 32px;color:#fff;background:linear-gradient(135deg,#0b3324,#15803d 65%,#16a34a);box-shadow:0 18px 44px rgba(14,61,46,.26);margin-bottom:20px}
+  .hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-bottom:12px}
+  .hero h1{font-size:clamp(26px,4.4vw,38px);line-height:1.1;margin:0 0 12px;font-weight:800;letter-spacing:-.02em;max-width:640px}
+  .hero p{font-size:15.5px;opacity:.94;margin:0;max-width:600px}
+  .methods{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 22px}
+  .method{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--green);display:inline-flex;gap:6px;align-items:center}
+  .method small{color:var(--muted);font-weight:400}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;box-shadow:0 2px 6px rgba(14,61,46,.04)}
+  .card h2{font-size:19px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .card .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .step-table{width:100%;border-collapse:collapse;font-size:14px}
+  .step-table th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;padding:0 8px 8px}
+  .step-table td{padding:5px 8px}
+  .step-table input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+  .step-table input[type=number]{width:80px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+  .step-table select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff}
+  input:focus,select:focus{outline:none;border-color:var(--green-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+  .delrow{background:none;border:0;color:var(--muted);cursor:pointer;font-size:17px}
+  .delrow:hover{color:var(--red)}
+  .btn-sm{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--green);font-weight:600;margin-top:10px}
+  .btn-sm:hover{border-color:var(--green-2)}
+  .vsm{display:flex;gap:4px;margin-top:16px;height:46px;border-radius:8px;overflow:hidden}
+  .vsm .seg{display:grid;place-items:center;font-size:11px;color:#fff;font-weight:600;min-width:28px;overflow:hidden;white-space:nowrap}
+  .vsm .va{background:var(--green-2)} .vsm .nva{background:#9aa7a0}
+  .vsm-legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
+  .vsm-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .waste{display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:center;margin:9px 0}
+  .waste .wl{font-size:13.5px} .waste .wl small{display:block;color:var(--muted);font-size:11.5px}
+  .waste select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;background:#fff}
+  button.run{margin-top:10px;background:var(--green);color:#fff;border:0;border-radius:11px;padding:13px 26px;font-size:15.5px;font-weight:700;cursor:pointer}
+  button.run:hover{background:#0b2e22}
+  .result{display:none} .result.show{display:block}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:6px}
+  @media(max-width:680px){.kpis{grid-template-columns:1fr}.waste{grid-template-columns:1fr}}
+  .kpi{background:var(--green-soft);border-radius:12px;padding:14px 16px;text-align:center}
+  .kpi b{font-size:26px;color:var(--green);display:block;line-height:1.1} .kpi span{font-size:12.5px;color:var(--muted)}
+  /* DMAIC */
+  .dmaic{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+  @media(max-width:680px){.dmaic{grid-template-columns:1fr}}
+  .phase{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}
+  .phase .pt{font-size:12px;font-weight:800;letter-spacing:.03em;color:var(--green);display:flex;align-items:center;gap:6px}
+  .phase .pd{font-size:12px;color:var(--muted);margin-top:5px}
+  .phase.done{background:var(--green-soft);border-color:#bfe0cc}
+  /* Matrix */
+  .matrix{position:relative;height:320px;border:1px solid var(--line);border-radius:12px;margin-top:10px;background:
+     linear-gradient(to right, #f8fbf9 0 50%, #fff 50% 100%),
+     linear-gradient(to top,  #ffffff 0 0);}
+  .mx-quad{position:absolute;font-size:11px;font-weight:700;color:#9aa7a0;padding:8px 10px}
+  .mx-dot{position:absolute;transform:translate(-50%,50%);background:var(--green);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:4px 9px;white-space:nowrap;box-shadow:0 4px 12px rgba(14,61,46,.2)}
+  .mx-dot.win{background:var(--green-2)} .mx-dot.big{background:var(--blue)} .mx-dot.min{background:#9aa7a0}
+  .mx-axis{position:absolute;font-size:11px;color:var(--muted);font-weight:600}
+  .recs{margin-top:8px}
+  .rec{display:flex;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin-bottom:8px;font-size:14px}
+  .rec .tagq{flex-shrink:0;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;height:fit-content}
+  .tq-win{background:#dcfce7;color:#166534} .tq-big{background:#dbeafe;color:#1e40af} .tq-min{background:#eef2ef;color:#64756d}
+  .nextlvl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+  @media(max-width:680px){.nextlvl{grid-template-columns:1fr}}
+  .nl{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}
+  .nl b{display:block;color:var(--green);margin-bottom:4px}
+  .nl p{margin:0;font-size:13px;color:var(--muted)}
+  .finalcta{background:var(--green);color:#fff;border-radius:14px;padding:22px;margin-top:18px;text-align:center}
+  .finalcta h3{margin:0 0 8px;font-size:19px} .finalcta p{margin:0 0 14px;opacity:.92;font-size:14px}
+  .finalcta a{display:inline-block;background:#fff;color:var(--green);font-weight:700;text-decoration:none;border-radius:10px;padding:12px 24px}
+  .disc{font-size:11.5px;color:var(--muted);margin-top:12px}
+  .foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
+  a{color:var(--green-2)}
 </style>
 </head>
 <body>
@@ -80,149 +107,236 @@
     <a class="active" href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
   </nav>
 
-  <div class="hero">
-    <h1>Kostenlose Prozessanalyse für Ihr Unternehmen</h1>
-    <p>Wo verliert Ihr Betrieb jede Woche Zeit durch manuelle Abläufe? Machen Sie in 2 Minuten den Prozess-Check – Sie erhalten sofort Ihren Automatisierungs-Score, eine Schätzung Ihres Einsparpotenzials und konkrete Empfehlungen. <b>Kostenlos und unverbindlich.</b></p>
-    <a class="cta" href="#check">Jetzt Prozess-Check starten ↓</a>
-    <div style="margin-top:14px">
-      <span class="badge">✔ 100 % kostenlos</span>
-      <span class="badge">✔ Keine Anmeldung</span>
-      <span class="badge">✔ Ergebnis sofort</span>
-    </div>
+  <section class="hero">
+    <div class="eyebrow">Prozess-Check nach Lean &amp; Six Sigma</div>
+    <h1>Finden Sie heraus, wo Ihr Prozess Zeit verliert.</h1>
+    <p>Ein professioneller Selbst-Check mit den Methoden echter Prozessberatung: Wertstrom-Analyse, die 7 Verschwendungsarten, ein DMAIC-Fahrplan und eine Aufwand/Nutzen-Matrix – in wenigen Minuten, kostenlos.</p>
+  </section>
+
+  <div class="methods">
+    <span class="method">🧭 Lean <small>7 Verschwendungen</small></span>
+    <span class="method">📐 Six Sigma <small>DMAIC</small></span>
+    <span class="method">🧵 Value Stream <small>Durchlaufzeit</small></span>
+    <span class="method">🔁 Kaizen <small>Quick Wins</small></span>
+    <span class="method">🗺️ BPMN</span>
+    <span class="method">⛏️ Process Mining</span>
   </div>
 
-  <h2>Was Sie kostenlos von uns bekommen</h2>
-  <div class="grid4">
-    <div class="box"><div class="ic">🔍</div><b>Ist-Analyse</b><p>Wir schauen uns Ihre aktuellen Abläufe gemeinsam an und finden die Zeitfresser.</p></div>
-    <div class="box"><div class="ic">💡</div><b>Optimierungs-Vorschlag</b><p>Konkrete, umsetzbare Ideen – vom einfachen Handgriff bis zur KI-Lösung.</p></div>
-    <div class="box"><div class="ic">⏱️</div><b>Einsparpotenzial</b><p>Eine ehrliche Schätzung, wie viele Stunden und Euro pro Jahr drin sind.</p></div>
-    <div class="box"><div class="ic">☕</div><b>Erstgespräch</b><p>Ein kostenloses, unverbindliches Gespräch – Sie entscheiden, ob es passt.</p></div>
-  </div>
-
-  <h2>So läuft es ab</h2>
+  <!-- TEIL 1: WERTSTROM -->
   <div class="card">
-    <div class="step"><div class="n">1</div><div><b>Prozess-Check ausfüllen</b> – unten, in 2 Minuten. Sie bekommen sofort eine erste Auswertung.</div></div>
-    <div class="step"><div class="n">2</div><div><b>Kostenloses Erstgespräch</b> – wir besprechen Ihr Ergebnis und Ihre größten Zeitfresser (ca. 30 Min, per Telefon oder vor Ort).</div></div>
-    <div class="step"><div class="n">3</div><div><b>Optimierungs-Vorschlag</b> – Sie erhalten eine schriftliche Empfehlung mit Prioritäten. Ob Sie umsetzen, entscheiden Sie frei.</div></div>
+    <h2>🧵 1 · Wertstrom-Analyse</h2>
+    <p class="sub">Tragen Sie die Schritte eines Ablaufs ein (z. B. Auftrag → Lieferung), mit Dauer und ob der Schritt für den Kunden einen <b>Wert schafft</b>. Wir berechnen Durchlaufzeit und Flow-Effizienz.</p>
+    <table class="step-table">
+      <thead><tr><th>Prozessschritt</th><th>Dauer (Min)</th><th>Wertschöpfend?</th><th></th></tr></thead>
+      <tbody id="steps"></tbody>
+    </table>
+    <button class="btn-sm" id="addStep">+ Schritt hinzufügen</button>
+    <div class="vsm" id="vsm"></div>
+    <div class="vsm-legend"><span><i style="background:#16a34a"></i>Wertschöpfung</span><span><i style="background:#9aa7a0"></i>Verschwendung / Warten</span></div>
   </div>
 
-  <h2 id="check">Ihr Prozess-Check</h2>
+  <!-- TEIL 2: 7 VERSCHWENDUNGEN -->
   <div class="card">
-    <div class="q"><label>1. Wie viele Mitarbeiter hat Ihr Unternehmen?</label>
-      <select id="q_emp"><option value="1">1–3</option><option value="7" selected>4–10</option><option value="20">11–30</option><option value="50">über 30</option></select></div>
-
-    <div class="q"><label>2. Wie viele E-Mails / Anfragen bearbeiten Sie pro Tag?</label>
-      <select id="q_mail"><option value="10">unter 20</option><option value="35" selected>20–50</option><option value="75">50–100</option><option value="120">über 100</option></select></div>
-
-    <div class="q"><label>3. Werden dieselben Daten mehrfach von Hand in verschiedene Systeme eingetippt?</label>
-      <select id="q_double"><option value="0">Nein, selten</option><option value="1">Manchmal</option><option value="2" selected>Oft</option><option value="3">Ständig</option></select></div>
-
-    <div class="q"><label>4. Wie erstellen Sie Angebote / Rechnungen?</label>
-      <select id="q_docs"><option value="0">Automatisiert aus System</option><option value="1" selected>Teils manuell, teils Vorlage</option><option value="2">Komplett von Hand</option></select></div>
-
-    <div class="q"><label>5. Wie koordinieren Sie Termine &amp; Aufgaben im Team?</label>
-      <select id="q_coord"><option value="0">Mit einer Software/Tool</option><option value="1" selected>Per E-Mail / Telefon</option><option value="2">Zettel, Zuruf, Excel</option></select></div>
-
-    <div class="q"><label>6. Wie viele Stunden pro Woche verbringt Ihr Team mit immer gleichen Routineaufgaben?</label>
-      <select id="q_rout"><option value="3">unter 5 Std</option><option value="8" selected>5–10 Std</option><option value="15">10–20 Std</option><option value="25">über 20 Std</option></select></div>
-
-    <div class="q"><label>7. Wie entstehen Auswertungen / Berichte (z. B. Umsatz, Lager)?</label>
-      <select id="q_report"><option value="0">Automatisch / per Klick</option><option value="1" selected>Teilweise manuell in Excel</option><option value="2">Komplett manuell zusammengesucht</option></select></div>
-
-    <div class="q"><label>8. Wie oft suchen Mitarbeiter länger nach Dokumenten oder Informationen?</label>
-      <select id="q_search"><option value="0">Selten, alles gut abgelegt</option><option value="1" selected>Gelegentlich</option><option value="2">Täglich, kostet viel Zeit</option></select></div>
-
-    <button class="run" id="run">📊 Mein Ergebnis anzeigen</button>
+    <h2>🧭 2 · Die 7 Verschwendungsarten (Lean)</h2>
+    <p class="sub">Wie stark treten diese Verschwendungen bei Ihnen auf? (0 = gar nicht … 3 = stark)</p>
+    <div id="wastes"></div>
   </div>
 
+  <div style="text-align:center"><button class="run" id="run">📊 Prozess-Analyse starten</button></div>
+
+  <!-- ERGEBNIS -->
   <div class="card result" id="result">
-    <div class="score-wrap">
-      <div class="gauge" id="gauge"><div class="inner"><b id="scoreNum">0</b><span>Optimierungs-<br>potenzial</span></div></div>
-      <div class="kpis">
-        <div class="kpi"><b id="kpiHours">0 h</b><span>geschätzt einsparbar / Woche</span></div>
-        <div class="kpi"><b id="kpiYear">0 h</b><span>pro Jahr</span></div>
-        <div class="kpi"><b id="kpiEuro">0 €</b><span>Kostenpotenzial / Jahr</span></div>
-        <div class="kpi"><b id="kpiLevel">–</b><span>Einstufung</span></div>
-      </div>
+    <h2>📈 Ihr Ergebnis</h2>
+    <div class="kpis">
+      <div class="kpi"><b id="kLead">–</b><span>Durchlaufzeit (Min)</span></div>
+      <div class="kpi"><b id="kFlow">–</b><span>Flow-Effizienz</span></div>
+      <div class="kpi"><b id="kWaste">–</b><span>Verschwendungs-Level</span></div>
     </div>
 
-    <div class="recs">
-      <h3>💡 Unsere Empfehlungen für Sie</h3>
-      <div id="recList"></div>
+    <h2 style="margin-top:26px">📐 Ihr DMAIC-Fahrplan</h2>
+    <p class="sub">So würde ein Six-Sigma-Projekt Ihren Prozess verbessern:</p>
+    <div class="dmaic">
+      <div class="phase done"><div class="pt">① DEFINE ✓</div><div class="pd">Prozess &amp; Ziel abgegrenzt – erledigt mit diesem Check.</div></div>
+      <div class="phase done"><div class="pt">② MEASURE ✓</div><div class="pd">Durchlaufzeit &amp; Verschwendung erfasst.</div></div>
+      <div class="phase done"><div class="pt">③ ANALYZE ✓</div><div class="pd" id="dmAnalyze">Hauptverschwendung erkannt.</div></div>
+      <div class="phase"><div class="pt">④ IMPROVE</div><div class="pd">Maßnahmen umsetzen (siehe Matrix unten).</div></div>
+      <div class="phase"><div class="pt">⑤ CONTROL</div><div class="pd">Kennzahlen überwachen, Standard sichern.</div></div>
+    </div>
+
+    <h2 style="margin-top:26px">🎯 Aufwand/Nutzen-Matrix</h2>
+    <p class="sub">Womit zuerst anfangen? Oben links = schnelle Erfolge (Quick Wins).</p>
+    <div class="matrix" id="matrix">
+      <div class="mx-quad" style="left:0;top:0">⭐ Quick Wins</div>
+      <div class="mx-quad" style="right:0;top:0;text-align:right">Strategische Projekte</div>
+      <div class="mx-quad" style="left:0;bottom:0">Nebenbei erledigen</div>
+      <div class="mx-quad" style="right:0;bottom:0;text-align:right">Eher vermeiden</div>
+      <div class="mx-axis" style="left:50%;bottom:4px;transform:translateX(-50%)">Aufwand →</div>
+      <div class="mx-axis" style="left:4px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left">Nutzen →</div>
+    </div>
+
+    <h2 style="margin-top:26px">🔁 Empfohlene Maßnahmen (Kaizen)</h2>
+    <div class="recs" id="recs"></div>
+
+    <h2 style="margin-top:26px">⛏️ Die nächste Stufe (im Projekt)</h2>
+    <div class="nextlvl">
+      <div class="nl"><b>🗺️ BPMN-Modellierung</b><p>Ihren Prozess als standardisiertes Fluss-Diagramm abbilden – die Basis für jede saubere Optimierung.</p></div>
+      <div class="nl"><b>⛏️ Process Mining</b><p>Aus Ihren System-Daten (ERP/SAP) den tatsächlichen Prozess sichtbar machen – inkl. aller Schleifen und Ausnahmen.</p></div>
     </div>
 
     <div class="finalcta">
-      <h3>Holen Sie sich diese Stunden zurück</h3>
-      <p>Im kostenlosen Erstgespräch zeigen wir Ihnen, welche dieser Punkte sich am schnellsten umsetzen lassen.</p>
+      <h3>Aus der Analyse echte Einsparung machen</h3>
+      <p>Im kostenlosen Erstgespräch zeigen wir Ihnen, welche Maßnahmen sich am schnellsten lohnen.</p>
       <a id="ctaMail" href="#">📅 Kostenloses Erstgespräch anfragen</a>
     </div>
-    <div class="disc">Hinweis: Die Zahlen sind eine grobe, unverbindliche Schätzung auf Basis Ihrer Angaben (angenommener Stundensatz 40 €, 46 Arbeitswochen). Die genaue Analyse erfolgt im persönlichen Gespräch.</div>
+    <div class="disc">Hinweis: Dieser Selbst-Check liefert eine erste, unverbindliche Einschätzung nach Lean- und Six-Sigma-Logik. Die belastbare Analyse erfolgt im Projekt mit Ist-Aufnahme vor Ort.</div>
   </div>
 
-  <div class="note">
-    Entwickelt von <b>Doudouzi &amp; Ergün</b> · Prozessoptimierung &amp; KI für kleine und mittlere Unternehmen.
-    Probieren Sie auch unsere <a href="../">KI-Textanalyse →</a>
-  </div>
+  <div class="foot">Entwickelt von <b>Doudouzi &amp; Ergün</b> · Methoden: Lean · Six Sigma (DMAIC) · Value Stream Mapping · Kaizen · BPMN · Process Mining</div>
 
 </div>
 
 <script>
 const $ = (id) => document.getElementById(id);
-const CONTACT = "mailto:KONTAKT@IHRE-ADRESSE.de?subject=Kostenloses%20Erstgespr%C3%A4ch%20Prozessanalyse&body=Guten%20Tag%2C%0D%0A%0D%0Aich%20habe%20den%20Prozess-Check%20gemacht%20und%20m%C3%B6chte%20gern%20ein%20kostenloses%20Erstgespr%C3%A4ch%20vereinbaren.%0D%0A%0D%0AMein%20Unternehmen%3A%20%0D%0ATelefon%3A%20%0D%0A%0D%0AViele%20Gr%C3%BC%C3%9Fe";
+const CONTACT = "mailto:KONTAKT@IHRE-ADRESSE.de?subject=Prozess-Analyse%20Erstgespr%C3%A4ch&body=Guten%20Tag%2C%0D%0A%0D%0Aich%20habe%20den%20Prozess-Check%20gemacht%20und%20m%C3%B6chte%20gern%20ein%20kostenloses%20Erstgespr%C3%A4ch.%0D%0A%0D%0AUnternehmen%3A%20%0D%0ATelefon%3A%20";
 $('ctaMail').href = CONTACT;
 
-$('run').addEventListener('click', () => {
-  const v = (id) => parseFloat($(id).value);
-  const emp = v('q_emp'), mail = v('q_mail'), dbl = v('q_double'), docs = v('q_docs'),
-        coord = v('q_coord'), rout = v('q_rout'), report = v('q_report'), search = v('q_search');
+/* --- Wertstrom-Schritte --- */
+const STEPS0 = [
+  { n:"Auftrag erfassen", d:15, v:true },
+  { n:"Warten auf Freigabe", d:120, v:false },
+  { n:"Kommissionieren", d:40, v:true },
+  { n:"Zwischenlager / Warten", d:90, v:false },
+  { n:"Verpacken & Versand", d:25, v:true },
+];
+const stepsBody = $('steps');
+function addStepRow(s){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><input type="text" class="s-n" value="${s? s.n.replace(/"/g,'&quot;'):''}" placeholder="z. B. Freigabe"></td>
+    <td><input type="number" class="s-d" min="0" value="${s? s.d:''}"></td>
+    <td><select class="s-v"><option value="1"${s&&s.v?' selected':''}>✅ Ja (Wert)</option><option value="0"${s&&!s.v?' selected':''}>⏳ Nein (Warten/Verschw.)</option></select></td>
+    <td><button class="delrow" title="Entfernen">✕</button></td>`;
+  tr.querySelector('.delrow').addEventListener('click', ()=>{ tr.remove(); drawVSM(); });
+  tr.querySelectorAll('input,select').forEach(el=> el.addEventListener('input', drawVSM));
+  stepsBody.appendChild(tr);
+}
+STEPS0.forEach(addStepRow);
+$('addStep').addEventListener('click', ()=>{ addStepRow(null); });
 
-  // --- Optimierungs-Score (0–100): Anteil manueller/ineffizienter Antworten ---
-  const manualPts = dbl + docs + coord + report + search;        // 0..12
-  const maxManual = 3 + 2 + 2 + 2 + 2;                           // 11
-  const volumeBoost = Math.min(1, (mail/120)*0.5 + (rout/25)*0.5); // 0..1
-  let score = Math.round((manualPts / maxManual) * 70 + volumeBoost * 30);
-  score = Math.max(8, Math.min(97, score));
+function readSteps(){
+  return [...stepsBody.querySelectorAll('tr')].map(tr=>({
+    n: tr.querySelector('.s-n').value || 'Schritt',
+    d: parseFloat(tr.querySelector('.s-d').value)||0,
+    v: tr.querySelector('.s-v').value==='1',
+  })).filter(s=>s.d>0);
+}
+function drawVSM(){
+  const steps = readSteps(); const vsm = $('vsm'); vsm.innerHTML='';
+  const total = steps.reduce((a,s)=>a+s.d,0)||1;
+  steps.forEach(s=>{
+    const seg=document.createElement('div');
+    seg.className='seg '+(s.v?'va':'nva');
+    seg.style.flex = s.d;
+    seg.title = s.n+' · '+s.d+' Min';
+    seg.textContent = s.d>=total*0.07 ? s.n : '';
+    vsm.appendChild(seg);
+  });
+}
+drawVSM();
 
-  // --- geschätzte einsparbare Stunden / Woche ---
-  // Routineaufgaben sind grundlegend automatisierbar; E-Mail-Flut + Doppeleingabe + manuelle Reports addieren.
-  let hours = rout * (0.35 + 0.1*dbl)        // Routine, Automatisierbarkeit steigt mit Doppeleingabe
-            + (mail/60)                        // E-Mail-Handling (Vorsortierung/Vorlagen)
-            + dbl * 1.2                        // Doppeleingabe
-            + report * 1.3                     // manuelle Reports
-            + search * 1.1;                    // Suchzeiten
-  hours = Math.round(hours * 2) / 2;           // auf halbe Stunde
-  const yearH = Math.round(hours * 46);
-  const euro = Math.round(yearH * 40 / 100) * 100;
+/* --- 7 Verschwendungen --- */
+const WASTES = [
+  { id:'ueberprod', l:'Überproduktion', s:'Mehr/früher produziert als gebraucht' },
+  { id:'bestand',   l:'Bestände',       s:'Material/Aufträge stapeln sich' },
+  { id:'warten',    l:'Warten',          s:'Liege- & Wartezeiten' },
+  { id:'transport', l:'Transport',       s:'Unnötige Wege von Material' },
+  { id:'bewegung',  l:'Bewegung',        s:'Unnötige Wege von Menschen, Suchen' },
+  { id:'ueberbearb',l:'Überbearbeitung', s:'Mehr Aufwand als nötig, Doppelprüfung' },
+  { id:'fehler',    l:'Fehler/Nacharbeit',s:'Fehler, Korrekturen, Reklamationen' },
+];
+const wBox = $('wastes');
+WASTES.forEach(w=>{
+  const d=document.createElement('div'); d.className='waste';
+  d.innerHTML = `<div class="wl">${w.l}<small>${w.s}</small></div>
+    <select id="w_${w.id}"><option value="0">0 – gar nicht</option><option value="1">1 – wenig</option><option value="2" selected>2 – spürbar</option><option value="3">3 – stark</option></select>
+    <span></span>`;
+  wBox.appendChild(d);
+});
 
-  let level, lvlColor;
-  if (score >= 66) { level = 'Hoch'; lvlColor = '#dc2626'; }
-  else if (score >= 38) { level = 'Mittel'; lvlColor = '#d97706'; }
-  else { level = 'Gering'; lvlColor = '#16a34a'; }
+/* --- Maßnahmen-Katalog (Trigger, Titel, Aufwand 1-3, Nutzen 1-3) --- */
+const MEASURES = [
+  { t:'warten',    title:'Warte-/Pufferzeiten reduzieren (Lean Flow)', a:1, n:3 },
+  { t:'bewegung',  title:'Arbeitsplätze nach 5S ordnen', a:1, n:2 },
+  { t:'ueberbearb',title:'Standards definieren, Doppelprüfungen streichen', a:1, n:2 },
+  { t:'fehler',    title:'Fehlerquellen mit DMAIC analysieren', a:2, n:3 },
+  { t:'transport', title:'Wege & Layout optimieren (Spaghetti-Diagramm)', a:2, n:2 },
+  { t:'bestand',   title:'Bestände senken (Kanban / Pull-Prinzip)', a:2, n:2 },
+  { t:'ueberprod', title:'Nach Bedarf produzieren statt auf Vorrat', a:3, n:3 },
+];
+function quad(a,n){ // a,n 1..3
+  const highN = n>=2.5, lowA = a<=1.5;
+  if(highN&&lowA) return ['win','⭐ Quick Win'];
+  if(highN&&!lowA) return ['big','Strategisch'];
+  if(!highN&&lowA) return ['min','Nebenbei'];
+  return ['min','Prüfen'];
+}
 
-  // gauge animieren
-  const g = $('gauge'); let cur = 0;
-  const tick = setInterval(() => { cur += 2; if (cur >= score) { cur = score; clearInterval(tick); }
-    g.style.setProperty('--v', cur); $('scoreNum').textContent = cur; }, 14);
-  $('kpiHours').textContent = hours + ' h';
-  $('kpiYear').textContent = yearH.toLocaleString('de-DE') + ' h';
-  $('kpiEuro').textContent = euro.toLocaleString('de-DE') + ' €';
-  $('kpiLevel').textContent = level; $('kpiLevel').style.color = lvlColor;
+$('run').addEventListener('click', ()=>{
+  const steps = readSteps();
+  const lead = steps.reduce((a,s)=>a+s.d,0);
+  const va = steps.filter(s=>s.v).reduce((a,s)=>a+s.d,0);
+  const flow = lead? Math.round(va/lead*100) : 0;
 
-  // --- Empfehlungen ---
-  const recs = [];
-  if (dbl >= 2) recs.push('Ihre Systeme mehrfach von Hand zu befüllen kostet Zeit und erzeugt Fehler. <b>Schnittstellen / Automatisierung</b> übertragen Daten einmal – überall.');
-  if (mail >= 50) recs.push('Bei '+mail+' Mails/Tag lohnt sich eine <b>KI-gestützte Vorsortierung &amp; Antwort-Vorschläge</b> – genau wie in unserem <a href="../">KI-Textanalyse-Tool</a>.');
-  if (docs >= 2) recs.push('Angebote/Rechnungen komplett von Hand? <b>Vorlagen &amp; teil-automatische Erstellung</b> sparen pro Dokument mehrere Minuten.');
-  if (coord >= 2) recs.push('Termine über Zettel/Zuruf gehen unter. Ein einfaches <b>gemeinsames Aufgaben-/Terminboard</b> schafft Überblick.');
-  if (report >= 2) recs.push('Berichte manuell zusammenzusuchen bindet Zeit. <b>Automatische Auswertungen</b> liefern Zahlen auf Knopfdruck.');
-  if (search >= 2) recs.push('Tägliche Suche nach Dokumenten? Eine <b>klare Ablage-Struktur + Volltextsuche</b> holt viel Zeit zurück.');
-  if (rout >= 15) recs.push('Über '+rout+' Std/Woche Routine im Team ist der größte Hebel – hier lohnt sich <b>gezielte Automatisierung</b> am meisten.');
-  if (!recs.length) recs.push('Ihre Prozesse sind schon gut aufgestellt! Im Gespräch finden wir die letzten Feinheiten für noch mehr Effizienz.');
+  const w = {}; let wsum=0, wmax=0, wtop=null;
+  WASTES.forEach(x=>{ const v=parseInt($('w_'+x.id).value,10); w[x.id]=v; wsum+=v; if(v>wmax){wmax=v;wtop=x;} });
+  const wPct = Math.round(wsum/(WASTES.length*3)*100);
 
-  $('recList').innerHTML = recs.map(r => `<div class="rec"><span class="ic">➜</span><span>${r}</span></div>`).join('');
+  $('kLead').textContent = lead.toLocaleString('de-DE');
+  $('kFlow').textContent = flow + '%';
+  $('kFlow').style.color = flow<30?'#dc2626':flow<60?'#d97706':'#16a34a';
+  $('kWaste').textContent = wPct + '%';
+  $('kWaste').style.color = wPct>=66?'#dc2626':wPct>=38?'#d97706':'#16a34a';
+
+  $('dmAnalyze').textContent = wtop && wmax>0
+    ? 'Größte Verschwendung: „'+wtop.l+'". Flow-Effizienz '+flow+'%.'
+    : 'Prozess läuft rund – Fokus auf Feinheiten.';
+
+  // Matrix
+  const matrix = $('matrix');
+  matrix.querySelectorAll('.mx-dot').forEach(e=>e.remove());
+  const chosen = MEASURES.filter(m=> (w[m.t]||0) >= 2);
+  const measuresToShow = chosen.length? chosen : [MEASURES[0]];
+  measuresToShow.forEach(m=>{
+    const [cls] = quad(m.a, m.n);
+    const dot=document.createElement('div');
+    dot.className='mx-dot '+cls;
+    // x: Aufwand 1..3 -> 15%..85% ; y: Nutzen 1..3 -> bottom 15%..85%
+    const x = 15 + (m.a-1)/2*70;
+    const yFromBottom = 15 + (m.n-1)/2*70;
+    dot.style.left = x+'%';
+    dot.style.bottom = yFromBottom+'%';
+    dot.style.transform='translate(-50%,50%)';
+    dot.textContent = m.title.split('(')[0].trim().slice(0,22);
+    dot.title = m.title;
+    matrix.appendChild(dot);
+  });
+
+  // Empfehlungen
+  const recs = $('recs'); recs.innerHTML='';
+  const sorted = measuresToShow.slice().sort((a,b)=> (b.n-b.a)-(a.n-a.a));
+  sorted.forEach(m=>{
+    const [cls,label] = quad(m.a,m.n);
+    const div=document.createElement('div'); div.className='rec';
+    div.innerHTML = `<span class="tagq tq-${cls}">${label}</span><span>${m.title}</span>`;
+    recs.appendChild(div);
+  });
+  if(flow<40){
+    const div=document.createElement('div'); div.className='rec';
+    div.innerHTML = `<span class="tagq tq-big">Strategisch</span><span>Wertstrom neu gestalten – Flow-Effizienz liegt bei nur ${flow}%.</span>`;
+    recs.prepend(div);
+  }
 
   $('result').classList.add('show');
-  $('result').scrollIntoView({ behavior:'smooth', block:'start' });
+  $('result').scrollIntoView({behavior:'smooth',block:'start'});
 });
 </script>
 </body>
