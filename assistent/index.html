@@ -42,6 +42,10 @@
   .err { color:#b91c1c; font-size:13px; background:#fee2e2; border-radius:8px; padding:8px 11px; margin:8px 0; }
   .foot { font-size:11.5px; color:var(--muted); margin-top:10px; text-align:center; }
   a { color:var(--green-2); }
+  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .toolnav a{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;transition:.15s}
+  .toolnav a:hover{border-color:var(--green-2);color:var(--green)}
+  .toolnav a.active{background:var(--green);color:#fff;border-color:var(--green)}
 </style>
 </head>
 <body>
@@ -51,6 +55,13 @@
     <div class="logo">E&amp;A</div>
     <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
   </header>
+
+  <nav class="toolnav">
+    <a href="/ki-tool/">🧠 Textanalyse</a>
+    <a class="active" href="/ki-tool/assistent/">🤖 Assistent</a>
+    <a href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
+    <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
+  </nav>
 
   <div class="hero">
     <h1>🤖 KI-Assistent</h1>

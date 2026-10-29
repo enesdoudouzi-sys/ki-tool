@@ -51,6 +51,10 @@
   .btn-sec { background:#fff; border:1px solid var(--line); border-radius:9px; padding:8px 14px; font-size:13.5px; cursor:pointer; color:var(--ink); } .btn-sec:hover { border-color:var(--green-2); color:var(--green); }
   .note { font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); margin-top:26px; padding-top:14px; }
   a { color:var(--green-2); }
+  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .toolnav a{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;transition:.15s}
+  .toolnav a:hover{border-color:var(--green-2);color:var(--green)}
+  .toolnav a.active{background:var(--green);color:#fff;border-color:var(--green)}
 </style>
 </head>
 <body>
@@ -60,6 +64,13 @@
     <div class="logo">E&amp;A</div>
     <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
   </header>
+
+  <nav class="toolnav">
+    <a href="/ki-tool/">🧠 Textanalyse</a>
+    <a href="/ki-tool/assistent/">🤖 Assistent</a>
+    <a class="active" href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
+    <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
+  </nav>
 
   <div class="hero">
     <h1>KI E-Mail-Filter für Ihren Posteingang</h1>
