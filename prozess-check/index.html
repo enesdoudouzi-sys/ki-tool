@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script defer src="/ki-tool/assets/export.js"></script>
 <style>
   :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
     --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
@@ -183,6 +184,12 @@
       <div class="nl"><b>⛏️ Process Mining</b><p>Aus Ihren System-Daten (ERP/SAP) den tatsächlichen Prozess sichtbar machen – inkl. aller Schleifen und Ausnahmen.</p></div>
     </div>
 
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:22px">
+      <button class="btn-sm" id="expPdf">📄 PDF-Report</button>
+      <button class="btn-sm" id="expXlsx">📊 Excel</button>
+      <button class="btn-sm" id="expPptx">📽️ PowerPoint</button>
+    </div>
+
     <div class="finalcta">
       <h3>Aus der Analyse echte Einsparung machen</h3>
       <p>Im kostenlosen Erstgespräch zeigen wir Ihnen, welche Maßnahmen sich am schnellsten lohnen.</p>
@@ -335,9 +342,33 @@ $('run').addEventListener('click', ()=>{
     recs.prepend(div);
   }
 
+  // Ergebnis für Export speichern
+  window._pc = {
+    lead, flow, wPct, wtop: (wtop && wmax>0)? wtop.l : '–',
+    steps: steps.map(s=>[s.n, s.d, s.v?'Wertschöpfung':'Verschwendung/Warten']),
+    wastes: WASTES.map(x=>[x.l, w[x.id]]),
+    measures: measuresToShow.map(m=>{ const [,label]=quad(m.a,m.n); return [label, m.title, m.a, m.n]; }),
+  };
+
   $('result').classList.add('show');
   $('result').scrollIntoView({behavior:'smooth',block:'start'});
 });
+
+/* --- Export (PDF / Excel / PowerPoint) --- */
+function pcGuard(){ if(!window._pc||!window.KIExport){ alert('Bitte zuerst die Analyse starten.'); return false; } return true; }
+function pcKPI(){ const p=window._pc; return [['Durchlaufzeit', p.lead+' Min'],['Flow-Effizienz', p.flow+' %'],['Verschwendungs-Level', p.wPct+' %'],['Größte Verschwendung', p.wtop]]; }
+const PC_MHEAD=['Priorität','Maßnahme','Aufwand (1-3)','Nutzen (1-3)'];
+document.getElementById('expXlsx').addEventListener('click', ()=>{ if(!pcGuard())return; window.KIExport.xlsx('prozess-check.xlsx','Maßnahmen',PC_MHEAD,window._pc.measures); });
+document.getElementById('expPdf').addEventListener('click', ()=>{ if(!pcGuard())return; const p=window._pc;
+  window.KIExport.pdf('prozess-check-report.pdf',{ title:'Prozess-Analyse (Lean & Six Sigma)', subtitle:new Date().toLocaleDateString('de-DE'),
+    sections:[ {type:'kv',title:'Kennzahlen',items:pcKPI()},
+               {type:'table',title:'Wertstrom – Schritte',head:['Schritt','Dauer (Min)','Art'],body:p.steps},
+               {type:'table',title:'7 Verschwendungsarten (Lean)',head:['Verschwendung','Level 0–3'],body:p.wastes},
+               {type:'table',title:'Empfohlene Maßnahmen (Kaizen)',head:PC_MHEAD,body:p.measures} ] }); });
+document.getElementById('expPptx').addEventListener('click', ()=>{ if(!pcGuard())return; const p=window._pc;
+  window.KIExport.pptx('prozess-check.pptx',{ title:'Prozess-Analyse', subtitle:'Lean & Six Sigma · '+new Date().toLocaleDateString('de-DE'),
+    slides:[ {title:'Kennzahlen', bullets:['Durchlaufzeit: '+p.lead+' Min','Flow-Effizienz: '+p.flow+' %','Verschwendungs-Level: '+p.wPct+' %','Größte Verschwendung: '+p.wtop]},
+             {title:'Empfohlene Maßnahmen', table:{head:PC_MHEAD,body:p.measures}} ] }); });
 </script>
 </body>
 </html>

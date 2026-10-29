@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KI-Textanalyse für Unternehmen · Doudouzi & Ergün</title>
 <meta name="description" content="KI-gestützte Textanalyse für Unternehmen: Posteingang automatisch kategorisieren, Stimmung erkennen, Priorität einschätzen und wichtige Begriffe extrahieren – direkt im Browser, DSGVO-freundlich, ohne Daten-Upload.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script defer src="/ki-tool/assets/export.js"></script>
 <style>
   :root {
     --green: #0e3d2e; --green-2: #16a34a; --green-3: #15803d; --green-soft: #e8f3ee;
@@ -178,6 +182,9 @@
     </div>
     <div class="tools">
       <button class="btn-sec" id="copyBtn">📋 Gesamt-Ergebnis kopieren</button>
+      <button class="btn-sec" id="expPdf">📄 PDF</button>
+      <button class="btn-sec" id="expXlsx">📊 Excel</button>
+      <button class="btn-sec" id="expPptx">📽️ PowerPoint</button>
     </div>
   </div>
 
@@ -418,6 +425,34 @@ $('copyReply').addEventListener('click', () => {
     setTimeout(() => b.textContent = o, 1500);
   });
 });
+
+/* --- Export (PDF / Excel / PowerPoint) --- */
+const SMAP = { positive:'😊 Positiv', negative:'😟 Negativ', neutral:'😐 Neutral' };
+function taGuard(){ if(!lastResult||!window.KIExport){ alert('Bitte zuerst analysieren.'); return false; } return true; }
+function taData(){
+  const sent = SMAP[(lastResult.sentiment||'').toLowerCase()] || lastResult.sentiment;
+  return {
+    kat: lastResult.topCat + ' (' + lastResult.topPct + '%)',
+    stimmung: sent,
+    prio: $('prioText').textContent,
+    begriffe: (lastResult.entities||[]).join(', ') || '–',
+    zusammenfassung: lastResult.summary || '–',
+    antwort: $('replyOut').value || '–',
+  };
+}
+$('expXlsx').addEventListener('click', ()=>{ if(!taGuard())return; const d=taData();
+  window.KIExport.xlsx('textanalyse.xlsx','Analyse',['Feld','Wert'],
+    [['Kategorie',d.kat],['Stimmung',d.stimmung],['Priorität',d.prio],['Begriffe',d.begriffe],['Zusammenfassung',d.zusammenfassung],['Antwort-Vorschlag',d.antwort]]); });
+$('expPdf').addEventListener('click', ()=>{ if(!taGuard())return; const d=taData();
+  window.KIExport.pdf('textanalyse.pdf',{ title:'KI-Textanalyse', subtitle:new Date().toLocaleDateString('de-DE'),
+    sections:[ {type:'kv',title:'Auswertung',items:[['Kategorie',d.kat],['Stimmung',d.stimmung],['Priorität',d.prio],['Begriffe',d.begriffe]]},
+               {type:'text',title:'Zusammenfassung',text:d.zusammenfassung},
+               {type:'text',title:'Antwort-Vorschlag',text:d.antwort} ] }); });
+$('expPptx').addEventListener('click', ()=>{ if(!taGuard())return; const d=taData();
+  window.KIExport.pptx('textanalyse.pptx',{ title:'KI-Textanalyse', subtitle:new Date().toLocaleDateString('de-DE'),
+    slides:[ {title:'Auswertung', bullets:['Kategorie: '+d.kat,'Stimmung: '+d.stimmung,'Priorität: '+d.prio,'Begriffe: '+d.begriffe]},
+             {title:'Zusammenfassung', bullets:[d.zusammenfassung]},
+             {title:'Antwort-Vorschlag', bullets:[d.antwort]} ] }); });
 </script>
 </body>
 </html>

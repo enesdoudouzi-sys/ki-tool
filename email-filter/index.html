@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script defer src="/ki-tool/assets/export.js"></script>
 <style>
   :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
     --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
@@ -129,7 +130,12 @@
       <div class="scount sc-l"><b id="cL">0</b><span>🟢 Niedrig</span></div>
     </div>
     <div id="mailList"></div>
-    <div class="tools"><button class="btn-sec" id="copyBtn">📋 Übersicht kopieren</button></div>
+    <div class="tools">
+      <button class="btn-sec" id="copyBtn">📋 Übersicht kopieren</button>
+      <button class="btn-sec" id="expPdf">📄 PDF</button>
+      <button class="btn-sec" id="expXlsx">📊 Excel</button>
+      <button class="btn-sec" id="expPptx">📽️ PowerPoint</button>
+    </div>
   </div>
 
   <div class="foot">Entwickelt von <b>Doudouzi &amp; Ergün</b>. Antwort-Entwürfe per KI (Groq) – bitte vor dem Senden prüfen.</div>
@@ -260,6 +266,23 @@ $('copyBtn').addEventListener('click', ()=>{
     const b=$('copyBtn'); const o=b.textContent; b.textContent='✓ Kopiert'; setTimeout(()=>b.textContent=o,1500);
   });
 });
+
+/* --- Export (PDF / Excel / PowerPoint) --- */
+const PLAIN={hoch:'Dringend',mittel:'Normal',niedrig:'Niedrig'}, SPLAIN={positive:'Positiv',negative:'Negativ',neutral:'Neutral'};
+const EF_HEAD=['Nr','Priorität','Kategorie','Konfidenz %','Stimmung','E-Mail (Auszug)'];
+function efRows(){ return (window._items||[]).map((it,i)=>[i+1,PLAIN[it.prio],it.cat,it.catPct,SPLAIN[it.sent]||it.sent,it.text.replace(/\s+/g,' ').slice(0,180)]); }
+function efCounts(){ const c={hoch:0,mittel:0,niedrig:0}; (window._items||[]).forEach(it=>c[it.prio]++); return c; }
+function efGuard(){ if(!window._items||!window.KIExport){ alert('Bitte zuerst den Posteingang sortieren.'); return false; } return true; }
+$('expXlsx').addEventListener('click', ()=>{ if(!efGuard())return; window.KIExport.xlsx('posteingang.xlsx','Posteingang',EF_HEAD,efRows()); });
+$('expPdf').addEventListener('click', ()=>{ if(!efGuard())return; const c=efCounts();
+  window.KIExport.pdf('posteingang.pdf',{ title:'Posteingang – nach Dringlichkeit sortiert',
+    subtitle:new Date().toLocaleDateString('de-DE')+'  ·  '+window._items.length+' E-Mails',
+    sections:[ {type:'kv',title:'Übersicht',items:[['Dringend',c.hoch],['Normal',c.mittel],['Niedrig',c.niedrig]]},
+               {type:'table',title:'E-Mails',head:EF_HEAD,body:efRows()} ] }); });
+$('expPptx').addEventListener('click', ()=>{ if(!efGuard())return; const c=efCounts();
+  window.KIExport.pptx('posteingang.pptx',{ title:'Posteingang-Analyse', subtitle:new Date().toLocaleDateString('de-DE'),
+    slides:[ {title:'Übersicht', bullets:['Dringend: '+c.hoch,'Normal: '+c.mittel,'Niedrig: '+c.niedrig,'E-Mails gesamt: '+window._items.length]},
+             {title:'E-Mails nach Priorität', table:{head:EF_HEAD,body:efRows()}} ] }); });
 </script>
 </body>
 </html>
