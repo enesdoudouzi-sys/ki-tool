@@ -296,12 +296,12 @@ function buildReply(topCat, sentLabel, ents) {
 const WORKER_URL = "https://ki-proxy.enesdoudouzi.workers.dev/";
 async function aiReply(text, cat) {
   const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
-  const sys = "Du bist der KI-Assistent von Doudouzi & Ergün. Schreibe eine professionelle, höfliche Antwort-E-Mail auf Deutsch in der Sie-Form auf die folgende Kundennachricht (Kategorie: " + cat + "). Kurz, konkret und freundlich. Gib nur die fertige E-Mail aus, ohne Vorbemerkung.";
+  const sys = "Du bist der KI-Assistent von Doudouzi & Ergün. Schreibe eine professionelle, höfliche Antwort-E-Mail auf Deutsch in der Sie-Form auf die folgende Kundennachricht (Kategorie: " + cat + "). WICHTIG: kurz und kompakt – maximal 4 bis 6 Sätze, konkret, ohne lange Einleitung und ohne Floskeln. Struktur: kurze Anrede, Kernaussage, Grußformel. Gib nur die fertige E-Mail aus.";
   const messages = [{ role:"system", content:sys }, { role:"user", content:text }];
   for (const model of MODELS) {
     try {
       const res = await fetch(WORKER_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ model, messages, temperature:0.5, max_tokens:600 }) });
+        body: JSON.stringify({ model, messages, temperature:0.4, max_tokens:320 }) });
       const data = await res.json();
       if (res.ok && !data.error && data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
       const err = (data.error && (data.error.message||data.error)) || ('HTTP '+res.status);

@@ -4,57 +4,70 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KI E-Mail-Filter · Doudouzi & Ergün</title>
-<meta name="description" content="KI-gestützter Posteingang-Filter: Mehrere E-Mails automatisch nach Thema und Dringlichkeit sortieren – läuft im Browser, ohne Daten-Upload.">
+<meta name="description" content="KI-gestützter Posteingang-Filter: Mehrere E-Mails automatisch nach Thema und Dringlichkeit sortieren – plus KI-Antwort-Entwurf pro E-Mail. Direkt im Browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --green:#0e3d2e; --green-2:#16a34a; --green-soft:#e8f3ee;
-    --ink:#1f2a24; --muted:#6b7a72; --line:#dfe6e1; --bg:#f6f8f7; --card:#fff;
-    --amber:#d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2;
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:"Inter","Segoe UI",system-ui,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
-  .wrap { max-width:960px; margin:0 auto; padding:26px 16px 70px; }
-  header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
-  .logo { width:40px; height:40px; border-radius:11px; background:var(--green); color:#fff; display:grid; place-items:center; font-weight:800; font-size:15px; }
-  .brand small { color:var(--muted); display:block; font-size:12.5px; }
-  .hero { background:linear-gradient(135deg,#0e3d2e,#16a34a); color:#fff; border-radius:18px; padding:30px 26px; margin-bottom:18px; }
-  .hero h1 { font-size:27px; margin:0 0 8px; letter-spacing:-.02em; }
-  .hero p { margin:0 0 12px; font-size:15.5px; opacity:.95; max-width:650px; }
-  .badge { display:inline-block; background:rgba(255,255,255,.16); color:#fff; border-radius:999px; padding:4px 11px; font-size:12.5px; font-weight:600; margin:2px 6px 2px 0; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin:16px 0; box-shadow:0 1px 2px rgba(16,61,46,.04); }
-  label { font-weight:600; font-size:14px; display:block; margin-bottom:6px; }
-  textarea, select, input { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-size:15px; font-family:inherit; color:var(--ink); background:#fff; }
-  textarea:focus, select:focus, input:focus { outline:none; border-color:var(--green-2); box-shadow:0 0 0 3px rgba(22,163,74,.12); }
-  textarea { min-height:180px; resize:vertical; }
-  .hint { font-size:12.5px; color:var(--muted); margin-top:5px; }
-  .row { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; } .row > div { flex:1 1 240px; }
-  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-  .chip { background:#fff; border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:13px; cursor:pointer; }
-  .chip:hover { border-color:var(--green-2); color:var(--green); background:var(--green-soft); }
-  button.run { margin-top:14px; background:var(--green); color:#fff; border:0; border-radius:10px; padding:12px 22px; font-size:15px; font-weight:700; cursor:pointer; }
-  button.run:hover { background:#0b2e22; } button.run:disabled { opacity:.5; cursor:not-allowed; }
-  .status { font-size:13.5px; color:var(--muted); margin-top:12px; display:none; } .status.show { display:block; }
-  .bar { height:6px; background:var(--green-soft); border-radius:6px; overflow:hidden; margin-top:6px; } .bar > i { display:block; height:100%; width:0; background:var(--green-2); transition:width .2s; }
-  .summary { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
-  .scount { flex:1; min-width:120px; border-radius:11px; padding:12px 14px; text-align:center; }
-  .scount b { font-size:24px; display:block; } .scount span { font-size:12.5px; }
-  .sc-h { background:var(--red-soft); color:#991b1b; } .sc-m { background:var(--amber-soft); color:#92400e; } .sc-l { background:var(--green-soft); color:var(--green); }
-  .results { display:none; } .results.show { display:block; }
-  .mail { border:1px solid var(--line); border-left-width:5px; border-radius:10px; padding:13px 15px; margin:9px 0; background:#fff; }
-  .mail.hoch { border-left-color:var(--red); } .mail.mittel { border-left-color:var(--amber); } .mail.niedrig { border-left-color:var(--green-2); }
-  .mail .top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
-  .tag { font-size:12px; font-weight:700; border-radius:999px; padding:3px 10px; }
-  .tag.hoch { background:var(--red-soft); color:#991b1b; } .tag.mittel { background:var(--amber-soft); color:#92400e; } .tag.niedrig { background:var(--green-soft); color:var(--green); }
-  .tag.cat { background:#eef2ef; color:var(--ink); } .tag.sent { background:#f1f5f9; color:#475569; }
-  .mail .body { font-size:13.5px; color:#333; } .mail .body .em { color:var(--muted); }
-  .tools { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
-  .btn-sec { background:#fff; border:1px solid var(--line); border-radius:9px; padding:8px 14px; font-size:13.5px; cursor:pointer; color:var(--ink); } .btn-sec:hover { border-color:var(--green-2); color:var(--green); }
-  .note { font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); margin-top:26px; padding-top:14px; }
-  a { color:var(--green-2); }
-  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-  .toolnav a{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;transition:.15s}
+  :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
+    --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
+    --amber:#d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:26px 18px 70px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(14,61,46,.25)}
+  .brand small{color:var(--muted);display:block;font-size:12.5px;font-weight:500}
+  .brand strong{font-weight:800}
+  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+  .toolnav a{font-size:13px;font-weight:500;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;transition:.15s}
   .toolnav a:hover{border-color:var(--green-2);color:var(--green)}
   .toolnav a.active{background:var(--green);color:#fff;border-color:var(--green)}
+  .hero{position:relative;overflow:hidden;border-radius:22px;padding:36px 32px;color:#fff;background:linear-gradient(135deg,#0b3324,#15803d 65%,#16a34a);box-shadow:0 18px 44px rgba(14,61,46,.26);margin-bottom:20px}
+  .hero .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-bottom:12px}
+  .hero h1{font-size:clamp(26px,4.4vw,38px);line-height:1.1;margin:0 0 12px;font-weight:800;letter-spacing:-.02em;max-width:640px}
+  .hero p{font-size:15.5px;opacity:.94;margin:0;max-width:600px}
+  .hero-badges{margin-top:16px;display:flex;gap:7px;flex-wrap:wrap}
+  .hbadge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:500}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;box-shadow:0 2px 6px rgba(14,61,46,.04)}
+  label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
+  textarea,select,input{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:15px;font-family:inherit;color:var(--ink);background:#fff}
+  textarea:focus,select:focus,input:focus{outline:none;border-color:var(--green-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+  textarea{min-height:170px;resize:vertical}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px} .row>div{flex:1 1 240px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--green-2);color:var(--green);background:var(--green-soft)}
+  button.run{margin-top:16px;background:var(--green);color:#fff;border:0;border-radius:11px;padding:13px 24px;font-size:15px;font-weight:700;cursor:pointer}
+  button.run:hover{background:#0b2e22} button.run:disabled{opacity:.5;cursor:not-allowed}
+  .status{font-size:13.5px;color:var(--muted);margin-top:12px;display:none} .status.show{display:block}
+  .bar{height:6px;background:var(--green-soft);border-radius:6px;overflow:hidden;margin-top:6px} .bar>i{display:block;height:100%;width:0;background:var(--green-2);transition:width .2s}
+  .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+  .scount{flex:1;min-width:120px;border-radius:13px;padding:14px;text-align:center}
+  .scount b{font-size:26px;display:block;line-height:1.1} .scount span{font-size:12.5px}
+  .sc-h{background:var(--red-soft);color:#991b1b} .sc-m{background:var(--amber-soft);color:#92400e} .sc-l{background:var(--green-soft);color:var(--green)}
+  .results{display:none} .results.show{display:block}
+  .mail{border:1px solid var(--line);border-left-width:5px;border-radius:12px;padding:15px 17px;margin:10px 0;background:#fff}
+  .mail.hoch{border-left-color:var(--red)} .mail.mittel{border-left-color:var(--amber)} .mail.niedrig{border-left-color:var(--green-2)}
+  .mail .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .tag{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px}
+  .tag.hoch{background:var(--red-soft);color:#991b1b} .tag.mittel{background:var(--amber-soft);color:#92400e} .tag.niedrig{background:var(--green-soft);color:var(--green)}
+  .tag.cat{background:#eef2ef;color:var(--ink)} .tag.sent{background:#f1f5f9;color:#475569}
+  .mail .body{font-size:13.5px;color:#333}
+  .mail .acts{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+  .btn-sec{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;color:var(--green);font-weight:600}
+  .btn-sec:hover{border-color:var(--green-2)}
+  .reply{margin-top:11px;display:none}
+  .reply.show{display:block}
+  .reply textarea{min-height:130px;font-size:13.5px}
+  .reply .rhead{font-size:12.5px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .dots span{display:inline-block;width:6px;height:6px;margin:0 1px;background:var(--green-2);border-radius:50%;animation:b 1.2s infinite}
+  .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+  @keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .tools{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
+  a{color:var(--green-2)}
 </style>
 </head>
 <body>
@@ -73,21 +86,21 @@
     <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
   </nav>
 
-  <div class="hero">
-    <h1>KI E-Mail-Filter für Ihren Posteingang</h1>
-    <p>Mehrere E-Mails auf einmal einfügen – die KI sortiert sie automatisch nach <b>Thema</b> und <b>Dringlichkeit</b>. So sieht Ihr Team auf einen Blick, was zuerst beantwortet werden muss.</p>
-    <div>
-      <span class="badge">🔒 Kein Daten-Upload</span>
-      <span class="badge">Läuft im Browser</span>
-      <span class="badge">Mehrere E-Mails gleichzeitig</span>
+  <section class="hero">
+    <div class="eyebrow">KI-Posteingang-Assistent</div>
+    <h1>Ihr Posteingang – automatisch sortiert und beantwortet.</h1>
+    <p>Mehrere E-Mails einfügen: Die KI ordnet sie nach Thema und Dringlichkeit – und schreibt auf Wunsch gleich einen passenden Antwort-Entwurf pro E-Mail.</p>
+    <div class="hero-badges">
+      <span class="hbadge">🔒 Kein Daten-Upload für die Sortierung</span>
+      <span class="hbadge">⚡ Mehrere E-Mails gleichzeitig</span>
+      <span class="hbadge">✍️ KI-Antwort auf Knopfdruck</span>
     </div>
-  </div>
+  </section>
 
   <div class="card">
     <label for="input">E-Mails einfügen – jede E-Mail durch eine Zeile mit <code>---</code> trennen</label>
     <textarea id="input" placeholder="Erste E-Mail …&#10;---&#10;Zweite E-Mail …&#10;---&#10;Dritte E-Mail …"></textarea>
     <div class="chips"><button class="chip" type="button" id="loadSample">⚡ 4 Beispiel-E-Mails laden</button></div>
-
     <div class="row">
       <div>
         <label for="preset">Branche (gibt Themen-Kategorien vor)</label>
@@ -105,7 +118,6 @@
         <input id="cats" value="Reklamation, Anfrage, Bestellung, Angebot, Rechnung, Terminanfrage, Zoll/Transit">
       </div>
     </div>
-
     <button class="run" id="run">📥 Posteingang sortieren</button>
     <div class="status" id="status"><span id="statusText"></span><div class="bar"><i id="barFill"></i></div></div>
   </div>
@@ -120,15 +132,14 @@
     <div class="tools"><button class="btn-sec" id="copyBtn">📋 Übersicht kopieren</button></div>
   </div>
 
-  <div class="note">
-    Entwickelt von <b>Doudouzi &amp; Ergün</b>. Siehe auch: <a href="../">KI-Textanalyse</a> · <a href="../prozess-check/">Kostenlose Prozessanalyse</a>
-  </div>
+  <div class="foot">Entwickelt von <b>Doudouzi &amp; Ergün</b>. Antwort-Entwürfe per KI (Groq) – bitte vor dem Senden prüfen.</div>
 
 </div>
 
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2';
 env.allowLocalModels = false;
+const WORKER_URL = "https://ki-proxy.enesdoudouzi.workers.dev/";
 
 const PRESETS = {
   logistik:"Reklamation, Anfrage, Bestellung, Angebot, Rechnung, Terminanfrage, Zoll/Transit",
@@ -146,74 +157,105 @@ const SAMPLE = [
 ].join("\n---\n");
 
 const $ = (id) => document.getElementById(id);
-const preset = $('preset'), cats = $('cats'), runBtn = $('run');
-const statusEl = $('status'), statusText = $('statusText'), barFill = $('barFill'), results = $('results');
+const preset=$('preset'), cats=$('cats'), runBtn=$('run');
+const statusEl=$('status'), statusText=$('statusText'), barFill=$('barFill'), results=$('results');
 
-preset.addEventListener('change', () => { if (PRESETS[preset.value]) cats.value = PRESETS[preset.value]; });
-$('loadSample').addEventListener('click', () => { $('input').value = SAMPLE; });
+preset.addEventListener('change', ()=>{ if(PRESETS[preset.value]) cats.value=PRESETS[preset.value]; });
+$('loadSample').addEventListener('click', ()=>{ $('input').value=SAMPLE; });
 
-let classifier = null, sentiment = null;
-function setStatus(msg, pct) { statusEl.classList.add('show'); statusText.textContent = msg; if (pct!=null) barFill.style.width = pct+'%'; }
+let classifier=null, sentiment=null;
+function setStatus(m,p){ statusEl.classList.add('show'); statusText.textContent=m; if(p!=null) barFill.style.width=p+'%'; }
+async function ensureModels(){
+  if(classifier&&sentiment) return;
+  const prog=(x)=>{ if(x.status==='progress'&&x.total) setStatus('Lade KI-Modell: '+(x.file||''), Math.round(x.loaded/x.total*100)); };
+  if(!classifier){ setStatus('Lade Kategorisierungs-Modell … (einmalig)',10); classifier=await pipeline('zero-shot-classification','Xenova/nli-deberta-v3-xsmall',{progress_callback:prog}); }
+  if(!sentiment){ setStatus('Lade Stimmungs-Modell … (einmalig)',55); sentiment=await pipeline('sentiment-analysis','Xenova/distilbert-base-multilingual-cased-sentiments-student',{progress_callback:prog}); }
+}
+function priority(cat,sent){ const c=(cat||'').toLowerCase(); const u=/reklamation|beschwerde|notfall|fristsache|rückgabe|umtausch/.test(c);
+  if(u&&sent==='negative') return 'hoch'; if(u||sent==='negative') return 'mittel'; return 'niedrig'; }
+const PRANK={hoch:0,mittel:1,niedrig:2};
+const SENTTXT={positive:'😊 Positiv',negative:'😟 Negativ',neutral:'😐 Neutral'};
+const PRTXT={hoch:'🔴 Dringend',mittel:'🟠 Normal',niedrig:'🟢 Niedrig'};
 
-async function ensureModels() {
-  if (classifier && sentiment) return;
-  const prog = (p) => { if (p.status==='progress' && p.total) setStatus('Lade KI-Modell: '+(p.file||''), Math.round(p.loaded/p.total*100)); };
-  if (!classifier) { setStatus('Lade Kategorisierungs-Modell … (einmalig)', 10); classifier = await pipeline('zero-shot-classification','Xenova/nli-deberta-v3-xsmall',{progress_callback:prog}); }
-  if (!sentiment)  { setStatus('Lade Stimmungs-Modell … (einmalig)', 55); sentiment = await pipeline('sentiment-analysis','Xenova/distilbert-base-multilingual-cased-sentiments-student',{progress_callback:prog}); }
+async function aiReply(text, cat){
+  const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+  const sys="Du bist der KI-Assistent von Doudouzi & Ergün. Schreibe eine professionelle, höfliche Antwort-E-Mail auf Deutsch in der Sie-Form auf die folgende Kundennachricht (Kategorie: "+cat+"). WICHTIG: kurz und kompakt – maximal 4 bis 6 Sätze, konkret, ohne lange Einleitung und ohne Floskeln. Struktur: kurze Anrede, Kernaussage, Grußformel. Gib nur die fertige E-Mail aus.";
+  const messages=[{role:"system",content:sys},{role:"user",content:text}];
+  for(const model of MODELS){
+    try{
+      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.4,max_tokens:320})});
+      const data=await res.json();
+      if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+      const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);
+      if(!/model|decommission|not exist|access/i.test(String(err))) throw new Error(err);
+    }catch(e){ if(model===MODELS[MODELS.length-1]) throw e; }
+  }
+  return null;
 }
 
-function priority(cat, sent) {
-  const c = (cat||'').toLowerCase();
-  const urgent = /reklamation|beschwerde|notfall|fristsache|rückgabe|umtausch/.test(c);
-  if (urgent && sent==='negative') return 'hoch';
-  if (urgent || sent==='negative') return 'mittel';
-  return 'niedrig';
-}
-const PRANK = { hoch:0, mittel:1, niedrig:2 };
-const SENTTXT = { positive:'😊 Positiv', negative:'😟 Negativ', neutral:'😐 Neutral' };
-const PRTXT = { hoch:'🔴 Dringend', mittel:'🟠 Normal', niedrig:'🟢 Niedrig' };
-
-runBtn.addEventListener('click', async () => {
-  const mails = $('input').value.split(/^\s*---+\s*$/m).map(s=>s.trim()).filter(Boolean);
-  if (!mails.length) { alert('Bitte mindestens eine E-Mail einfügen (oder Beispiele laden).'); return; }
-  const labels = cats.value.split(',').map(s=>s.trim()).filter(Boolean);
-  if (!labels.length) { alert('Bitte Kategorien angeben.'); return; }
-
-  runBtn.disabled = true; results.classList.remove('show');
-  try {
+runBtn.addEventListener('click', async ()=>{
+  const mails=$('input').value.split(/^\s*---+\s*$/m).map(s=>s.trim()).filter(Boolean);
+  if(!mails.length){ alert('Bitte mindestens eine E-Mail einfügen (oder Beispiele laden).'); return; }
+  const labels=cats.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!labels.length){ alert('Bitte Kategorien angeben.'); return; }
+  runBtn.disabled=true; results.classList.remove('show');
+  try{
     await ensureModels();
-    const items = [];
-    for (let i=0; i<mails.length; i++) {
-      setStatus(`Analysiere E-Mail ${i+1} von ${mails.length} …`, Math.round(70 + (i/mails.length)*30));
-      const [cls, sen] = await Promise.all([ classifier(mails[i], labels), sentiment(mails[i]) ]);
-      const cat = cls.labels[0];
-      const sent = (sen[0].label||'').toLowerCase();
+    const items=[];
+    for(let i=0;i<mails.length;i++){
+      setStatus(`Analysiere E-Mail ${i+1} von ${mails.length} …`, Math.round(70+(i/mails.length)*30));
+      const [cls,sen]=await Promise.all([ classifier(mails[i],labels), sentiment(mails[i]) ]);
+      const cat=cls.labels[0], sent=(sen[0].label||'').toLowerCase();
       items.push({ text:mails[i], cat, catPct:Math.round(cls.scores[0]*100), sent, prio:priority(cat,sent) });
     }
-    items.sort((a,b)=> PRANK[a.prio]-PRANK[b.prio]);
-    const cnt = {hoch:0,mittel:0,niedrig:0}; items.forEach(it=>cnt[it.prio]++);
+    items.sort((a,b)=>PRANK[a.prio]-PRANK[b.prio]);
+    const cnt={hoch:0,mittel:0,niedrig:0}; items.forEach(it=>cnt[it.prio]++);
     $('cH').textContent=cnt.hoch; $('cM').textContent=cnt.mittel; $('cL').textContent=cnt.niedrig;
-    $('mailList').innerHTML = items.map(it => {
-      const snip = it.text.length>160 ? it.text.slice(0,160)+'…' : it.text;
-      return `<div class="mail ${it.prio}"><div class="top">
-        <span class="tag ${it.prio}">${PRTXT[it.prio]}</span>
-        <span class="tag cat">🏷 ${it.cat} (${it.catPct}%)</span>
-        <span class="tag sent">${SENTTXT[it.sent]||it.sent}</span>
-      </div><div class="body">${snip.replace(/</g,'&lt;')}</div></div>`;
-    }).join('');
-    window._items = items;
+
+    const list=$('mailList'); list.innerHTML='';
+    items.forEach((it,idx)=>{
+      const snip = it.text.length>220 ? it.text.slice(0,220)+'…' : it.text;
+      const el=document.createElement('div'); el.className='mail '+it.prio;
+      el.innerHTML = `<div class="top">
+          <span class="tag ${it.prio}">${PRTXT[it.prio]}</span>
+          <span class="tag cat">🏷 ${it.cat} (${it.catPct}%)</span>
+          <span class="tag sent">${SENTTXT[it.sent]||it.sent}</span>
+        </div>
+        <div class="body">${snip.replace(/</g,'&lt;')}</div>
+        <div class="acts"><button class="btn-sec reply-btn">✍️ KI-Antwort entwerfen</button></div>
+        <div class="reply"><div class="rhead"></div><textarea></textarea><div class="tools"><button class="btn-sec copy-reply">📋 Antwort kopieren</button></div></div>`;
+      const replyBox=el.querySelector('.reply');
+      const rhead=el.querySelector('.rhead');
+      const rta=el.querySelector('textarea');
+      el.querySelector('.reply-btn').addEventListener('click', async (ev)=>{
+        const btn=ev.target;
+        replyBox.classList.add('show');
+        rhead.innerHTML='<span class="dots"><span></span><span></span><span></span></span> KI schreibt eine Antwort …';
+        btn.disabled=true;
+        try{
+          const ans=await aiReply(it.text, it.cat);
+          rta.value=ans||''; rhead.textContent='✍️ KI-Entwurf – bitte prüfen und anpassen';
+        }catch(e){
+          rhead.textContent='⚠️ Fehler: '+(e.message||e)+' (Server/Schlüssel prüfen)';
+        }finally{ btn.disabled=false; }
+      });
+      el.querySelector('.copy-reply').addEventListener('click', ()=>{
+        navigator.clipboard.writeText(rta.value);
+      });
+      list.appendChild(el);
+    });
+    window._items=items;
     results.classList.add('show');
-    setStatus('Fertig ✓ – '+items.length+' E-Mails sortiert', 100);
-    setTimeout(()=>statusEl.classList.remove('show'), 1400);
-    results.scrollIntoView({behavior:'smooth', block:'start'});
-  } catch(e) {
-    setStatus('Fehler: '+(e.message||e)+' – bitte Seite neu laden.', 0);
-  } finally { runBtn.disabled=false; }
+    setStatus('Fertig ✓ – '+items.length+' E-Mails sortiert',100);
+    setTimeout(()=>statusEl.classList.remove('show'),1400);
+    results.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){ setStatus('Fehler: '+(e.message||e)+' – bitte Seite neu laden.',0); }
+  finally{ runBtn.disabled=false; }
 });
 
-$('copyBtn').addEventListener('click', () => {
-  if (!window._items) return;
-  const txt = window._items.map((it,i)=>`${i+1}. [${PRTXT[it.prio]}] ${it.cat} – ${SENTTXT[it.sent]||it.sent}\n   ${it.text.slice(0,120)}…`).join('\n\n');
+$('copyBtn').addEventListener('click', ()=>{
+  if(!window._items) return;
+  const txt=window._items.map((it,i)=>`${i+1}. [${PRTXT[it.prio]}] ${it.cat} – ${SENTTXT[it.sent]||it.sent}\n   ${it.text.slice(0,120)}…`).join('\n\n');
   navigator.clipboard.writeText('POSTEINGANG – nach Dringlichkeit sortiert\n\n'+txt).then(()=>{
     const b=$('copyBtn'); const o=b.textContent; b.textContent='✓ Kopiert'; setTimeout(()=>b.textContent=o,1500);
   });
