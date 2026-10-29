@@ -108,14 +108,23 @@ async function send() {
 
   const bubble = addMsg('ai', '');
   bubble.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant","qwen/qwen3-32b"];
   try {
-    const res = await fetch(WORKER_URL, {
-      method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ model:"llama-3.3-70b-versatile", messages:history, temperature:0.5, max_tokens:1024 }),
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error((data.error && (data.error.message||data.error)) || ('HTTP '+res.status));
-    const answer = data.choices?.[0]?.message?.content?.trim() || '(keine Antwort erhalten)';
+    let answer = null, lastErr = null;
+    for (const model of MODELS) {
+      const res = await fetch(WORKER_URL, {
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ model, messages:history, temperature:0.5, max_tokens:1024 }),
+      });
+      const data = await res.json();
+      if (res.ok && !data.error && data.choices?.[0]?.message?.content) {
+        answer = data.choices[0].message.content.trim(); break;
+      }
+      lastErr = (data.error && (data.error.message||data.error)) || ('HTTP '+res.status);
+      // nur bei Modell-Problem das nächste probieren; sonst abbrechen
+      if (!/model|decommission|not exist|access/i.test(String(lastErr))) break;
+    }
+    if (answer == null) throw new Error(lastErr || 'keine Antwort');
     bubble.textContent = answer;
     history.push({ role:"assistant", content:answer });
   } catch (e) {
