@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KI-Textanalyse für Unternehmen · Doudouzi & Ergün</title>
+<meta name="description" content="KI-gestützte Textanalyse für Unternehmen: Posteingang automatisch kategorisieren, Stimmung erkennen, Priorität einschätzen und wichtige Begriffe extrahieren – direkt im Browser, DSGVO-freundlich, ohne Daten-Upload.">
+<style>
+  :root {
+    --green: #0e3d2e; --green-2: #16a34a; --green-3: #15803d; --green-soft: #e8f3ee;
+    --ink: #1f2a24; --muted: #6b7a72; --line: #dfe6e1; --bg: #f6f8f7; --card: #ffffff;
+    --amber: #d97706; --amber-soft:#fef3c7; --red:#dc2626; --red-soft:#fee2e2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Inter", "Segoe UI", system-ui, Arial, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 26px 16px 70px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .logo { width: 40px; height: 40px; border-radius: 11px; background: var(--green); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+  .brand small { color: var(--muted); display:block; font-size:12.5px; }
+  .hero { background: linear-gradient(135deg,#0e3d2e,#16a34a); color:#fff; border-radius:18px; padding:30px 26px; margin-bottom:18px; }
+  .hero h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .hero p { margin: 0 0 14px; font-size: 15.5px; opacity:.95; max-width:640px; }
+  .hero .badge { background: rgba(255,255,255,.16); color:#fff; }
+  .badge { display: inline-block; background: var(--green-soft); color: var(--green); border-radius: 999px; padding: 4px 11px; font-size: 12.5px; font-weight: 600; margin: 2px 6px 2px 0; }
+  .usecards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+  @media (max-width:680px){ .usecards{ grid-template-columns:1fr; } }
+  .uc { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; font-size:13.5px; }
+  .uc b { color:var(--green); display:block; margin-bottom:3px; font-size:14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin: 16px 0; box-shadow: 0 1px 2px rgba(16,61,46,.04); }
+  label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px; }
+  textarea, input, select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; font-size: 15px; font-family: inherit; color: var(--ink); background: #fff; outline: none; }
+  textarea:focus, input:focus, select:focus { border-color: var(--green-2); box-shadow: 0 0 0 3px rgba(22,163,74,.12); }
+  textarea { min-height: 150px; resize: vertical; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1 1 240px; }
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+  button.run { margin-top: 14px; background: var(--green); color: #fff; border: 0; border-radius: 10px; padding: 12px 22px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s; }
+  button.run:hover { background: #0b2e22; }
+  button.run:disabled { opacity: .5; cursor: not-allowed; }
+  .samples { margin: 6px 0 2px; }
+  .samples .lbl { font-size:12.5px; color:var(--muted); margin-bottom:6px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition:.12s; }
+  .chip:hover { border-color: var(--green-2); color: var(--green); background:var(--green-soft); }
+  .status { font-size: 13.5px; color: var(--muted); margin-top: 12px; display: none; }
+  .status.show { display: block; }
+  .bar { height: 6px; background: var(--green-soft); border-radius: 6px; overflow: hidden; margin-top: 6px; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--green-2); transition: width .2s; }
+  .results { display: none; }
+  .results.show { display: block; }
+  .prio { display:flex; align-items:center; gap:12px; border-radius:12px; padding:14px 16px; margin-bottom:16px; font-weight:600; }
+  .prio .dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .prio small { display:block; font-weight:400; font-size:12.5px; opacity:.85; margin-top:2px; }
+  .prio.hoch { background:var(--red-soft); color:#991b1b; } .prio.hoch .dot{ background:var(--red); }
+  .prio.mittel { background:var(--amber-soft); color:#92400e; } .prio.mittel .dot{ background:var(--amber); }
+  .prio.niedrig { background:var(--green-soft); color:var(--green); } .prio.niedrig .dot{ background:var(--green-2); }
+  .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 680px) { .res-grid { grid-template-columns: 1fr; } }
+  .res h3 { font-size: 13px; margin: 0 0 10px; color: var(--green); text-transform: uppercase; letter-spacing: .04em; }
+  .classline { display: flex; align-items: center; gap: 10px; margin: 7px 0; }
+  .classline .name { width: 130px; font-size: 13.5px; flex-shrink: 0; }
+  .classline .track { flex: 1; height: 8px; background: #eef2ef; border-radius: 8px; overflow: hidden; }
+  .classline .track > i { display: block; height: 100%; background: var(--green-2); }
+  .classline .pct { width: 44px; text-align: right; font-size: 13px; font-weight: 700; color: var(--green); }
+  .classline.top .name { font-weight:700; color:var(--green); }
+  .sentiment { font-size: 30px; font-weight: 800; }
+  .summary { font-size: 14.5px; background:#f8faf9; border-left:3px solid var(--green-2); border-radius:0 8px 8px 0; padding:10px 14px; }
+  .ent { display: inline-block; border-radius: 6px; padding: 2px 8px; margin: 3px 4px 3px 0; font-size: 13px; }
+  .ent-PER { background: #e0ecff; color: #1e40af; }
+  .ent-ORG { background: #e8f3ee; color: #0e3d2e; }
+  .ent-LOC { background: #fef3c7; color: #92400e; }
+  .ent-MISC { background: #f1f5f9; color: #475569; }
+  .tools { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .btn-sec { background:#fff; border:1px solid var(--line); border-radius:9px; padding:8px 14px; font-size:13.5px; cursor:pointer; color:var(--ink); }
+  .btn-sec:hover { border-color:var(--green-2); color:var(--green); }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 24px; padding-top: 14px; }
+  a { color: var(--green-2); }
+  .toolnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+  .toolnav a{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;transition:.15s}
+  .toolnav a:hover{border-color:var(--green-2);color:var(--green)}
+  .toolnav a.active{background:var(--green);color:#fff;border-color:var(--green)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">E&amp;A</div>
+    <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
+  </header>
+
+  <nav class="toolnav">
+    <a href="/ki-tool/">🏠 Start</a>
+    <a class="active" href="/ki-tool/textanalyse/">🧠 Textanalyse</a>
+    <a href="/ki-tool/assistent/">🤖 Assistent</a>
+    <a href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
+    <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
+  </nav>
+
+  <div class="hero">
+    <h1>KI-Textanalyse für Ihr Unternehmen</h1>
+    <p>Jeden Tag erreichen Unternehmen Dutzende E-Mails, Anfragen und Bewertungen. Diese KI liest sie in Sekunden: Sie <b>kategorisiert</b>, erkennt die <b>Stimmung</b>, schlägt eine <b>Priorität</b> vor und zieht die <b>wichtigsten Begriffe</b> heraus – damit Ihr Team weiß, was zuerst dran ist.</p>
+    <div>
+      <span class="badge">🔒 DSGVO-freundlich · kein Daten-Upload</span>
+      <span class="badge">Läuft lokal im Browser</span>
+      <span class="badge">Kostenlos · ohne Konto</span>
+    </div>
+  </div>
+
+  <div class="usecards">
+    <div class="uc"><b>📥 Posteingang sortieren</b>Eingehende E-Mails automatisch nach Thema &amp; Dringlichkeit ordnen.</div>
+    <div class="uc"><b>😊 Kundenstimmung messen</b>Bewertungen &amp; Feedback auf einen Blick: zufrieden oder verärgert?</div>
+    <div class="uc"><b>⚡ Schneller reagieren</b>Reklamationen &amp; Fristsachen sofort erkennen und zuerst bearbeiten.</div>
+  </div>
+
+  <div class="card">
+    <label for="text">Text einfügen (E-Mail, Bewertung, Anfrage, Dokument …)</label>
+    <textarea id="text" placeholder="Fügen Sie hier einen Text ein – oder wählen Sie unten ein Beispiel."></textarea>
+
+    <div class="samples">
+      <div class="lbl">⚡ Beispiele zum sofort Ausprobieren:</div>
+      <div class="chips" id="sampleChips"></div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <div>
+        <label for="preset">Branche (gibt Kategorien vor)</label>
+        <select id="preset">
+          <option value="logistik">🚚 Logistik &amp; Transport</option>
+          <option value="gastro">🍽 Gastronomie</option>
+          <option value="handel">🛒 Handel &amp; E-Commerce</option>
+          <option value="recht">⚖️ Recht &amp; Steuern</option>
+          <option value="dienstleistung">🧰 Dienstleistung / Handwerk</option>
+          <option value="gesundheit">🩺 Gesundheit</option>
+          <option value="custom">✏️ Eigene Kategorien</option>
+        </select>
+      </div>
+      <div>
+        <label for="cats">Kategorien (Komma-getrennt)</label>
+        <input id="cats" value="Reklamation, Anfrage, Bestellung, Angebot, Rechnung, Terminanfrage, Zoll/Transit">
+        <div class="hint">Frei anpassbar – so funktioniert die KI für <b>jede</b> Branche.</div>
+      </div>
+    </div>
+
+    <button class="run" id="run">🔎 Analysieren</button>
+
+    <div class="status" id="status">
+      <span id="statusText">Lade KI-Modell … (einmaliger Download, danach schnell)</span>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+  </div>
+
+  <div class="card results" id="results">
+    <div class="prio" id="prio"><span class="dot"></span><div><span id="prioText"></span><small id="prioWhy"></small></div></div>
+    <div class="res-grid">
+      <div class="res">
+        <h3>🏷 Kategorie</h3>
+        <div id="classOut"></div>
+      </div>
+      <div class="res">
+        <h3>😊 Stimmung</h3>
+        <div id="sentOut" class="sentiment">–</div>
+        <div id="sentDetail" class="hint"></div>
+      </div>
+    </div>
+    <div class="res" style="margin-top:18px">
+      <h3>🔍 Wichtige Begriffe (Personen, Firmen, Orte)</h3>
+      <div id="entOut"></div>
+    </div>
+    <div class="res" style="margin-top:18px">
+      <h3>📝 Zusammenfassung (Kernaussage)</h3>
+      <div id="sumOut" class="summary"></div>
+    </div>
+    <div class="res" style="margin-top:18px">
+      <h3>✍️ Antwort-Vorschlag <span id="replyStatus" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">· Entwurf, bitte prüfen</span></h3>
+      <textarea id="replyOut" style="min-height:140px"></textarea>
+      <div class="tools"><button class="btn-sec" id="copyReply">📋 Antwort kopieren</button></div>
+    </div>
+    <div class="tools">
+      <button class="btn-sec" id="copyBtn">📋 Gesamt-Ergebnis kopieren</button>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>So funktioniert's:</b> Die KI-Modelle (von Hugging Face) werden einmalig in Ihren Browser geladen und rechnen <b>lokal auf Ihrem Gerät</b> – Ihre Texte verlassen den Browser nicht und werden nirgends gespeichert. Entwickelt von <b>Doudouzi &amp; Ergün</b> als Demo für KI-gestützte Prozessoptimierung. ·
+    <a href="../">← zur Website</a>
+  </div>
+
+</div>
+
+<script type="module">
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2';
+env.allowLocalModels = false;
+
+const PRESETS = {
+  logistik: "Reklamation, Anfrage, Bestellung, Angebot, Rechnung, Terminanfrage, Zoll/Transit",
+  gastro: "Reservierung, Beschwerde, Lob, Catering-Anfrage, Bewerbung, Lieferanten-Anfrage",
+  handel: "Reklamation, Bestellung, Rückgabe/Umtausch, Produktfrage, Versandfrage, Beschwerde",
+  recht: "Mandatsanfrage, Fristsache, Rechnung, Terminanfrage, Beschwerde, Allgemeine Frage",
+  dienstleistung: "Auftragsanfrage, Reklamation, Kostenvoranschlag, Terminanfrage, Beschwerde, Lob",
+  gesundheit: "Terminanfrage, Rezeptanfrage, Beschwerde, Allgemeine Frage, Notfall, Rückmeldung",
+  custom: null,
+};
+
+const SAMPLES = [
+  { label:"🚚 Reklamation (Logistik)", preset:"logistik",
+    text:"Sehr geehrte Damen und Herren, leider ist unsere Lieferung mit dem Fahrzeug 41 BFA 035 heute stark beschädigt in München angekommen. Zwei Paletten sind unbrauchbar. Wir erwarten dringend eine Klärung bis morgen, sonst müssen wir den Vorgang an unsere Rechtsabteilung geben. Mit freundlichen Grüßen, Firma Müller GmbH" },
+  { label:"🍽 Lob (Gastronomie)", preset:"gastro",
+    text:"Wir waren gestern Abend zum ersten Mal bei Ihnen essen und waren absolut begeistert! Das Personal war super freundlich, das Essen hervorragend und die Atmosphäre sehr gemütlich. Wir kommen auf jeden Fall wieder. Vielen Dank an das ganze Team in Frankfurt!" },
+  { label:"🛒 Rückgabe (Handel)", preset:"handel",
+    text:"Guten Tag, ich habe vor einer Woche die Bluetooth-Kopfhörer bestellt, aber der linke Lautsprecher funktioniert nicht richtig. Können Sie mir bitte sagen, wie ich das Gerät zurücksenden und einen Austausch bekommen kann? Danke, Sabine Hofmann" },
+];
+
+const $ = (id) => document.getElementById(id);
+const preset = $('preset'), cats = $('cats'), runBtn = $('run');
+const statusEl = $('status'), statusText = $('statusText'), barFill = $('barFill');
+const results = $('results');
+
+// sample chips
+const chipBox = $('sampleChips');
+SAMPLES.forEach(s => {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button'; b.textContent = s.label;
+  b.addEventListener('click', () => {
+    $('text').value = s.text;
+    preset.value = s.preset;
+    if (PRESETS[s.preset]) cats.value = PRESETS[s.preset];
+    $('text').scrollIntoView({ behavior:'smooth', block:'center' });
+  });
+  chipBox.appendChild(b);
+});
+
+preset.addEventListener('change', () => {
+  const v = PRESETS[preset.value];
+  if (v) cats.value = v;
+});
+
+let classifier = null, sentiment = null, ner = null;
+let lastResult = null;
+
+function setStatus(msg, pct) {
+  statusEl.classList.add('show');
+  statusText.textContent = msg;
+  if (pct != null) barFill.style.width = pct + '%';
+}
+
+async function ensureModels() {
+  if (classifier && sentiment && ner) return;
+  setStatus('Lade KI-Modelle … (einmaliger Download, danach schnell)', 5);
+  const prog = (p) => { if (p.status === 'progress' && p.total) setStatus('Lade Modell: ' + (p.file||''), Math.round(p.loaded/p.total*100)); };
+  if (!classifier) { setStatus('Lade Kategorisierungs-Modell …', 10); classifier = await pipeline('zero-shot-classification', 'Xenova/nli-deberta-v3-xsmall', { progress_callback: prog }); }
+  if (!sentiment)  { setStatus('Lade Stimmungs-Modell …', 40);        sentiment  = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-multilingual-cased-sentiments-student', { progress_callback: prog }); }
+  if (!ner)        { setStatus('Lade Begriffs-Modell …', 70);          ner        = await pipeline('token-classification', 'Xenova/bert-base-multilingual-cased-ner-hrl', { progress_callback: prog }); }
+  setStatus('Modelle bereit – analysiere …', 95);
+}
+
+const STOP = new Set("der die das und oder aber ein eine einen einem einer eines ist sind war waren hat haben wird werden wurde wurden auch nur noch schon sehr mit für von zu im in am an auf aus bei nach über unter vor als wie wenn dass dann denn weil ich du er sie es wir ihr mir mich uns ihnen ihre ihrem ihren unser unsere sich dem den des zur zum vom beim bitte danke sehr geehrte damen herren freundlichen grüßen".split(/\s+/));
+
+function summarize(text) {
+  const sents = text.replace(/\s+/g,' ').match(/[^.!?]+[.!?]+/g) || [text];
+  if (sents.length <= 2) return text.trim();
+  const freq = {};
+  text.toLowerCase().match(/[a-zäöüß0-9]{3,}/g)?.forEach(w => { if (!STOP.has(w)) freq[w] = (freq[w]||0)+1; });
+  const scored = sents.map((s, i) => {
+    let sc = 0; (s.toLowerCase().match(/[a-zäöüß0-9]{3,}/g)||[]).forEach(w => { if (!STOP.has(w)) sc += freq[w]||0; });
+    return { s: s.trim(), i, sc: sc / Math.max(1, (s.match(/\S+/g)||[]).length) };
+  });
+  const top = scored.slice().sort((a,b)=>b.sc-a.sc).slice(0, 2).sort((a,b)=>a.i-b.i);
+  return top.map(t=>t.s).join(' ');
+}
+
+function buildReply(topCat, sentLabel, ents) {
+  const cat = (topCat||'').toLowerCase();
+  const org = (ents.find(e=>e.type==='ORG')||{}).text;
+  const per = (ents.find(e=>e.type==='PER')||{}).text;
+  const anrede = per ? ('Sehr geehrte/r ' + per + ',') : 'Sehr geehrte Damen und Herren,';
+  let body;
+  if (/reklamation|beschwerde/.test(cat))
+    body = "vielen Dank für Ihre Nachricht und entschuldigen Sie bitte die entstandenen Unannehmlichkeiten. Wir nehmen Ihr Anliegen sehr ernst und prüfen den Vorgang umgehend. Wir melden uns schnellstmöglich mit einer Lösung bei Ihnen.";
+  else if (/rückgabe|umtausch/.test(cat))
+    body = "vielen Dank für Ihre Nachricht. Gerne wickeln wir die Rückgabe bzw. den Umtausch für Sie ab. Wir senden Ihnen in Kürze alle nötigen Schritte und Unterlagen zu.";
+  else if (/angebot|anfrage|mandatsanfrage|auftragsanfrage|kostenvoranschlag/.test(cat))
+    body = "vielen Dank für Ihr Interesse und Ihre Anfrage. Wir prüfen Ihr Anliegen und lassen Ihnen zeitnah ein passendes Angebot bzw. die gewünschten Informationen zukommen.";
+  else if (/termin|reservierung/.test(cat))
+    body = "vielen Dank für Ihre Terminanfrage. Wir prüfen die Verfügbarkeit und bestätigen Ihnen den Termin in Kürze. Sollten Sie einen Wunschtermin haben, teilen Sie uns diesen gerne mit.";
+  else if (/rechnung/.test(cat))
+    body = "vielen Dank für Ihre Nachricht bezüglich der Rechnung. Wir prüfen den Vorgang und melden uns zeitnah mit einer Rückmeldung bei Ihnen.";
+  else if (/lob/.test(cat) || sentLabel==='positive')
+    body = "ganz herzlichen Dank für Ihr positives Feedback – darüber freuen wir uns sehr! Wir geben Ihr Lob gerne an unser Team weiter und freuen uns darauf, Sie bald wieder begrüßen zu dürfen.";
+  else
+    body = "vielen Dank für Ihre Nachricht. Wir haben Ihr Anliegen erhalten und melden uns zeitnah bei Ihnen zurück.";
+  const gruss = "\n\nMit freundlichen Grüßen" + (org ? "\nIhr Team" : "");
+  return anrede + "\n\n" + body + gruss;
+}
+
+const WORKER_URL = "https://ki-proxy.enesdoudouzi.workers.dev/";
+async function aiReply(text, cat) {
+  const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+  const sys = "Du bist der KI-Assistent von Doudouzi & Ergün. Schreibe eine professionelle, höfliche Antwort-E-Mail auf Deutsch in der Sie-Form auf die folgende Kundennachricht (Kategorie: " + cat + "). Kurz, konkret und freundlich. Gib nur die fertige E-Mail aus, ohne Vorbemerkung.";
+  const messages = [{ role:"system", content:sys }, { role:"user", content:text }];
+  for (const model of MODELS) {
+    try {
+      const res = await fetch(WORKER_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ model, messages, temperature:0.5, max_tokens:600 }) });
+      const data = await res.json();
+      if (res.ok && !data.error && data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+      const err = (data.error && (data.error.message||data.error)) || ('HTTP '+res.status);
+      if (!/model|decommission|not exist|access/i.test(String(err))) break;
+    } catch (e) { break; }
+  }
+  return null;
+}
+
+function renderClass(out) {
+  const el = $('classOut'); el.innerHTML = '';
+  out.labels.forEach((lab, i) => {
+    const pct = Math.round(out.scores[i] * 100);
+    const row = document.createElement('div'); row.className = 'classline' + (i === 0 ? ' top' : '');
+    row.innerHTML = `<span class="name">${lab}</span><span class="track"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span>`;
+    el.appendChild(row);
+  });
+}
+
+function renderSentiment(out) {
+  const r = out[0];
+  const label = (r.label || '').toLowerCase();
+  const map = { positive: ['😊 Positiv', '#16a34a'], negative: ['😟 Negativ', '#dc2626'], neutral: ['😐 Neutral', '#6b7a72'] };
+  const [txt, col] = map[label] || ['😐 ' + r.label, '#6b7a72'];
+  const s = $('sentOut'); s.textContent = txt; s.style.color = col;
+  $('sentDetail').textContent = 'Sicherheit: ' + Math.round((r.score||0)*100) + '%';
+  return label;
+}
+
+function parseEntities(out) {
+  const ents = []; let cur = null;
+  for (const t of out) {
+    const type = (t.entity || '').replace(/^B-|^I-/, '');
+    const word = t.word.replace(/^##/, '');
+    const isCont = t.word.startsWith('##') || (cur && cur.type === type && (t.entity||'').startsWith('I-'));
+    if (isCont && cur) { cur.text += (t.word.startsWith('##') ? '' : ' ') + word; }
+    else { if (cur) ents.push(cur); cur = { type, text: word }; }
+  }
+  if (cur) ents.push(cur);
+  const seen = new Set();
+  return ents.filter(e => { const k = e.type+':'+e.text.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return e.text.length > 1; });
+}
+
+function renderEntities(uniq) {
+  const el = $('entOut');
+  if (!uniq.length) { el.innerHTML = '<span class="hint">Keine Personen/Firmen/Orte erkannt.</span>'; return; }
+  el.innerHTML = uniq.map(e => `<span class="ent ent-${e.type}">${e.text}</span>`).join('');
+}
+
+function renderPriority(topCat, sentLabel) {
+  const cat = (topCat || '').toLowerCase();
+  const urgent = /reklamation|beschwerde|notfall|fristsache|rückgabe|umtausch/.test(cat);
+  let level, text, why;
+  if (urgent && sentLabel === 'negative') { level='hoch'; text='🔴 Hohe Priorität'; why='Negative Stimmung + kritisches Thema („'+topCat+'") – zuerst bearbeiten.'; }
+  else if (urgent || sentLabel === 'negative') { level='mittel'; text='🟠 Mittlere Priorität'; why='Thema „'+topCat+'"'+(sentLabel==='negative'?' mit negativer Stimmung':'')+' – zeitnah bearbeiten.'; }
+  else { level='niedrig'; text='🟢 Niedrige Priorität'; why='Thema „'+topCat+'", neutrale/positive Stimmung – im normalen Ablauf bearbeiten.'; }
+  const el = $('prio'); el.className = 'prio ' + level;
+  $('prioText').textContent = text; $('prioWhy').textContent = why;
+}
+
+runBtn.addEventListener('click', async () => {
+  const text = $('text').value.trim();
+  if (!text) { alert('Bitte zuerst einen Text einfügen oder ein Beispiel wählen.'); return; }
+  const labels = cats.value.split(',').map(s => s.trim()).filter(Boolean);
+  if (!labels.length) { alert('Bitte mindestens eine Kategorie angeben.'); return; }
+
+  runBtn.disabled = true; results.classList.remove('show');
+  try {
+    await ensureModels();
+    const [cls, sen, entsRaw] = await Promise.all([
+      classifier(text, labels),
+      sentiment(text),
+      ner(text),
+    ]);
+    renderClass(cls);
+    const sentLabel = renderSentiment(sen);
+    const ents = parseEntities(entsRaw);
+    renderEntities(ents);
+    renderPriority(cls.labels[0], sentLabel);
+    const summary = summarize(text);
+    $('sumOut').textContent = summary;
+    $('replyOut').value = buildReply(cls.labels[0], sentLabel, ents);
+    lastResult = { topCat: cls.labels[0], topPct: Math.round(cls.scores[0]*100), sentiment: sen[0].label, entities: ents.map(e=>e.text), summary };
+    results.classList.add('show');
+    setStatus('Fertig ✓', 100);
+    setTimeout(() => statusEl.classList.remove('show'), 1200);
+    results.scrollIntoView({ behavior:'smooth', block:'start' });
+    // Antwort-Vorschlag per echter KI nachladen (Fallback: Vorlage bleibt)
+    const rs = $('replyStatus');
+    if (rs) rs.textContent = '· KI schreibt …';
+    aiReply(text, cls.labels[0]).then(ai => {
+      if (ai) { $('replyOut').value = ai; if (rs) rs.textContent = '· von KI verfasst – bitte prüfen'; }
+      else if (rs) rs.textContent = '· Entwurf (Vorlage) – KI nicht erreichbar';
+    });
+  } catch (e) {
+    setStatus('Fehler beim Laden/Analysieren: ' + (e.message || e) + ' – bitte Seite neu laden und erneut versuchen.', 0);
+  } finally {
+    runBtn.disabled = false;
+  }
+});
+
+$('copyBtn').addEventListener('click', () => {
+  if (!lastResult) return;
+  const txt = `KI-Textanalyse\n----------------\nKategorie: ${lastResult.topCat} (${lastResult.topPct}%)\nStimmung: ${lastResult.sentiment}\nPriorität: ${$('prioText').textContent}\nBegriffe: ${lastResult.entities.join(', ') || '–'}\n\nZusammenfassung:\n${lastResult.summary}\n\nAntwort-Vorschlag:\n${$('replyOut').value}`;
+  navigator.clipboard.writeText(txt).then(() => {
+    const b = $('copyBtn'); const o = b.textContent; b.textContent = '✓ Kopiert';
+    setTimeout(() => b.textContent = o, 1500);
+  });
+});
+
+$('copyReply').addEventListener('click', () => {
+  navigator.clipboard.writeText($('replyOut').value).then(() => {
+    const b = $('copyReply'); const o = b.textContent; b.textContent = '✓ Kopiert';
+    setTimeout(() => b.textContent = o, 1500);
+  });
+});
+</script>
+</body>
+</html>
+
+<!-- live -->
