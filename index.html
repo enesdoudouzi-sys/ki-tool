@@ -171,7 +171,7 @@
       <div id="sumOut" class="summary"></div>
     </div>
     <div class="res" style="margin-top:18px">
-      <h3>✍️ Antwort-Vorschlag <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">· Entwurf, bitte prüfen</span></h3>
+      <h3>✍️ Antwort-Vorschlag <span id="replyStatus" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">· Entwurf, bitte prüfen</span></h3>
       <textarea id="replyOut" style="min-height:140px"></textarea>
       <div class="tools"><button class="btn-sec" id="copyReply">📋 Antwort kopieren</button></div>
     </div>
@@ -292,6 +292,24 @@ function buildReply(topCat, sentLabel, ents) {
   return anrede + "\n\n" + body + gruss;
 }
 
+const WORKER_URL = "https://ki-proxy.enesdoudouzi.workers.dev/";
+async function aiReply(text, cat) {
+  const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+  const sys = "Du bist der KI-Assistent von Doudouzi & Ergün. Schreibe eine professionelle, höfliche Antwort-E-Mail auf Deutsch in der Sie-Form auf die folgende Kundennachricht (Kategorie: " + cat + "). Kurz, konkret und freundlich. Gib nur die fertige E-Mail aus, ohne Vorbemerkung.";
+  const messages = [{ role:"system", content:sys }, { role:"user", content:text }];
+  for (const model of MODELS) {
+    try {
+      const res = await fetch(WORKER_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ model, messages, temperature:0.5, max_tokens:600 }) });
+      const data = await res.json();
+      if (res.ok && !data.error && data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+      const err = (data.error && (data.error.message||data.error)) || ('HTTP '+res.status);
+      if (!/model|decommission|not exist|access/i.test(String(err))) break;
+    } catch (e) { break; }
+  }
+  return null;
+}
+
 function renderClass(out) {
   const el = $('classOut'); el.innerHTML = '';
   out.labels.forEach((lab, i) => {
@@ -370,6 +388,13 @@ runBtn.addEventListener('click', async () => {
     setStatus('Fertig ✓', 100);
     setTimeout(() => statusEl.classList.remove('show'), 1200);
     results.scrollIntoView({ behavior:'smooth', block:'start' });
+    // Antwort-Vorschlag per echter KI nachladen (Fallback: Vorlage bleibt)
+    const rs = $('replyStatus');
+    if (rs) rs.textContent = '· KI schreibt …';
+    aiReply(text, cls.labels[0]).then(ai => {
+      if (ai) { $('replyOut').value = ai; if (rs) rs.textContent = '· von KI verfasst – bitte prüfen'; }
+      else if (rs) rs.textContent = '· Entwurf (Vorlage) – KI nicht erreichbar';
+    });
   } catch (e) {
     setStatus('Fehler beim Laden/Analysieren: ' + (e.message || e) + ' – bitte Seite neu laden und erneut versuchen.', 0);
   } finally {
