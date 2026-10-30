@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<title>Bewertungs-Analyse · Gastronomie · Doudouzi & Ergün</title>
+<meta name="description" content="KI-Bewertungs-Analyse für Restaurants: Lob & Kritik erkennen und professionelle Antworten auf jede Gästebewertung.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<style>
+  :root{ --ink:#0f1115; --muted:#6b7280; --line:#ececef; --accent:#15803d; --accent-2:#16a34a; --accent-soft:#f1f7f3; --bg2:#fbfbfc; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  .wrap{max-width:860px;margin:0 auto;padding:0 24px 70px}
+  .card{border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;background:#fff}
+  label{font-weight:600;font-size:14px;display:block;margin-bottom:8px}
+  textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:14.5px;min-height:170px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;margin-top:10px}
+  .chip:hover{border-color:var(--accent-2);color:var(--accent)}
+  button.run{margin-top:14px;background:var(--ink);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:500;cursor:pointer}
+  button.run:hover{background:#000} button.run:disabled{opacity:.5;cursor:not-allowed}
+  .btn-sec{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13px;cursor:pointer;color:var(--ink);font-weight:500;margin-top:12px}
+  .btn-sec:hover{border-color:var(--accent-2);color:var(--accent)}
+  .status{font-size:13.5px;color:var(--muted);margin-top:12px;display:none}.status.show{display:block}
+  .result{display:none;white-space:pre-wrap;font-size:14.5px;line-height:1.7}.result.show{display:block}
+  .err{color:#b91c1c;background:#fee2e2;border-radius:8px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+  .dots span{display:inline-block;width:6px;height:6px;margin:0 1px;background:var(--accent-2);border-radius:50%;animation:b 1.2s infinite}
+  .dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+  @keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;font-size:12.5px;color:var(--muted)}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/gastro/">Gastro-Tools</a>
+      <a href="/ki-tool/">Alle Tools</a>
+      <a class="cta" href="/ki-tool/assistent/">KI-Assistent →</a>
+    </nav>
+  </div>
+
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> Gastronomie</span>
+    <h1>Bewertungen beantworten – in Sekunden.</h1>
+    <p>Fügen Sie Gästebewertungen ein. Die KI erkennt Lob und Kritik und schreibt eine professionelle Antwort auf jede Bewertung.</p>
+  </div>
+
+  <div class="card">
+    <label for="input">Bewertungen einfügen – jede durch eine Zeile mit <code>---</code> trennen</label>
+    <textarea id="input" placeholder="Erste Bewertung …&#10;---&#10;Zweite Bewertung …"></textarea>
+    <div><button class="chip" type="button" id="sample">⚡ Beispiel-Bewertungen laden</button></div>
+    <button class="run" id="run">⭐ Bewertungen analysieren</button>
+    <div class="status" id="status"><span id="statusText"></span></div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <div class="result" id="result"></div>
+    <button class="btn-sec" id="copy">📋 Ergebnis kopieren</button>
+  </div>
+
+  <footer>Powered by Groq · KI-Antworten bitte vor dem Veröffentlichen prüfen · <a href="/ki-tool/gastro/">← Gastro-Tools</a></footer>
+</div>
+
+<script>
+const $=(id)=>document.getElementById(id);
+const WORKER_URL="https://ki-proxy.enesdoudouzi.workers.dev/";
+const SAMPLE=[
+"Super Abend! Essen top, Personal mega freundlich. Nur die Wartezeit auf die Getränke war etwas lang. Kommen gerne wieder!",
+"Leider enttäuschend. Die Pizza kam kalt an und wir mussten über 40 Minuten warten. Schade, das Lokal sieht eigentlich schön aus.",
+"Sehr leckeres Essen und faire Preise. Die Atmosphäre ist gemütlich, ideal für einen Familienabend. Klare Empfehlung!"
+].join("\n---\n");
+$('sample').addEventListener('click',()=>{ $('input').value=SAMPLE; });
+
+function setStatus(m){ const s=$('status'); s.classList.add('show'); $('statusText').innerHTML=m; }
+
+async function groq(messages){
+  const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+  for(const model of MODELS){
+    try{
+      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.5,max_tokens:1400})});
+      const data=await res.json();
+      if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+      const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);
+      if(!/model|decommission|not exist|access/i.test(String(err))) throw new Error(err);
+    }catch(e){ if(model===MODELS[MODELS.length-1]) throw e; }
+  }
+}
+
+$('run').addEventListener('click', async ()=>{
+  const text=$('input').value.trim();
+  if(!text){ alert('Bitte mindestens eine Bewertung einfügen (oder Beispiele laden).'); return; }
+  const btn=$('run'); btn.disabled=true;
+  $('resultCard').style.display='block'; $('result').classList.remove('show');
+  setStatus('<span class="dots"><span></span><span></span><span></span></span> KI analysiert die Bewertungen …');
+  const sys="Du bist KI-Assistent für einen Gastronomie-Betrieb. Analysiere die folgenden Gästebewertungen (durch '---' getrennt). Antworte auf Deutsch und gib EXAKT diese Struktur aus:\n\nGESAMT-STIMMUNG: (ein Satz)\n\nWAS GÄSTE LOBEN:\n- ...\n\nWAS KRITISIERT WIRD:\n- ...\n\nEMPFEHLUNGEN:\n- ...\n\nANTWORT-VORSCHLÄGE:\nBewertung 1: (kurze, höfliche öffentliche Antwort, Sie-Form)\nBewertung 2: ...\n\nHalte die Antworten freundlich, wertschätzend und konkret. Bei Kritik: entschuldigen und Besserung zusagen, ohne Ausreden.";
+  try{
+    const out=await groq([{role:"system",content:sys},{role:"user",content:text}]);
+    $('result').textContent=out; $('result').classList.add('show');
+    $('status').classList.remove('show');
+    window._out=out;
+  }catch(e){
+    $('status').classList.remove('show');
+    const d=document.createElement('div'); d.className='err'; d.textContent='Fehler: '+(e.message||e)+' – bitte später erneut versuchen.';
+    $('resultCard').appendChild(d);
+  }finally{ btn.disabled=false; }
+});
+
+$('copy').addEventListener('click',()=>{ if(window._out) navigator.clipboard.writeText(window._out); });
+</script>
+</body>
+</html>
