@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script defer src="/ki-tool/assets/export.js"></script>
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
 <style>
   :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
     --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
@@ -113,24 +114,21 @@
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="logo">E&amp;A</div>
-    <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
-  </header>
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/textanalyse/">Textanalyse</a>
+      <a href="/ki-tool/email-filter/">E-Mail-Filter</a>
+      <a class="active" href="/ki-tool/prozess-check/">Prozess-Check</a>
+      <a class="cta" href="/ki-tool/assistent/">KI-Assistent →</a>
+    </nav>
+  </div>
 
-  <nav class="toolnav">
-    <a href="/ki-tool/">🏠 Start</a>
-    <a href="/ki-tool/textanalyse/">🧠 Textanalyse</a>
-    <a href="/ki-tool/assistent/">🤖 Assistent</a>
-    <a href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
-    <a class="active" href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
-  </nav>
-
-  <section class="hero">
-    <div class="eyebrow">Prozess-Check nach Lean &amp; Six Sigma</div>
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> Prozess-Check nach Lean &amp; Six Sigma</span>
     <h1>Finden Sie heraus, wo Ihr Prozess Zeit verliert.</h1>
-    <p>Ein professioneller Selbst-Check mit den Methoden echter Prozessberatung: Wertstrom-Analyse, die 7 Verschwendungsarten, ein DMAIC-Fahrplan und eine Aufwand/Nutzen-Matrix – in wenigen Minuten, kostenlos.</p>
-  </section>
+    <p>Ein Selbst-Check mit den Methoden echter Prozessberatung: Wertstrom-Analyse, 7 Verschwendungsarten, DMAIC-Fahrplan und Aufwand/Nutzen-Matrix – in wenigen Minuten.</p>
+  </div>
 
   <div class="methods">
     <span class="method">🧭 Lean <small>7 Verschwendungen</small></span>

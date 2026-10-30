@@ -13,6 +13,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <title>KI-Assistent · Doudouzi & Ergün</title>
 <meta name="description" content="Echter KI-Assistent (LLM) für Unternehmen – beantwortet Fragen, schreibt E-Mails und Texte. Powered by Groq (Llama 3.3).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
 <style>
   :root {
     --green:#0e3d2e; --green-2:#16a34a; --green-soft:#e8f3ee;
@@ -59,22 +63,20 @@
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="logo">E&amp;A</div>
-    <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
-  </header>
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/textanalyse/">Textanalyse</a>
+      <a href="/ki-tool/email-filter/">E-Mail-Filter</a>
+      <a href="/ki-tool/prozess-check/">Prozess-Check</a>
+      <a class="cta active" href="/ki-tool/assistent/">KI-Assistent →</a>
+    </nav>
+  </div>
 
-  <nav class="toolnav">
-    <a href="/ki-tool/">🏠 Start</a>
-    <a href="/ki-tool/textanalyse/">🧠 Textanalyse</a>
-    <a class="active" href="/ki-tool/assistent/">🤖 Assistent</a>
-    <a href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
-    <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
-  </nav>
-
-  <div class="hero">
-    <h1>🤖 KI-Assistent</h1>
-    <p>Echte KI (Llama 3.3) – stellt Fragen, schreibt E-Mails, fasst zusammen, übersetzt. Für Ihren Arbeitsalltag.</p>
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> KI-Assistent</span>
+    <h1>Echte KI für Ihren Arbeitsalltag.</h1>
+    <p>Fragen beantworten, E-Mails schreiben, zusammenfassen, übersetzen – direkt im Browser.</p>
   </div>
 
   <div class="chips" id="suggest">

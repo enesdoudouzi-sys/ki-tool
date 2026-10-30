@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script defer src="/ki-tool/assets/export.js"></script>
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
 <style>
   :root{ --green:#0e3d2e; --green-2:#16a34a; --green-3:#15803d; --green-soft:#e8f3ee;
     --ink:#14201b; --muted:#64756d; --line:#e3eae5; --bg:#f4f7f5; --card:#fff;
@@ -82,29 +83,21 @@
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="logo">E&amp;A</div>
-    <div class="brand"><strong>Doudouzi &amp; Ergün</strong><small>Prozessoptimierung &amp; KI</small></div>
-  </header>
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/textanalyse/">Textanalyse</a>
+      <a class="active" href="/ki-tool/email-filter/">E-Mail-Filter</a>
+      <a href="/ki-tool/prozess-check/">Prozess-Check</a>
+      <a class="cta" href="/ki-tool/assistent/">KI-Assistent →</a>
+    </nav>
+  </div>
 
-  <nav class="toolnav">
-    <a href="/ki-tool/">🏠 Start</a>
-    <a href="/ki-tool/textanalyse/">🧠 Textanalyse</a>
-    <a href="/ki-tool/assistent/">🤖 Assistent</a>
-    <a class="active" href="/ki-tool/email-filter/">📥 E-Mail-Filter</a>
-    <a href="/ki-tool/prozess-check/">📊 Prozess-Check</a>
-  </nav>
-
-  <section class="hero">
-    <div class="eyebrow">KI-Posteingang-Assistent</div>
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> KI-Posteingang-Assistent</span>
     <h1>Ihr Posteingang – automatisch sortiert und beantwortet.</h1>
-    <p>Mehrere E-Mails einfügen: Die KI ordnet sie nach Thema und Dringlichkeit – und schreibt auf Wunsch gleich einen passenden Antwort-Entwurf pro E-Mail.</p>
-    <div class="hero-badges">
-      <span class="hbadge">🔒 Kein Daten-Upload für die Sortierung</span>
-      <span class="hbadge">⚡ Mehrere E-Mails gleichzeitig</span>
-      <span class="hbadge">✍️ KI-Antwort auf Knopfdruck</span>
-    </div>
-  </section>
+    <p>Mehrere E-Mails einfügen: Die KI ordnet sie nach Thema und Dringlichkeit – und schreibt auf Wunsch einen Antwort-Entwurf pro E-Mail.</p>
+  </div>
 
   <div class="card">
     <label for="input">E-Mails einfügen – jede E-Mail durch eine Zeile mit <code>---</code> trennen</label>
