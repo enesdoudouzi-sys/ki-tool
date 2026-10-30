@@ -87,6 +87,16 @@
   .finalcta{background:var(--green);color:#fff;border-radius:14px;padding:22px;margin-top:18px;text-align:center}
   .finalcta h3{margin:0 0 8px;font-size:19px} .finalcta p{margin:0 0 14px;opacity:.92;font-size:14px}
   .finalcta a{display:inline-block;background:#fff;color:var(--green);font-weight:700;text-decoration:none;border-radius:10px;padding:12px 24px}
+  .leadform{margin-top:8px;text-align:left}
+  .leadform .lf-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .leadform .lf-row>input{flex:1 1 200px;min-width:0}
+  .leadform input,.leadform textarea{width:100%;border:0;border-radius:9px;padding:11px 12px;font:inherit;font-size:14px;color:var(--ink)}
+  .leadform textarea{margin-bottom:10px;resize:vertical}
+  .lf-consent{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;opacity:.95;margin-bottom:12px;font-weight:400}
+  .lf-consent input{width:auto;flex:0 0 auto;margin-top:3px}
+  .lf-btn{background:#fff;color:var(--green);font-weight:700;border:0;border-radius:10px;padding:12px 26px;font-size:15px;cursor:pointer}
+  .lf-btn:disabled{opacity:.6;cursor:not-allowed}
+  .lf-status{margin-top:10px;font-size:13.5px;min-height:18px}
   .disc{font-size:11.5px;color:var(--muted);margin-top:12px}
   .foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:26px;padding-top:14px}
   a{color:var(--green-2)}
@@ -191,9 +201,22 @@
     </div>
 
     <div class="finalcta">
-      <h3>Aus der Analyse echte Einsparung machen</h3>
-      <p>Im kostenlosen Erstgespräch zeigen wir Ihnen, welche Maßnahmen sich am schnellsten lohnen.</p>
-      <a id="ctaMail" href="#">📅 Kostenloses Erstgespräch anfragen</a>
+      <h3>Kostenloses Erstgespräch anfragen</h3>
+      <p>Wir melden uns und zeigen Ihnen, welche Maßnahmen sich am schnellsten lohnen. Ihre Check-Ergebnisse senden wir automatisch mit.</p>
+      <form id="leadForm" class="leadform" novalidate>
+        <div class="lf-row">
+          <input name="name" placeholder="Ihr Name *" autocomplete="name" required>
+          <input name="firma" placeholder="Firma" autocomplete="organization">
+        </div>
+        <div class="lf-row">
+          <input name="email" type="email" placeholder="E-Mail *" autocomplete="email" required>
+          <input name="telefon" placeholder="Telefon" autocomplete="tel">
+        </div>
+        <textarea name="nachricht" rows="3" placeholder="Nachricht (optional)"></textarea>
+        <label class="lf-consent"><input type="checkbox" name="consent" required> Ich bin mit der Kontaktaufnahme zu meiner Anfrage einverstanden.</label>
+        <button type="submit" class="lf-btn" id="leadSubmit">📨 Anfrage senden</button>
+        <div class="lf-status" id="leadStatus" role="status" aria-live="polite"></div>
+      </form>
     </div>
     <div class="disc">Hinweis: Dieser Selbst-Check liefert eine erste, unverbindliche Einschätzung nach Lean- und Six-Sigma-Logik. Die belastbare Analyse erfolgt im Projekt mit Ist-Aufnahme vor Ort.</div>
   </div>
@@ -204,8 +227,28 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
-const CONTACT = "mailto:KONTAKT@IHRE-ADRESSE.de?subject=Prozess-Analyse%20Erstgespr%C3%A4ch&body=Guten%20Tag%2C%0D%0A%0D%0Aich%20habe%20den%20Prozess-Check%20gemacht%20und%20m%C3%B6chte%20gern%20ein%20kostenloses%20Erstgespr%C3%A4ch.%0D%0A%0D%0AUnternehmen%3A%20%0D%0ATelefon%3A%20";
-$('ctaMail').href = CONTACT;
+const WORKER_URL = "https://ki-proxy.enesdoudouzi.workers.dev/";
+
+/* --- Lead-Formular: Anfrage per Server an E-Mail senden --- */
+function setLead(msg, err){ const s=$('leadStatus'); if(!s)return; s.textContent=msg; s.style.color=err?'#fecaca':'#d8ffe9'; }
+$('leadForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const f=e.target;
+  if(!f.name.value.trim() || !f.email.value.trim() || !f.consent.checked){ setLead('Bitte Name, E-Mail und Einwilligung ausfüllen.', true); return; }
+  const btn=$('leadSubmit'); btn.disabled=true; setLead('Senden …');
+  const p=window._pc;
+  const ergebnis = p
+    ? `Durchlaufzeit: ${p.lead} Min | Flow-Effizienz: ${p.flow}% | Verschwendungs-Level: ${p.wPct}% | Größte Verschwendung: ${p.wtop}\nMaßnahmen:\n` + p.measures.map(m=>`- [${m[0]}] ${m[1]}`).join('\n')
+    : '(Prozess-Check wurde nicht ausgefüllt)';
+  try{
+    const res=await fetch(WORKER_URL+'lead', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ quelle:'Prozess-Check', name:f.name.value, firma:f.firma.value, email:f.email.value, telefon:f.telefon.value, nachricht:f.nachricht.value, ergebnis }) });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){ f.reset(); setLead('✅ Vielen Dank! Ihre Anfrage wurde gesendet – wir melden uns zeitnah bei Ihnen.'); }
+    else throw new Error(data.error || ('HTTP '+res.status));
+  }catch(err){ setLead('⚠️ Senden fehlgeschlagen: '+(err.message||err)+'. Bitte später erneut versuchen.', true); }
+  finally{ btn.disabled=false; }
+});
 
 /* --- Wertstrom-Schritte --- */
 const STEPS0 = [
