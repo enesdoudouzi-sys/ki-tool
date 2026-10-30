@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kostenlose Prozessanalyse · Doudouzi & Ergün">
+<meta property="og:description" content="Prozess-Check nach Lean & Six Sigma: Wertstrom, 7 Verschwendungen, DMAIC und Aufwand/Nutzen-Matrix.">
+<meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <title>Prozess-Check (Lean & Six Sigma) · Doudouzi & Ergün</title>
 <meta name="description" content="Professioneller Prozess-Check nach Lean & Six Sigma: Wertstrom-Analyse, 7 Verschwendungsarten, DMAIC-Fahrplan und Aufwand/Nutzen-Matrix – kostenlos im Browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -204,6 +212,7 @@
       <h3>Kostenloses Erstgespräch anfragen</h3>
       <p>Wir melden uns und zeigen Ihnen, welche Maßnahmen sich am schnellsten lohnen. Ihre Check-Ergebnisse senden wir automatisch mit.</p>
       <form id="leadForm" class="leadform" novalidate>
+        <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="lf-row">
           <input name="name" placeholder="Ihr Name *" autocomplete="name" required>
           <input name="firma" placeholder="Firma" autocomplete="organization">
@@ -221,7 +230,7 @@
     <div class="disc">Hinweis: Dieser Selbst-Check liefert eine erste, unverbindliche Einschätzung nach Lean- und Six-Sigma-Logik. Die belastbare Analyse erfolgt im Projekt mit Ist-Aufnahme vor Ort.</div>
   </div>
 
-  <div class="foot">Entwickelt von <b>Doudouzi &amp; Ergün</b> · Methoden: Lean · Six Sigma (DMAIC) · Value Stream Mapping · Kaizen · BPMN · Process Mining</div>
+  <div class="foot">Entwickelt von <b>Doudouzi &amp; Ergün</b> · Methoden: Lean · Six Sigma (DMAIC) · Value Stream Mapping · Kaizen · BPMN · Process Mining<br><a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/datenschutz.html">Datenschutz</a> · <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/impressum.html">Impressum</a></div>
 
 </div>
 
@@ -234,6 +243,7 @@ function setLead(msg, err){ const s=$('leadStatus'); if(!s)return; s.textContent
 $('leadForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const f=e.target;
+  if(f.website && f.website.value){ f.reset(); setLead('✅ Vielen Dank! Ihre Anfrage wurde gesendet.'); return; } // Honeypot: Bots
   if(!f.name.value.trim() || !f.email.value.trim() || !f.consent.checked){ setLead('Bitte Name, E-Mail und Einwilligung ausfüllen.', true); return; }
   const btn=$('leadSubmit'); btn.disabled=true; setLead('Senden …');
   const p=window._pc;
