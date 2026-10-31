@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<title>KI-Telefonassistent (Demo) · Gastronomie · Doudouzi & Ergün</title>
+<meta name="description" content="Demo eines KI-Telefonassistenten für Restaurants: per Sprache Fragen beantworten und Reservierungen aufnehmen – direkt im Browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<style>
+  :root{ --ink:#0f1115; --muted:#6b7280; --line:#ececef; --accent:#15803d; --accent-2:#16a34a; --accent-soft:#f1f7f3; --bg2:#fbfbfc; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px 70px}
+  .card{border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;background:#fff}
+  label{font-weight:600;font-size:13.5px;display:block;margin-bottom:6px}
+  input,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+  .row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1 1 200px}
+  .phone{text-align:center;padding:30px 22px}
+  .avatar{width:84px;height:84px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;font-size:38px;margin:0 auto 14px;position:relative}
+  .avatar.active::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--accent-2);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+  .pstate{font-size:14px;color:var(--muted);min-height:20px}
+  .pname{font-size:18px;font-weight:600;margin:2px 0}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:11px;padding:13px 24px;font-size:15px;font-weight:500;cursor:pointer;margin:6px}
+  .btn-call{background:var(--accent-2);color:#fff}.btn-call:hover{background:#15803d}
+  .btn-hang{background:#dc2626;color:#fff}.btn-hang:hover{background:#b91c1c}
+  .btn-sec{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn-sec:hover{border-color:var(--accent-2);color:var(--accent)}
+  .log{margin-top:18px;text-align:left;display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto}
+  .msg{display:flex;gap:9px}.msg .who{font-size:11px;font-weight:700;color:#fff;border-radius:7px;width:34px;height:34px;display:grid;place-items:center;flex-shrink:0}
+  .msg.ki .who{background:var(--accent)}.msg.user .who{background:#334155}
+  .msg .tx{font-size:14.5px;padding-top:6px}
+  .txtrow{display:flex;gap:8px;margin-top:14px}
+  .txtrow input{flex:1}
+  .txtrow button{background:var(--ink);color:#fff;border:0;border-radius:10px;padding:0 18px;font-weight:500;cursor:pointer}
+  .err{color:#b91c1c;background:#fee2e2;border-radius:8px;padding:9px 12px;font-size:13px;margin-top:10px}
+  .note{font-size:12.5px;color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-top:8px}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;font-size:12.5px;color:var(--muted)}
+  footer a{color:var(--muted)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/gastro/">Gastro-Tools</a>
+      <a href="/ki-tool/">Alle Tools</a>
+      <a class="cta" href="/ki-tool/assistent/">KI-Assistent →</a>
+    </nav>
+  </div>
+
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> Gastronomie · Demo</span>
+    <h1>KI-Telefonassistent</h1>
+    <p>Sprechen Sie mit dem Assistenten wie am Telefon: Er beantwortet Fragen und nimmt Reservierungen auf – mit echter Stimme, direkt im Browser.</p>
+  </div>
+
+  <div class="card" id="setup">
+    <div class="row">
+      <div><label for="rName">Name des Lokals</label><input id="rName" value="Trattoria Bella"></div>
+      <div><label for="rHours">Öffnungszeiten</label><input id="rHours" value="Di–So 12:00–22:00 Uhr, Montag Ruhetag"></div>
+    </div>
+    <div style="margin-top:12px"><label for="rInfo">Weitere Infos (Adresse, Spezialitäten, Plätze …)</label>
+      <textarea id="rInfo" rows="2">Italienische Küche in Frankfurt. Spezialitäten: Pizza aus dem Holzofen, hausgemachte Pasta. 60 Plätze, Terrasse vorhanden. Parkplätze in der Seitenstraße.</textarea></div>
+    <div class="note">💡 Für die Sprachfunktion am besten <b>Chrome</b> oder <b>Edge</b> nutzen und den Mikrofon-Zugriff erlauben. Ohne Mikrofon können Sie unten auch tippen.</div>
+  </div>
+
+  <div class="card phone">
+    <div class="avatar" id="avatar">📞</div>
+    <div class="pname" id="pname">Trattoria Bella</div>
+    <div class="pstate" id="pstate">Bereit – klicken Sie auf „Anruf starten"</div>
+
+    <div style="margin-top:14px">
+      <button class="btn btn-call" id="callBtn">📞 Anruf starten</button>
+      <button class="btn btn-hang hidden" id="hangBtn">🔴 Auflegen</button>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <div class="txtrow hidden" id="txtrow">
+      <input id="txtInput" placeholder="Antwort tippen (falls kein Mikrofon) …">
+      <button id="txtSend">Senden</button>
+    </div>
+    <div id="errBox"></div>
+  </div>
+
+  <div class="card hidden" id="summaryCard">
+    <label>📋 Gesprächs-Zusammenfassung</label>
+    <div id="summary" style="white-space:pre-wrap;font-size:14.5px"></div>
+    <button class="btn btn-sec" id="copySum" style="margin-top:12px">📋 Kopieren</button>
+  </div>
+
+  <footer>Powered by Groq · Demo (kein echter Telefonanschluss) · <a href="/ki-tool/gastro/">← Gastro-Tools</a></footer>
+</div>
+
+<script>
+const $=(id)=>document.getElementById(id);
+const WORKER_URL="https://ki-proxy.enesdoudouzi.workers.dev/";
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let history=[], inCall=false, recog=null, speaking=false;
+
+function addMsg(role, text){
+  const d=document.createElement('div'); d.className='msg '+(role==='assistant'?'ki':'user');
+  d.innerHTML='<div class="who">'+(role==='assistant'?'KI':'Sie')+'</div><div class="tx"></div>';
+  d.querySelector('.tx').textContent=text; $('log').appendChild(d); $('log').scrollTop=$('log').scrollHeight;
+}
+function setState(s){ $('pstate').textContent=s; }
+function showErr(t){ $('errBox').innerHTML='<div class="err">'+t+'</div>'; }
+
+function speak(text){
+  return new Promise((resolve)=>{
+    try{
+      window.speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=1.03;
+      const vs=window.speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.startsWith('de'));
+      if(vs[0]) u.voice=vs[0];
+      $('avatar').classList.add('active'); speaking=true; setState('spricht …');
+      u.onend=()=>{ speaking=false; $('avatar').classList.remove('active'); resolve(); };
+      u.onerror=()=>{ speaking=false; $('avatar').classList.remove('active'); resolve(); };
+      window.speechSynthesis.speak(u);
+    }catch(e){ speaking=false; resolve(); }
+  });
+}
+
+async function groq(messages, temp, maxTok){
+  const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+  for(const model of MODELS){
+    try{
+      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:temp,max_tokens:maxTok})});
+      const data=await res.json();
+      if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
+      const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);
+      if(!/model|decommission|not exist|access/i.test(String(err))) throw new Error(err);
+    }catch(e){ if(model===MODELS[MODELS.length-1]) throw e; }
+  }
+}
+
+function systemPrompt(){
+  return "Du bist der freundliche Telefon-Assistent des Restaurants \""+$('rName').value+"\". "
+    +"Öffnungszeiten: "+$('rHours').value+". Infos: "+$('rInfo').value+" "
+    +"Du führst ein TELEFONAT. Sprich natürlich, höflich und KURZ (1-3 Sätze), wie am Telefon. "
+    +"Beantworte Fragen zu Öffnungszeiten, Lage und Speisen. Wenn der Anrufer reservieren möchte, frage nach fehlenden Angaben: Name, Datum, Uhrzeit, Anzahl Personen. "
+    +"Wenn du alle vier Angaben hast, bestätige die Reservierung freundlich und fasse sie in einem Satz zusammen. Erfinde keine Angaben.";
+}
+
+async function startCall(){
+  if(!window.speechSynthesis){ showErr('Sprachausgabe wird von diesem Browser nicht unterstützt.'); }
+  $('errBox').innerHTML=''; $('log').innerHTML=''; $('summaryCard').classList.add('hidden');
+  $('pname').textContent=$('rName').value; $('setup').classList.add('hidden');
+  $('callBtn').classList.add('hidden'); $('hangBtn').classList.remove('hidden'); $('txtrow').classList.remove('hidden');
+  inCall=true; history=[{role:"system",content:systemPrompt()}];
+  const greet="Guten Tag, hier ist "+$('rName').value+". Wie kann ich Ihnen helfen?";
+  addMsg('assistant',greet); history.push({role:"assistant",content:greet});
+  await speak(greet);
+  listen();
+}
+
+function listen(){
+  if(!inCall) return;
+  if(!SR){ setState('Bitte unten tippen'); return; }
+  try{
+    recog=new SR(); recog.lang='de-DE'; recog.interimResults=false; recog.maxAlternatives=1;
+    setState('hört zu … (sprechen Sie)');
+    recog.onresult=(e)=>{ const t=e.results[0][0].transcript; handleUser(t); };
+    recog.onerror=(e)=>{ if(e.error==='not-allowed'){ showErr('Mikrofon nicht erlaubt – bitte Zugriff gestatten oder unten tippen.'); setState('Bitte unten tippen'); } else { setState('Bitte unten tippen oder erneut sprechen'); } };
+    recog.onend=()=>{ if(inCall && !speaking && $('pstate').textContent.startsWith('hört')) { /* no speech */ } };
+    recog.start();
+  }catch(e){ setState('Bitte unten tippen'); }
+}
+
+async function handleUser(text){
+  if(!text || !inCall) return;
+  if(recog){ try{recog.stop();}catch(e){} }
+  addMsg('user',text); history.push({role:"user",content:text});
+  setState('denkt nach …');
+  try{
+    const reply=await groq(history,0.5,160);
+    addMsg('assistant',reply); history.push({role:"assistant",content:reply});
+    await speak(reply);
+    listen();
+  }catch(e){ showErr('Fehler: '+(e.message||e)); setState('Fehler – bitte Auflegen & neu starten'); }
+}
+
+async function hangUp(){
+  inCall=false;
+  try{ if(recog) recog.stop(); }catch(e){}
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+  $('avatar').classList.remove('active'); setState('Anruf beendet');
+  $('hangBtn').classList.add('hidden'); $('callBtn').classList.remove('hidden'); $('txtrow').classList.add('hidden'); $('setup').classList.remove('hidden');
+  // Zusammenfassung
+  if(history.length>2){
+    const conv=history.filter(m=>m.role!=='system').map(m=>(m.role==='assistant'?'Assistent: ':'Anrufer: ')+m.content).join("\n");
+    try{
+      const sum=await groq([{role:"system",content:"Fasse das folgende Telefonat kurz zusammen. Gib an: Anliegen, und falls eine Reservierung gewünscht wurde: Name, Datum, Uhrzeit, Personen. Wenn etwas fehlt, schreibe 'offen'. Kurz und als Stichpunkte."},{role:"user",content:conv}],0.3,300);
+      $('summary').textContent=sum; $('summaryCard').classList.remove('hidden'); window._sum=sum;
+    }catch(e){}
+  }
+}
+
+$('callBtn').addEventListener('click',startCall);
+$('hangBtn').addEventListener('click',hangUp);
+$('txtSend').addEventListener('click',()=>{ const v=$('txtInput').value.trim(); if(v){ $('txtInput').value=''; handleUser(v); } });
+$('txtInput').addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); $('txtSend').click(); } });
+$('copySum').addEventListener('click',()=>{ if(window._sum) navigator.clipboard.writeText(window._sum); });
+if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=()=>{}; }
+</script>
+</body>
+</html>
