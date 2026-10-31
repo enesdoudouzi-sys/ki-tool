@@ -17,8 +17,8 @@
   .wrap{max-width:720px;margin:0 auto;padding:0 24px 70px}
   .card{border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;background:#fff}
   label{font-weight:600;font-size:13.5px;display:block;margin-bottom:6px}
-  input,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px}
-  input:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:#fff}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
   .row{display:flex;gap:12px;flex-wrap:wrap}.row>div{flex:1 1 200px}
   .phone{text-align:center;padding:30px 22px}
   .avatar{width:84px;height:84px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;font-size:38px;margin:0 auto 14px;position:relative}
@@ -69,6 +69,10 @@
     </div>
     <div style="margin-top:12px"><label for="rInfo">Weitere Infos (Adresse, Spezialitäten, Plätze …)</label>
       <textarea id="rInfo" rows="2">Italienische Küche in Frankfurt. Spezialitäten: Pizza aus dem Holzofen, hausgemachte Pasta. 60 Plätze, Terrasse vorhanden. Parkplätze in der Seitenstraße.</textarea></div>
+    <div class="row" style="margin-top:12px">
+      <div><label for="voiceSel">Stimme des Assistenten</label><select id="voiceSel"><option>Wird geladen …</option></select></div>
+      <div><label for="speedSel">Sprechtempo</label><select id="speedSel"><option value="0.92">Ruhig</option><option value="1" selected>Normal</option><option value="1.1">Zügig</option></select></div>
+    </div>
     <div class="note">💡 Für die Sprachfunktion am besten <b>Chrome</b> oder <b>Edge</b> nutzen und den Mikrofon-Zugriff erlauben. Ohne Mikrofon können Sie unten auch tippen.</div>
   </div>
 
@@ -105,6 +109,29 @@ const $=(id)=>document.getElementById(id);
 const WORKER_URL="https://ki-proxy.enesdoudouzi.workers.dev/";
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let history=[], inCall=false, recog=null, speaking=false;
+let deVoices=[], chosenVoice=null;
+
+function voiceScore(v){
+  const n=(v.name||'').toLowerCase(); let s=0;
+  if(n.includes('natural')) s+=5;
+  if(n.includes('online')) s+=4;
+  if(n.includes('google')) s+=3;
+  if(n.includes('microsoft')) s+=1;
+  if(/katja|hedda|marlene|petra|amala/.test(n)) s+=1; // natürliche weibl. Stimmen
+  return s;
+}
+function loadVoices(){
+  const all=(window.speechSynthesis? window.speechSynthesis.getVoices():[])||[];
+  deVoices=all.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('de')).sort((a,b)=>voiceScore(b)-voiceScore(a));
+  const sel=$('voiceSel'); if(!sel) return;
+  if(!deVoices.length){ sel.innerHTML='<option>Standard-Stimme</option>'; chosenVoice=null; return; }
+  sel.innerHTML=deVoices.map((v,i)=>{
+    const label=v.name.replace(/microsoft|online|\(natural\)/ig,'').replace(/\s+/g,' ').trim()+(voiceScore(v)>=4?' ⭐':'');
+    return '<option value="'+i+'">'+label+'</option>';
+  }).join('');
+  chosenVoice=deVoices[0];
+  sel.addEventListener('change',()=>{ chosenVoice=deVoices[parseInt(sel.value,10)]||deVoices[0]; });
+}
 
 function addMsg(role, text){
   const d=document.createElement('div'); d.className='msg '+(role==='assistant'?'ki':'user');
@@ -118,9 +145,9 @@ function speak(text){
   return new Promise((resolve)=>{
     try{
       window.speechSynthesis.cancel();
-      const u=new SpeechSynthesisUtterance(text); u.lang='de-DE'; u.rate=1.03;
-      const vs=window.speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.startsWith('de'));
-      if(vs[0]) u.voice=vs[0];
+      const u=new SpeechSynthesisUtterance(text); u.lang='de-DE';
+      u.rate=parseFloat(($('speedSel')||{}).value||'1'); u.pitch=1.02;
+      if(chosenVoice) u.voice=chosenVoice;
       $('avatar').classList.add('active'); speaking=true; setState('spricht …');
       u.onend=()=>{ speaking=false; $('avatar').classList.remove('active'); resolve(); };
       u.onerror=()=>{ speaking=false; $('avatar').classList.remove('active'); resolve(); };
@@ -209,7 +236,7 @@ $('hangBtn').addEventListener('click',hangUp);
 $('txtSend').addEventListener('click',()=>{ const v=$('txtInput').value.trim(); if(v){ $('txtInput').value=''; handleUser(v); } });
 $('txtInput').addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); $('txtSend').click(); } });
 $('copySum').addEventListener('click',()=>{ if(window._sum) navigator.clipboard.writeText(window._sum); });
-if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=()=>{}; }
+if(window.speechSynthesis){ loadVoices(); window.speechSynthesis.onvoiceschanged=loadVoices; setTimeout(loadVoices,400); }
 </script>
 </body>
 </html>
