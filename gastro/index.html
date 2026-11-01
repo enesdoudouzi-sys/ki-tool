@@ -6,11 +6,11 @@
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="KI für Gastronomie · Doudouzi & Ergün">
-<meta property="og:description" content="KI-Werkzeuge für Restaurants & Cafés: Bewertungen beantworten, Social-Media-Posts erstellen, Gäste-Mails sortieren.">
+<meta property="og:description" content="KI-Werkzeuge für Restaurants & Cafés: Anrufe entgegennehmen, Bewertungen beantworten, Social-Media-Posts erstellen – weniger Aufwand, mehr Gäste.">
 <meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <title>KI für Gastronomie · Doudouzi & Ergün</title>
-<meta name="description" content="KI-Werkzeuge für Restaurants & Cafés: Bewertungen beantworten, Social-Media-Posts, Speisekarten-Texte, Gäste-Kommunikation.">
+<meta name="description" content="KI-Werkzeuge für Restaurants & Cafés: Telefon-Assistent, Bewertungen beantworten, Social-Media-Posts, Gäste-Kommunikation – weniger Aufwand, mehr Gäste.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,22 +20,35 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:"Inter",system-ui,Arial,sans-serif;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
   .wrap{max-width:1000px;margin:0 auto;padding:0 24px 70px}
-  .k{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:40px 0 14px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:720px){.grid{grid-template-columns:1fr}}
-  .tool{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:.18s;background:#fff}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;border-radius:10px;padding:12px 22px;text-decoration:none;border:1px solid transparent}
+  .btn-dark{background:var(--ink);color:#fff} .btn-dark:hover{opacity:.9}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line)} .btn-ghost:hover{border-color:#c9cbd1}
+  .k{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:44px 0 14px}
+  .benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  @media(max-width:760px){.benefits{grid-template-columns:1fr 1fr}}
+  @media(max-width:460px){.benefits{grid-template-columns:1fr}}
+  .bf{background:#fff;padding:20px 18px} .bf .ic{font-size:22px} .bf b{display:block;margin:8px 0 3px;font-size:15px}
+  .bf span{font-size:13px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .tool{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;padding:22px;text-decoration:none;color:inherit;transition:.18s;background:#fff}
   .tool:hover{border-color:#d3d5db;box-shadow:0 10px 30px rgba(15,17,21,.06);transform:translateY(-2px)}
   .tool .ic{width:42px;height:42px;border-radius:11px;background:var(--accent-soft);display:grid;place-items:center;font-size:20px;margin-bottom:14px}
-  .tool h3{margin:0 0 6px;font-size:17px;font-weight:600;display:flex;align-items:center;gap:9px}
-  .tool .live{font-size:10.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid #dcebe2;border-radius:999px;padding:2px 8px}
-  .tool .soon{font-size:10.5px;font-weight:600;color:var(--muted);background:#f3f4f6;border:1px solid var(--line);border-radius:999px;padding:2px 8px}
-  .tool p{margin:0 0 16px;font-size:14px;color:var(--muted);flex:1}
-  .tool .go{font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+  .tool h3{margin:0 0 6px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tool .live{font-size:10px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid #dcebe2;border-radius:999px;padding:2px 7px}
+  .tool .soon{font-size:10px;font-weight:600;color:var(--muted);background:#f3f4f6;border:1px solid var(--line);border-radius:999px;padding:2px 7px}
+  .tool p{margin:0 0 14px;font-size:13.5px;color:var(--muted);flex:1}
+  .tool .go{font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
   .tool .go .arr{color:var(--accent-2)}
-  .cta{margin-top:46px;border:1px solid var(--line);background:var(--bg2);border-radius:16px;padding:28px;text-align:center}
-  .cta h3{margin:0 0 8px;font-size:20px;font-weight:600}
-  .cta p{margin:0 0 16px;color:var(--muted);font-size:15px}
-  .cta a{display:inline-flex;gap:8px;background:var(--ink);color:#fff;text-decoration:none;font-weight:500;border-radius:10px;padding:12px 22px;font-size:15px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{border:1px solid var(--line);border-radius:14px;padding:20px;background:#fff}
+  .step .n{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:14px;margin-bottom:12px}
+  .step b{display:block;font-size:15px;margin-bottom:4px} .step p{margin:0;font-size:13.5px;color:var(--muted)}
+  .cta{margin-top:46px;border:1px solid var(--line);background:var(--bg2);border-radius:16px;padding:30px;text-align:center}
+  .cta h3{margin:0 0 8px;font-size:21px;font-weight:600} .cta p{margin:0 0 16px;color:var(--muted);font-size:15px}
+  .cta a{display:inline-flex;gap:8px;background:var(--ink);color:#fff;text-decoration:none;font-weight:500;border-radius:10px;padding:12px 24px;font-size:15px}
   footer{margin-top:52px;border-top:1px solid var(--line);padding:24px 0 0;font-size:13px;color:var(--muted)}
   footer a{color:var(--muted)}
 </style>
@@ -53,33 +66,50 @@
   </div>
 
   <div class="phero">
-    <span class="eyebrow"><span class="dot"></span> KI für die Gastronomie</span>
-    <h1>Mehr Zeit für Ihre Gäste – die KI übernimmt den Rest.</h1>
-    <p>Speziell für Restaurants, Cafés &amp; Lieferdienste: Bewertungen beantworten, Social-Media-Posts erstellen, Gäste-Anfragen sortieren – in Sekunden.</p>
+    <span class="eyebrow"><span class="dot"></span> KI für Restaurants &amp; Cafés</span>
+    <h1>Weniger Aufwand. Mehr Gäste.</h1>
+    <p>Die KI nimmt Anrufe entgegen, beantwortet Bewertungen und schreibt Ihre Social-Media-Posts – damit Sie mehr Zeit für Ihre Gäste haben. Jetzt kostenlos ausprobieren.</p>
+    <div class="cta-row">
+      <a class="btn btn-dark" href="#tools">Tools ausprobieren →</a>
+      <a class="btn btn-ghost" href="#start">Kostenlos beraten lassen</a>
+    </div>
   </div>
 
-  <div class="k">Sofort ausprobieren</div>
+  <div class="benefits">
+    <div class="bf"><div class="ic">📞</div><b>Kein Anruf verpasst</b><span>Reservierungen werden auch in der Stoßzeit aufgenommen.</span></div>
+    <div class="bf"><div class="ic">⭐</div><b>Bessere Bewertungen</b><span>Schnelle, höfliche Antworten auf jede Rezension.</span></div>
+    <div class="bf"><div class="ic">📣</div><b>Mehr Sichtbarkeit</b><span>Social-Media-Posts in Sekunden statt Stunden.</span></div>
+    <div class="bf"><div class="ic">⏱️</div><b>Zeit gespart</b><span>Weniger Büroarbeit, mehr Zeit für den Service.</span></div>
+  </div>
+
+  <div class="k" id="tools">Sofort ausprobieren – kostenlos</div>
   <div class="grid">
+    <a class="tool" href="/ki-tool/gastro/telefon/">
+      <div class="ic">📞</div>
+      <h3>Telefon-Assistent <span class="live">● DEMO</span></h3>
+      <p>Sprechen Sie wie am Telefon: Die KI beantwortet Fragen und nimmt Reservierungen auf – mit echter Stimme.</p>
+      <span class="go">Demo ausprobieren <span class="arr">→</span></span>
+    </a>
     <a class="tool" href="/ki-tool/gastro/bewertungen/">
       <div class="ic">⭐</div>
       <h3>Bewertungs-Analyse <span class="live">● LIVE</span></h3>
-      <p>Google-/TripAdvisor-Bewertungen einfügen → die KI zeigt Lob &amp; Kritik und schreibt eine professionelle Antwort auf jede Bewertung – auch auf negative.</p>
+      <p>Google-/TripAdvisor-Bewertungen einfügen → die KI zeigt Lob &amp; Kritik und schreibt eine Antwort auf jede.</p>
       <span class="go">Bewertungen analysieren <span class="arr">→</span></span>
     </a>
     <a class="tool" href="/ki-tool/gastro/social/">
       <div class="ic">📣</div>
       <h3>Social-Media-Generator <span class="live">● LIVE</span></h3>
-      <p>Gericht oder Tagesangebot eingeben → fertiger Instagram-/Facebook-Post inklusive passender Hashtags. Ton wählbar.</p>
+      <p>Gericht oder Angebot eingeben → fertiger Instagram-/Facebook-Post inklusive Hashtags.</p>
       <span class="go">Post erstellen <span class="arr">→</span></span>
     </a>
   </div>
 
-  <div class="k">Teil des Gastro-Pakets (auf Anfrage)</div>
+  <div class="k">Weitere Bausteine (auf Anfrage)</div>
   <div class="grid">
     <div class="tool" style="cursor:default">
       <div class="ic">📋</div>
       <h3>Speisekarten-Texter <span class="soon">Auf Anfrage</span></h3>
-      <p>Zutaten eingeben → appetitliche Beschreibungen, mehrsprachig für Touristen, inkl. Allergen-Hinweisen.</p>
+      <p>Appetitliche Beschreibungen, mehrsprachig für Touristen, inkl. Allergen-Hinweisen.</p>
     </div>
     <div class="tool" style="cursor:default">
       <div class="ic">📥</div>
@@ -87,22 +117,23 @@
       <p>Reservierungs-, Catering- und Beschwerde-Mails automatisch einordnen und beantworten.</p>
     </div>
     <div class="tool" style="cursor:default">
-      <div class="ic">👥</div>
-      <h3>Personal &amp; Stellenanzeigen <span class="soon">Auf Anfrage</span></h3>
-      <p>Stellenanzeigen für Kellner/Köche schreiben, Bewerbungen kurz zusammenfassen.</p>
+      <div class="ic">☎️</div>
+      <h3>Echter Telefonanschluss <span class="soon">Projekt</span></h3>
+      <p>Der Assistent geht an Ihre echte Rufnummer (wie bei großen Anbietern) – als betreutes Projekt.</p>
     </div>
-    <a class="tool" href="/ki-tool/gastro/telefon/">
-      <div class="ic">📞</div>
-      <h3>Telefon-Assistent <span class="live">● DEMO</span></h3>
-      <p>Sprechen Sie wie am Telefon: Die KI beantwortet Fragen und nimmt Reservierungen auf – mit echter Stimme im Browser.</p>
-      <span class="go">Demo ausprobieren <span class="arr">→</span></span>
-    </a>
+  </div>
+
+  <div class="k" id="start">So starten Sie</div>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><b>Tools testen</b><p>Probieren Sie die kostenlosen Werkzeuge oben direkt aus – ganz ohne Anmeldung.</p></div>
+    <div class="step"><div class="n">2</div><b>Kostenloses Erstgespräch</b><p>Wir schauen, welche Bausteine für Ihr Lokal am meisten bringen.</p></div>
+    <div class="step"><div class="n">3</div><b>Einrichtung &amp; Betreuung</b><p>Wir richten alles mit Ihren Daten ein und begleiten Sie im Alltag.</p></div>
   </div>
 
   <div class="cta">
     <h3>KI für Ihr Lokal einrichten</h3>
-    <p>Wir richten die passenden Werkzeuge für Ihren Betrieb ein – im kostenlosen Erstgespräch.</p>
-    <a href="/ki-tool/prozess-check/">Kostenlos anfragen →</a>
+    <p>Kostenloses, unverbindliches Erstgespräch – wir melden uns zeitnah bei Ihnen.</p>
+    <a href="/ki-tool/prozess-check/">Jetzt kostenlos anfragen →</a>
   </div>
 
   <footer>
