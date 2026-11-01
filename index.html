@@ -41,6 +41,8 @@
   .nav a.cta:hover{opacity:.88}
   .themetog{background:none;border:0;cursor:pointer;font-size:15px;line-height:1;padding:7px 9px;border-radius:8px}
   .themetog:hover{background:var(--bg2)}
+  .langsel{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font:inherit;font-size:12.5px;font-weight:500;padding:6px 8px;cursor:pointer}
+  .langsel:hover{color:var(--ink);border-color:var(--line-2)}
   @media(max-width:640px){ .nav a:not(.cta){display:none} }
 
   /* Hero */
@@ -105,32 +107,33 @@
 
   <div class="topbar">
     <div class="wrap row">
-      <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+      <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small data-i18n="foot.tag">Prozessoptimierung &amp; KI</small></span></a>
       <nav class="nav">
-        <a href="/ki-tool/textanalyse/">Textanalyse</a>
-        <a href="/ki-tool/email-filter/">E-Mail-Filter</a>
-        <a href="/ki-tool/prozess-check/">Prozess-Check</a>
-        <a href="/ki-tool/gastro/">Gastro</a>
-        <a href="/ki-tool/methoden/">Methoden</a>
+        <a href="/ki-tool/textanalyse/" data-i18n="nav.textanalyse">Textanalyse</a>
+        <a href="/ki-tool/email-filter/" data-i18n="nav.email">E-Mail-Filter</a>
+        <a href="/ki-tool/prozess-check/" data-i18n="nav.prozess">Prozess-Check</a>
+        <a href="/ki-tool/gastro/" data-i18n="nav.gastro">Gastro</a>
+        <a href="/ki-tool/methoden/" data-i18n="nav.methoden">Methoden</a>
+        <select class="langsel" id="langsel" aria-label="Sprache / Language"><option value="de">DE</option><option value="en">EN</option><option value="tr">TR</option><option value="fr">FR</option><option value="es">ES</option></select>
         <button class="themetog" id="themetog" type="button" aria-label="Hell/Dunkel umschalten" title="Hell/Dunkel">🌙</button>
-        <a class="cta" href="/ki-tool/assistent/">KI-Assistent →</a>
+        <a class="cta" href="/ki-tool/assistent/"><span data-i18n="nav.assistant">KI-Assistent</span> →</a>
       </nav>
     </div>
   </div>
 
   <header class="hero">
     <div class="wrap">
-      <span class="eyebrow"><span class="dot"></span> KI-Werkzeuge für Unternehmen</span>
-      <h1>Künstliche Intelligenz, die im Arbeitsalltag wirklich hilft.</h1>
-      <p class="lead">Vier Werkzeuge, die Routine abnehmen – vom echten Assistenten bis zur Prozessanalyse. Direkt im Browser, ohne Installation.</p>
+      <span class="eyebrow"><span class="dot"></span> <span data-i18n="hero.eyebrow">KI-Werkzeuge für Unternehmen</span></span>
+      <h1 data-i18n="hero.h1">Künstliche Intelligenz, die im Arbeitsalltag wirklich hilft.</h1>
+      <p class="lead" data-i18n="hero.lead">Vier Werkzeuge, die Routine abnehmen – vom echten Assistenten bis zur Prozessanalyse. Direkt im Browser, ohne Installation.</p>
       <div class="cta-row">
-        <a class="btn btn-dark" href="/ki-tool/assistent/">KI-Assistent starten <span>→</span></a>
-        <a class="btn btn-ghost" href="#tools">Alle Tools ansehen</a>
+        <a class="btn btn-dark" href="/ki-tool/assistent/"><span data-i18n="hero.cta1">KI-Assistent starten</span> <span>→</span></a>
+        <a class="btn btn-ghost" href="#tools" data-i18n="hero.cta2">Alle Tools ansehen</a>
       </div>
       <div class="trust">
-        <span>🔒 DSGVO-freundlich</span>
-        <span>⚡ Ergebnis in Sekunden</span>
-        <span>💶 Kostenlos</span>
+        <span data-i18n="trust.1">🔒 DSGVO-freundlich</span>
+        <span data-i18n="trust.2">⚡ Ergebnis in Sekunden</span>
+        <span data-i18n="trust.3">💶 Kostenlos</span>
       </div>
     </div>
   </header>
@@ -138,62 +141,120 @@
   <main class="wrap">
     <section class="section" id="tools">
       <div class="sec-head">
-        <div class="k">Die Werkzeuge</div>
-        <h2>Vier Tools, ein System</h2>
+        <div class="k" data-i18n="sec.k">Die Werkzeuge</div>
+        <h2 data-i18n="sec.h2">Vier Tools, ein System</h2>
       </div>
       <div class="tools">
 
         <a class="tool" href="/ki-tool/assistent/">
           <div class="ic">🤖</div>
-          <h3>KI-Assistent <span class="live">● LIVE</span></h3>
-          <p>Echter Chat auf GPT-Niveau: beantwortet Fragen, schreibt E-Mails, fasst zusammen und übersetzt – wie ein menschlicher Mitarbeiter.</p>
-          <span class="go">Assistent öffnen <span class="arr">→</span></span>
+          <h3><span data-i18n="t.assistant">KI-Assistent</span> <span class="live">● LIVE</span></h3>
+          <p data-i18n="d.assistant">Echter Chat auf GPT-Niveau: beantwortet Fragen, schreibt E-Mails, fasst zusammen und übersetzt – wie ein menschlicher Mitarbeiter.</p>
+          <span class="go"><span data-i18n="go.assistant">Assistent öffnen</span> <span class="arr">→</span></span>
         </a>
 
         <a class="tool" href="/ki-tool/email-filter/">
           <div class="ic">📥</div>
-          <h3>E-Mail-Filter</h3>
-          <p>Mehrere E-Mails einfügen – die KI sortiert den Posteingang automatisch nach Thema und Dringlichkeit und schlägt Antworten vor.</p>
-          <span class="go">Posteingang sortieren <span class="arr">→</span></span>
+          <h3 data-i18n="t.email">E-Mail-Filter</h3>
+          <p data-i18n="d.email">Mehrere E-Mails einfügen – die KI sortiert den Posteingang automatisch nach Thema und Dringlichkeit und schlägt Antworten vor.</p>
+          <span class="go"><span data-i18n="go.email">Posteingang sortieren</span> <span class="arr">→</span></span>
         </a>
 
         <a class="tool" href="/ki-tool/textanalyse/">
           <div class="ic">🧠</div>
-          <h3>KI-Textanalyse</h3>
-          <p>Jeden Text analysieren: Kategorie, Stimmung, wichtige Begriffe, Zusammenfassung – plus automatischer Antwort-Vorschlag.</p>
-          <span class="go">Text analysieren <span class="arr">→</span></span>
+          <h3 data-i18n="t.text">KI-Textanalyse</h3>
+          <p data-i18n="d.text">Jeden Text analysieren: Kategorie, Stimmung, wichtige Begriffe, Zusammenfassung – plus automatischer Antwort-Vorschlag.</p>
+          <span class="go"><span data-i18n="go.text">Text analysieren</span> <span class="arr">→</span></span>
         </a>
 
         <a class="tool" href="/ki-tool/prozess-check/">
           <div class="ic">📊</div>
-          <h3>Prozess-Check</h3>
-          <p>In Minuten das Automatisierungspotenzial ermitteln – nach Lean &amp; Six Sigma, mit geschätzter Zeit- und Kostenersparnis.</p>
-          <span class="go">Potenzial berechnen <span class="arr">→</span></span>
+          <h3 data-i18n="t.prozess">Prozess-Check</h3>
+          <p data-i18n="d.prozess">In Minuten das Automatisierungspotenzial ermitteln – nach Lean &amp; Six Sigma, mit geschätzter Zeit- und Kostenersparnis.</p>
+          <span class="go"><span data-i18n="go.prozess">Potenzial berechnen</span> <span class="arr">→</span></span>
         </a>
 
       </div>
 
       <div class="feat">
-        <div class="f"><b>Datenschutz zuerst</b><span>Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.</span></div>
-        <div class="f"><b>Für jede Branche</b><span>Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.</span></div>
-        <div class="f"><b>Sofort einsatzbereit</b><span>Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.</span></div>
+        <div class="f"><b data-i18n="feat1.t">Datenschutz zuerst</b><span data-i18n="feat1.d">Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.</span></div>
+        <div class="f"><b data-i18n="feat2.t">Für jede Branche</b><span data-i18n="feat2.d">Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.</span></div>
+        <div class="f"><b data-i18n="feat3.t">Sofort einsatzbereit</b><span data-i18n="feat3.d">Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.</span></div>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="wrap row">
-      <span>© <span id="y"></span> Doudouzi &amp; Ergün · Prozessoptimierung &amp; KI</span>
+      <span>© <span id="y"></span> Doudouzi &amp; Ergün · <span data-i18n="foot.tag">Prozessoptimierung &amp; KI</span></span>
       <span class="links">
-        <a href="/ki-tool/methoden/">Methoden</a>
-        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/">Website</a>
-        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/datenschutz.html">Datenschutz</a>
-        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/impressum.html">Impressum</a>
+        <a href="/ki-tool/methoden/" data-i18n="foot.methoden">Methoden</a>
+        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/" data-i18n="foot.website">Website</a>
+        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/datenschutz.html" data-i18n="foot.datenschutz">Datenschutz</a>
+        <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/impressum.html" data-i18n="foot.impressum">Impressum</a>
       </span>
     </div>
   </footer>
   <script>
     document.getElementById('y').textContent=new Date().getFullYear();
+
+    /* --- Mehrsprachigkeit --- */
+    const I18N = {
+      de:{ "nav.textanalyse":"Textanalyse","nav.email":"E-Mail-Filter","nav.prozess":"Prozess-Check","nav.gastro":"Gastro","nav.methoden":"Methoden","nav.assistant":"KI-Assistent",
+        "hero.eyebrow":"KI-Werkzeuge für Unternehmen","hero.h1":"Künstliche Intelligenz, die im Arbeitsalltag wirklich hilft.","hero.lead":"Vier Werkzeuge, die Routine abnehmen – vom echten Assistenten bis zur Prozessanalyse. Direkt im Browser, ohne Installation.","hero.cta1":"KI-Assistent starten","hero.cta2":"Alle Tools ansehen",
+        "trust.1":"🔒 DSGVO-freundlich","trust.2":"⚡ Ergebnis in Sekunden","trust.3":"💶 Kostenlos","sec.k":"Die Werkzeuge","sec.h2":"Vier Tools, ein System",
+        "t.assistant":"KI-Assistent","d.assistant":"Echter Chat auf GPT-Niveau: beantwortet Fragen, schreibt E-Mails, fasst zusammen und übersetzt – wie ein menschlicher Mitarbeiter.","go.assistant":"Assistent öffnen",
+        "t.email":"E-Mail-Filter","d.email":"Mehrere E-Mails einfügen – die KI sortiert den Posteingang nach Thema und Dringlichkeit und schlägt Antworten vor.","go.email":"Posteingang sortieren",
+        "t.text":"KI-Textanalyse","d.text":"Jeden Text analysieren: Kategorie, Stimmung, wichtige Begriffe, Zusammenfassung – plus automatischer Antwort-Vorschlag.","go.text":"Text analysieren",
+        "t.prozess":"Prozess-Check","d.prozess":"In Minuten das Automatisierungspotenzial ermitteln – nach Lean & Six Sigma, mit geschätzter Zeit- und Kostenersparnis.","go.prozess":"Potenzial berechnen",
+        "feat1.t":"Datenschutz zuerst","feat1.d":"Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.","feat2.t":"Für jede Branche","feat2.d":"Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.","feat3.t":"Sofort einsatzbereit","feat3.d":"Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.",
+        "foot.tag":"Prozessoptimierung & KI","foot.methoden":"Methoden","foot.website":"Website","foot.datenschutz":"Datenschutz","foot.impressum":"Impressum" },
+      en:{ "nav.textanalyse":"Text Analysis","nav.email":"Email Filter","nav.prozess":"Process Check","nav.gastro":"Gastro","nav.methoden":"Methods","nav.assistant":"AI Assistant",
+        "hero.eyebrow":"AI tools for businesses","hero.h1":"Artificial intelligence that truly helps in everyday work.","hero.lead":"Four tools that take over routine work – from a real assistant to process analysis. Right in your browser, no installation.","hero.cta1":"Start AI Assistant","hero.cta2":"See all tools",
+        "trust.1":"🔒 GDPR-friendly","trust.2":"⚡ Results in seconds","trust.3":"💶 Free","sec.k":"The tools","sec.h2":"Four tools, one system",
+        "t.assistant":"AI Assistant","d.assistant":"A real GPT-level chat: answers questions, writes emails, summarizes and translates – like a human colleague.","go.assistant":"Open assistant",
+        "t.email":"Email Filter","d.email":"Paste several emails – the AI sorts your inbox by topic and urgency and suggests replies.","go.email":"Sort inbox",
+        "t.text":"AI Text Analysis","d.text":"Analyze any text: category, sentiment, key terms, summary – plus an automatic reply suggestion.","go.text":"Analyze text",
+        "t.prozess":"Process Check","d.prozess":"Find your automation potential in minutes – based on Lean & Six Sigma, with estimated time and cost savings.","go.prozess":"Calculate potential",
+        "feat1.t":"Privacy first","feat1.d":"Most tools run right in your browser – data is not stored.","feat2.t":"For every industry","feat2.d":"Logistics, retail, hospitality, legal, services, healthcare – fully customizable.","feat3.t":"Ready to use","feat3.d":"No installation, no account, no cost. Just open and start.",
+        "foot.tag":"Process optimization & AI","foot.methoden":"Methods","foot.website":"Website","foot.datenschutz":"Privacy","foot.impressum":"Imprint" },
+      tr:{ "nav.textanalyse":"Metin Analizi","nav.email":"E-posta Filtresi","nav.prozess":"Süreç Kontrolü","nav.gastro":"Gastro","nav.methoden":"Yöntemler","nav.assistant":"Yapay Zekâ Asistanı",
+        "hero.eyebrow":"İşletmeler için yapay zekâ araçları","hero.h1":"Günlük işlerde gerçekten yardımcı olan yapay zekâ.","hero.lead":"Rutin işleri üstlenen dört araç – gerçek bir asistandan süreç analizine kadar. Doğrudan tarayıcıda, kurulum yok.","hero.cta1":"Asistanı başlat","hero.cta2":"Tüm araçları gör",
+        "trust.1":"🔒 KVKK/GDPR uyumlu","trust.2":"⚡ Saniyeler içinde sonuç","trust.3":"💶 Ücretsiz","sec.k":"Araçlar","sec.h2":"Dört araç, tek sistem",
+        "t.assistant":"Yapay Zekâ Asistanı","d.assistant":"Gerçek bir sohbet: soruları yanıtlar, e-posta yazar, özetler ve çevirir – insan bir çalışan gibi.","go.assistant":"Asistanı aç",
+        "t.email":"E-posta Filtresi","d.email":"Birden fazla e-postayı yapıştırın – yapay zekâ gelen kutusunu konu ve önceliğe göre sıralar ve yanıt önerir.","go.email":"Gelen kutusunu sırala",
+        "t.text":"Metin Analizi","d.text":"Her metni analiz edin: kategori, duygu, önemli terimler, özet – ayrıca otomatik yanıt önerisi.","go.text":"Metni analiz et",
+        "t.prozess":"Süreç Kontrolü","d.prozess":"Dakikalar içinde otomasyon potansiyelinizi öğrenin – Lean & Six Sigma'ya göre, tahmini zaman ve maliyet tasarrufuyla.","go.prozess":"Potansiyeli hesapla",
+        "feat1.t":"Önce gizlilik","feat1.d":"Çoğu araç doğrudan tarayıcıda çalışır – veriler saklanmaz.","feat2.t":"Her sektör için","feat2.d":"Lojistik, perakende, gastronomi, hukuk, hizmet, sağlık – tamamen uyarlanabilir.","feat3.t":"Hemen kullanıma hazır","feat3.d":"Kurulum yok, hesap yok, ücret yok. Aç ve başla.",
+        "foot.tag":"Süreç optimizasyonu & YZ","foot.methoden":"Yöntemler","foot.website":"Web sitesi","foot.datenschutz":"Gizlilik","foot.impressum":"Künye" },
+      fr:{ "nav.textanalyse":"Analyse de texte","nav.email":"Filtre e-mails","nav.prozess":"Contrôle de processus","nav.gastro":"Gastro","nav.methoden":"Méthodes","nav.assistant":"Assistant IA",
+        "hero.eyebrow":"Outils d'IA pour les entreprises","hero.h1":"Une intelligence artificielle vraiment utile au quotidien.","hero.lead":"Quatre outils qui prennent en charge les tâches routinières – de l'assistant réel à l'analyse de processus. Directement dans le navigateur, sans installation.","hero.cta1":"Lancer l'assistant IA","hero.cta2":"Voir tous les outils",
+        "trust.1":"🔒 Conforme RGPD","trust.2":"⚡ Résultats en secondes","trust.3":"💶 Gratuit","sec.k":"Les outils","sec.h2":"Quatre outils, un système",
+        "t.assistant":"Assistant IA","d.assistant":"Un vrai chat de niveau GPT : répond aux questions, rédige des e-mails, résume et traduit – comme un collègue.","go.assistant":"Ouvrir l'assistant",
+        "t.email":"Filtre e-mails","d.email":"Collez plusieurs e-mails – l'IA trie la boîte de réception par sujet et urgence et propose des réponses.","go.email":"Trier la boîte",
+        "t.text":"Analyse de texte IA","d.text":"Analysez tout texte : catégorie, sentiment, termes clés, résumé – plus une suggestion de réponse automatique.","go.text":"Analyser le texte",
+        "t.prozess":"Contrôle de processus","d.prozess":"Évaluez votre potentiel d'automatisation en quelques minutes – selon Lean & Six Sigma, avec économies estimées de temps et de coûts.","go.prozess":"Calculer le potentiel",
+        "feat1.t":"La confidentialité d'abord","feat1.d":"La plupart des outils fonctionnent dans le navigateur – les données ne sont pas stockées.","feat2.t":"Pour chaque secteur","feat2.d":"Logistique, commerce, restauration, juridique, services, santé – entièrement personnalisable.","feat3.t":"Prêt à l'emploi","feat3.d":"Aucune installation, aucun compte, aucun coût. Ouvrez et commencez.",
+        "foot.tag":"Optimisation des processus & IA","foot.methoden":"Méthodes","foot.website":"Site web","foot.datenschutz":"Confidentialité","foot.impressum":"Mentions légales" },
+      es:{ "nav.textanalyse":"Análisis de texto","nav.email":"Filtro de correo","nav.prozess":"Control de procesos","nav.gastro":"Gastro","nav.methoden":"Métodos","nav.assistant":"Asistente IA",
+        "hero.eyebrow":"Herramientas de IA para empresas","hero.h1":"Inteligencia artificial que realmente ayuda en el día a día.","hero.lead":"Cuatro herramientas que asumen las tareas rutinarias – desde un asistente real hasta el análisis de procesos. Directamente en el navegador, sin instalación.","hero.cta1":"Iniciar asistente IA","hero.cta2":"Ver todas las herramientas",
+        "trust.1":"🔒 Conforme al RGPD","trust.2":"⚡ Resultados en segundos","trust.3":"💶 Gratis","sec.k":"Las herramientas","sec.h2":"Cuatro herramientas, un sistema",
+        "t.assistant":"Asistente IA","d.assistant":"Un chat real de nivel GPT: responde preguntas, escribe correos, resume y traduce – como un compañero humano.","go.assistant":"Abrir asistente",
+        "t.email":"Filtro de correo","d.email":"Pega varios correos – la IA ordena la bandeja por tema y urgencia y sugiere respuestas.","go.email":"Ordenar bandeja",
+        "t.text":"Análisis de texto IA","d.text":"Analiza cualquier texto: categoría, sentimiento, términos clave, resumen – más una sugerencia de respuesta automática.","go.text":"Analizar texto",
+        "t.prozess":"Control de procesos","d.prozess":"Descubre tu potencial de automatización en minutos – según Lean & Six Sigma, con ahorro estimado de tiempo y costes.","go.prozess":"Calcular potencial",
+        "feat1.t":"La privacidad primero","feat1.d":"La mayoría de las herramientas funcionan en el navegador – los datos no se almacenan.","feat2.t":"Para cada sector","feat2.d":"Logística, comercio, hostelería, legal, servicios, salud – totalmente personalizable.","feat3.t":"Listo para usar","feat3.d":"Sin instalación, sin cuenta, sin coste. Abre y empieza.",
+        "foot.tag":"Optimización de procesos e IA","foot.methoden":"Métodos","foot.website":"Sitio web","foot.datenschutz":"Privacidad","foot.impressum":"Aviso legal" }
+    };
+    (function(){
+      const LKEY='ki-lang', sel=document.getElementById('langsel');
+      function applyLang(l){ const d=I18N[l]||I18N.de; document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(d[k]!=null) el.textContent=d[k]; }); document.documentElement.lang=l; }
+      let lang=''; try{lang=localStorage.getItem(LKEY)||'';}catch(e){}
+      if(!lang){ const b=(navigator.language||'de').slice(0,2).toLowerCase(); lang=I18N[b]?b:'de'; }
+      sel.value=lang; applyLang(lang);
+      sel.addEventListener('change',()=>{ try{localStorage.setItem(LKEY,sel.value);}catch(e){} applyLang(sel.value); });
+    })();
+
     (function(){
       const KEY='ki-theme', r=document.documentElement, t=document.getElementById('themetog');
       function apply(m){ if(m==='dark'){r.setAttribute('data-theme','dark');t.textContent='☀️';}
