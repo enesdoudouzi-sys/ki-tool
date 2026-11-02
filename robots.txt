@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /ki-tool/
+
+Sitemap: https://enesdoudouzi-sys.github.io/ki-tool/sitemap.xml

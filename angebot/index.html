@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Angebots-Generator · Doudouzi & Ergün">
+<meta property="og:description" content="Professionelle Beratungsangebote in Minuten – automatisch per KI.">
+<meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
+<title>Angebots-Generator · Doudouzi & Ergün</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<script defer src="/ki-tool/assets/suite.js"></script>
+<style>
+:root{--accent:#7c3aed;--accent-2:#6d28d9;--accent-soft:#f5f3ff;--ink:#1e1b4b;--muted:#64748b;--bg:#f8fafc;--card:#fff;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px}
+.steps{display:flex;gap:4px;margin-bottom:24px;counter-reset:step;flex-wrap:wrap}
+.step-item{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;counter-increment:step;flex:1;min-width:120px}
+.step-item::before{content:counter(step);width:22px;height:22px;border-radius:50%;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:12px;flex-shrink:0}
+.step-item.active{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.step-item.active::before{background:var(--accent);color:#fff}
+.step-item.done{color:#16a34a;border-color:#bbf7d0;background:#f0fdf4}
+.step-item.done::before{background:#16a34a;color:#fff}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 4px;color:var(--ink)}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--ink)}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);margin-bottom:14px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+textarea{resize:vertical;min-height:90px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
+.btn{padding:11px 22px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;border:0}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent-2)}
+.btn-s{background:var(--card);border:1px solid var(--line);color:var(--muted)}.btn-s:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.preview{background:#f9f7ff;border:1px solid #ddd6fe;border-radius:12px;padding:20px;font-size:13.5px;line-height:1.7;white-space:pre-wrap;max-height:600px;overflow-y:auto}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--card);cursor:pointer;transition:.15s}
+.badge.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.badge:hover:not(.sel){border-color:var(--accent);color:var(--accent)}
+.dots span{display:inline-block;width:6px;height:6px;margin:0 2px;background:var(--accent);border-radius:50%;animation:b 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;border-radius:9px;padding:10px 14px;font-size:13px;margin:10px 0}
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn-exp{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s}
+.btn-exp:hover{border-color:var(--accent);color:var(--accent)}
+.field-hint{font-size:11.5px;color:var(--muted);margin-top:-10px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+  <nav class="tbnav">
+    <a href="/ki-tool/assistent/">KI-Assistent</a>
+    <a href="/ki-tool/prozess-check/">Prozess-Check</a>
+    <a href="/ki-tool/logistik/">Logistik-KI</a>
+    <a class="cta active" href="/ki-tool/angebot/">Angebots-Generator →</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> Angebots-Generator</span>
+    <h1>Professionelle Angebote in Minuten.</h1>
+    <p>3 Schritte – Unternehmensdaten, Leistungen, Konditionen – die KI schreibt das vollständige Beratungsangebot.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step-item active" data-step="1">Unternehmen</div>
+    <div class="step-item" data-step="2">Leistungen</div>
+    <div class="step-item" data-step="3">Konditionen</div>
+    <div class="step-item" data-step="4">Vorschau &amp; Export</div>
+  </div>
+
+  <!-- STEP 1: Unternehmen -->
+  <div id="step-1" class="panel active">
+    <div class="card">
+      <h2>1. Kundenunternehmen</h2>
+      <p class="sub">Wer ist der potenzielle Kunde?</p>
+      <label>Unternehmensname</label>
+      <input type="text" id="f-firma" placeholder="z.B. Müller Transport GmbH">
+      <div class="row">
+        <div>
+          <label>Branche</label>
+          <select id="f-branche">
+            <option>Logistik & Transport</option>
+            <option>Gastronomie & Hotellerie</option>
+            <option>Handel & E-Commerce</option>
+            <option>Produktion & Fertigung</option>
+            <option>Gesundheit & Pflege</option>
+            <option>Bau & Handwerk</option>
+            <option>IT & Dienstleistungen</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div>
+          <label>Unternehmensgröße</label>
+          <select id="f-groesse">
+            <option>1–10 Mitarbeiter</option>
+            <option>11–50 Mitarbeiter</option>
+            <option>51–200 Mitarbeiter</option>
+            <option>200+ Mitarbeiter</option>
+          </select>
+        </div>
+      </div>
+      <label>Ansprechpartner (optional)</label>
+      <input type="text" id="f-ap" placeholder="z.B. Herr Thomas Müller, Geschäftsführer">
+      <label>Hauptproblem / Ausgangssituation</label>
+      <textarea id="f-problem" rows="3" placeholder="z.B. Hohe Verspätungsquote bei Lieferungen, manuelle Prozesse kosten zu viel Zeit, Mitarbeiter überlastet..."></textarea>
+      <label>Wie wurde der Kontakt hergestellt?</label>
+      <select id="f-kontakt">
+        <option>Empfehlung</option>
+        <option>Kaltakquise</option>
+        <option>Website / Online</option>
+        <option>Messe / Event</option>
+        <option>Bestehendes Netzwerk</option>
+      </select>
+    </div>
+    <div class="nav-row">
+      <span></span>
+      <button class="btn btn-p" onclick="nextStep(1)">Weiter → Leistungen</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Leistungen -->
+  <div id="step-2" class="panel">
+    <div class="card">
+      <h2>2. Unsere Leistungen</h2>
+      <p class="sub">Was bieten wir diesem Kunden an? (Mehrfachauswahl möglich)</p>
+      <div class="badge-row" id="leistungen-badges">
+        <div class="badge" data-val="Prozessanalyse & -optimierung">🔍 Prozessanalyse</div>
+        <div class="badge" data-val="KI-Implementierung & Automatisierung">🤖 KI-Implementierung</div>
+        <div class="badge" data-val="Lean Management & Verschwendungsreduzierung">⚡ Lean Management</div>
+        <div class="badge" data-val="Digitalisierungsberatung">💻 Digitalisierung</div>
+        <div class="badge" data-val="Mitarbeiterschulung & Change Management">👥 Schulungen</div>
+        <div class="badge" data-val="KPI-Dashboard & Reporting">📊 KPI & Reporting</div>
+        <div class="badge" data-val="Workflow-Automatisierung">⚙️ Automatisierung</div>
+        <div class="badge" data-val="Strategieberatung & Wachstumsstrategie">🎯 Strategie</div>
+      </div>
+      <label>Eigene Leistung ergänzen (optional)</label>
+      <input type="text" id="f-custom-leist" placeholder="z.B. Telefonassistent-Einrichtung, Einkaufsoptimierung...">
+      <label>Besonderer Fokus / Ziel des Projekts</label>
+      <textarea id="f-ziel" rows="3" placeholder="z.B. Liefertreue von 80% auf 95% steigern, manuelle Dateneingabe eliminieren..."></textarea>
+      <label>Zeitrahmen</label>
+      <select id="f-zeit">
+        <option>4 Wochen (Quick Win)</option>
+        <option>8 Wochen</option>
+        <option>3 Monate</option>
+        <option>6 Monate</option>
+        <option>12 Monate (langfristig)</option>
+        <option>Laufend / monatlich</option>
+      </select>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-s" onclick="prevStep(2)">← Zurück</button>
+      <button class="btn btn-p" onclick="nextStep(2)">Weiter → Konditionen</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Konditionen -->
+  <div id="step-3" class="panel">
+    <div class="card">
+      <h2>3. Konditionen</h2>
+      <p class="sub">Preise und Modalitäten für das Angebot.</p>
+      <div class="row">
+        <div>
+          <label>Angebotstyp</label>
+          <select id="f-atyp">
+            <option>Festpreis-Projekt</option>
+            <option>Tagessatz / Stundenabrechnung</option>
+            <option>Monatliche Pauschale (Retainer)</option>
+            <option>Erfolgsbasierte Vergütung</option>
+            <option>Kostenlose Erstanalyse</option>
+          </select>
+        </div>
+        <div>
+          <label>Preisrahmen</label>
+          <input type="text" id="f-preis" placeholder="z.B. 2.500–4.000 € oder 850 €/Tag">
+        </div>
+      </div>
+      <div class="field-hint">Leer lassen = KI schlägt passenden Rahmen vor</div>
+      <div class="row">
+        <div>
+          <label>Zahlungsmodalität</label>
+          <select id="f-zahlung">
+            <option>50% Anzahlung, 50% nach Abschluss</option>
+            <option>100% nach Abschluss</option>
+            <option>Monatlich im Voraus</option>
+            <option>Nach Meilenstein</option>
+          </select>
+        </div>
+        <div>
+          <label>Gültigkeit des Angebots</label>
+          <select id="f-guelt">
+            <option>14 Tage</option>
+            <option>30 Tage</option>
+            <option>60 Tage</option>
+          </select>
+        </div>
+      </div>
+      <label>Besondere Konditionen / Hinweise (optional)</label>
+      <input type="text" id="f-extra" placeholder="z.B. Reisekosten separat, Workshops vor Ort, kostenlose Nachbetreuung 30 Tage...">
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-s" onclick="prevStep(3)">← Zurück</button>
+      <button class="btn btn-p" id="gen-btn" onclick="generateAngebot()">🤖 Angebot generieren →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Vorschau -->
+  <div id="step-4" class="panel">
+    <div class="card">
+      <h2>4. Ihr Angebot</h2>
+      <p class="sub">Vollständiges, professionelles Beratungsangebot – bereit zum Senden.</p>
+      <div id="angebot-loading" style="text-align:center;padding:30px">
+        <span class="dots"><span></span><span></span><span></span></span>
+        <p style="color:var(--muted);margin-top:12px;font-size:14px">KI erstellt Ihr Angebot …</p>
+      </div>
+      <div id="angebot-err" class="err" style="display:none"></div>
+      <div id="angebot-preview" class="preview" style="display:none"></div>
+      <div id="angebot-export" class="export-row" style="display:none">
+        <button class="btn-exp" onclick="doExport('pdf')">📕 PDF speichern</button>
+        <button class="btn-exp" onclick="doExport('txt')">📄 Text kopieren</button>
+        <button class="btn-exp" onclick="doExport('pptx')">📊 PowerPoint</button>
+        <button class="btn-exp" onclick="resetForm()">🔄 Neues Angebot</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-s" onclick="prevStep(4)">← Zurück bearbeiten</button>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:24px">
+    Powered by Groq KI · <a href="/ki-tool/" style="color:var(--accent)">← Alle Tools</a>
+  </p>
+</div>
+
+<script>
+const WORKER = "https://ki-proxy.enesdoudouzi.workers.dev/";
+const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+let currentStep = 1;
+let generatedText = '';
+
+// Steps
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.step-item').forEach((s,i) => {
+    s.classList.remove('active','done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+  });
+  document.getElementById('step-' + n).classList.add('active');
+  currentStep = n;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function nextStep(from) { goStep(from + 1); }
+function prevStep(from) { goStep(from - 1); }
+
+// Badges multi-select
+document.querySelectorAll('#leistungen-badges .badge').forEach(b => {
+  b.addEventListener('click', () => b.classList.toggle('sel'));
+});
+
+async function generateAngebot() {
+  goStep(4);
+  document.getElementById('angebot-loading').style.display = 'block';
+  document.getElementById('angebot-preview').style.display = 'none';
+  document.getElementById('angebot-export').style.display = 'none';
+  document.getElementById('angebot-err').style.display = 'none';
+
+  const firma = document.getElementById('f-firma').value || 'Kundenunternehmen';
+  const branche = document.getElementById('f-branche').value;
+  const groesse = document.getElementById('f-groesse').value;
+  const ap = document.getElementById('f-ap').value;
+  const problem = document.getElementById('f-problem').value;
+  const ziel = document.getElementById('f-ziel').value;
+  const zeit = document.getElementById('f-zeit').value;
+  const atyp = document.getElementById('f-atyp').value;
+  const preis = document.getElementById('f-preis').value;
+  const zahlung = document.getElementById('f-zahlung').value;
+  const guelt = document.getElementById('f-guelt').value;
+  const extra = document.getElementById('f-extra').value;
+  const kontakt = document.getElementById('f-kontakt').value;
+  const custom = document.getElementById('f-custom-leist').value;
+  const selLeist = [...document.querySelectorAll('#leistungen-badges .badge.sel')].map(b => b.dataset.val);
+  if (custom) selLeist.push(custom);
+
+  const prompt = `Du bist Berater bei "Doudouzi & Ergün – Prozessoptimierung & KI" und erstellst ein professionelles Beratungsangebot.
+
+KUNDENINFOS:
+- Unternehmen: ${firma}
+- Branche: ${branche}
+- Größe: ${groesse}
+- Ansprechpartner: ${ap || 'nicht angegeben'}
+- Ausgangsproblem: ${problem || 'nicht spezifiziert'}
+- Kontaktherkunft: ${kontakt}
+
+LEISTUNGEN:
+${selLeist.length ? selLeist.map((l,i) => `${i+1}. ${l}`).join('\n') : 'Allgemeine Prozessoptimierung'}
+
+PROJEKTZIEL: ${ziel || 'Effizienzsteigerung und Kostensenkung'}
+ZEITRAHMEN: ${zeit}
+
+KONDITIONEN:
+- Angebotstyp: ${atyp}
+- Preis: ${preis || 'wird passend vorgeschlagen'}
+- Zahlung: ${zahlung}
+- Gültig: ${guelt}
+- Extras: ${extra || 'keine'}
+
+Erstelle jetzt ein vollständiges, professionelles Angebot mit diesen Abschnitten:
+1. Kopfzeile (Datum, Empfänger, Absender Doudouzi & Ergün)
+2. Betreff: Angebot für [Leistung] – [Firmenname]
+3. Anrede und Einleitung (Bezug auf Problem/Situation)
+4. Unsere Leistungen (strukturiert, mit Mehrwert-Argumentation)
+5. Vorgehensweise / Projektphasen (mit Zeitplan)
+6. Investition / Kosten (konkret, nachvollziehbar begründet)
+7. Warum Doudouzi & Ergün? (kurze, überzeugende Positionierung)
+8. Nächste Schritte / Call to Action
+9. Grußformel und Unterschrift (Enes Doudouzi / Doudouzi & Ergün)
+
+Professionell, überzeugend, geschäftsmäßig. Auf Deutsch. Komplett und versandfertig.`;
+
+  let answer = null, lastErr = null;
+  for (const model of MODELS) {
+    try {
+      const r = await fetch(WORKER, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({model, temperature:0.5, max_tokens:2000, messages:[{role:'user',content:prompt}]})
+      });
+      const d = await r.json();
+      if (r.ok && d.choices?.[0]?.message?.content) { answer = d.choices[0].message.content.trim(); break; }
+      lastErr = d.error?.message || d.error || 'HTTP ' + r.status;
+      if (!/model|decommission|not exist|access/i.test(String(lastErr))) break;
+    } catch(e) { lastErr = e.message; break; }
+  }
+
+  document.getElementById('angebot-loading').style.display = 'none';
+  if (answer) {
+    generatedText = answer;
+    const prev = document.getElementById('angebot-preview');
+    prev.textContent = answer;
+    prev.style.display = 'block';
+    document.getElementById('angebot-export').style.display = 'flex';
+  } else {
+    const err = document.getElementById('angebot-err');
+    err.textContent = '⚠️ Fehler: ' + lastErr + ' – Worker/API-Schlüssel prüfen.';
+    err.style.display = 'block';
+  }
+}
+
+function doExport(type) {
+  if (!generatedText) return;
+  if (type === 'txt') {
+    navigator.clipboard.writeText(generatedText).then(() => alert('Text in Zwischenablage kopiert!'));
+    return;
+  }
+  if (type === 'pdf') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = () => {
+      const {jsPDF} = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(13);
+      const lines = doc.splitTextToSize(generatedText, 182);
+      let y = 14;
+      lines.forEach(l => {
+        if (y > 280) { doc.addPage(); y = 14; }
+        doc.text(l, 14, y); y += 6;
+      });
+      doc.save('angebot-doudouzi-erguen.pdf');
+    };
+    document.head.appendChild(s);
+    return;
+  }
+  if (type === 'pptx') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js';
+    s.onload = () => {
+      const pptx = new PptxGenJS();
+      const slide = pptx.addSlide();
+      slide.addText('Angebot – Doudouzi & Ergün', {x:0.5,y:0.3,fontSize:20,bold:true,color:'7c3aed'});
+      slide.addText(generatedText.slice(0,1500), {x:0.5,y:1.0,w:9,h:5.5,fontSize:9});
+      pptx.writeFile({fileName:'angebot-doudouzi-erguen.pptx'});
+    };
+    document.head.appendChild(s);
+  }
+}
+
+function resetForm() {
+  document.querySelectorAll('input[type=text],textarea').forEach(i => i.value = '');
+  document.querySelectorAll('.badge.sel').forEach(b => b.classList.remove('sel'));
+  generatedText = '';
+  goStep(1);
+}
+</script>
+</body>
+</html>

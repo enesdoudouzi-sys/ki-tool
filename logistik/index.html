@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Logistik-KI · Doudouzi & Ergün">
+<meta property="og:description" content="KI-Tools für Disponenten: Routenplanung, Fahrer-Kommunikation, Schadensmeldung, Disposition.">
+<meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
+<title>Logistik-KI · Doudouzi & Ergün</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<script defer src="/ki-tool/assets/suite.js"></script>
+<style>
+:root{--accent:#2563eb;--accent-2:#1d4ed8;--accent-soft:#eff6ff;--ink:#1e293b;--muted:#64748b;--bg:#f8fafc;--card:#fff;--line:#e2e8f0;--green:#16a34a}
+*{box-sizing:border-box}body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 20px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.tab{padding:8px 16px;border-radius:8px 8px 0 0;border:1px solid transparent;border-bottom:2px solid transparent;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);background:none;transition:.15s}
+.tab.active{color:var(--accent);border-color:var(--line);border-bottom-color:var(--card);background:var(--card)}
+.tab:hover:not(.active){color:var(--ink);background:var(--card)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--ink)}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);margin-bottom:12px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea{resize:vertical;min-height:80px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.btn-run{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-run:hover{background:var(--accent-2)}.btn-run:disabled{opacity:.5;cursor:not-allowed}
+.result{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:14px;white-space:pre-wrap;margin-top:14px;display:none;line-height:1.6}
+.result.show{display:block}
+.err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;border-radius:9px;padding:10px 14px;font-size:13px;margin-top:10px;display:none}
+.err.show{display:block}
+.dots span{display:inline-block;width:6px;height:6px;margin:0 2px;background:var(--accent);border-radius:50%;animation:b 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.chip{padding:6px 13px;border:1px solid var(--line);border-radius:999px;font-size:13px;cursor:pointer;background:var(--card);color:var(--muted);transition:.15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent)}
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-exp{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s}
+.btn-exp:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+  <nav class="tbnav">
+    <a href="/ki-tool/assistent/">KI-Assistent</a>
+    <a href="/ki-tool/prozess-check/">Prozess-Check</a>
+    <a href="/ki-tool/gastro/">Gastro</a>
+    <a class="cta active" href="/ki-tool/logistik/">Logistik-KI →</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <div class="phero">
+    <span class="eyebrow"><span class="dot"></span> Logistik-KI</span>
+    <h1>KI-Tools für Disponenten &amp; Logistik.</h1>
+    <p>Fahrer-E-Mails, Schadensmeldungen, Disposition, Routen-Optimierung – alles per KI in Sekunden.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="komm">✉️ Kommunikation</button>
+    <button class="tab" data-tab="schaden">⚠️ Schadensmeldung</button>
+    <button class="tab" data-tab="dispo">📋 Disposition</button>
+    <button class="tab" data-tab="zoll">🌍 Zoll &amp; Docs</button>
+    <button class="tab" data-tab="kpi">📊 KPI-Analyse</button>
+  </div>
+
+  <!-- TAB: KOMMUNIKATION -->
+  <div id="tab-komm" class="panel active">
+    <div class="card">
+      <h2>Fahrer & Kunden Kommunikation</h2>
+      <p class="sub">Erstellt professionelle E-Mails und Nachrichten – für Verspätungen, Routen, Aufträge.</p>
+      <div class="chip-row" id="komm-chips">
+        <span class="chip" data-t="komm" data-v="Lieferverspätung dem Kunden mitteilen – 2 Stunden Verzögerung wegen Stau A3">📦 Lieferverspätung</span>
+        <span class="chip" data-t="komm" data-v="Fahrer über neue Route informieren – Umleitungsbeschild ab Abfahrt km 45">🚛 Routenänderung</span>
+        <span class="chip" data-t="komm" data-v="Neuen Auftrag an Fahrer kommunizieren – Abholung 08:00 Uhr in Frankfurt, Lieferung Köln bis 16:00 Uhr">📋 Auftragszuweisung</span>
+        <span class="chip" data-t="komm" data-v="Kunden über Sendungsstatus informieren – Paket ist im Depot, wird morgen früh zugestellt">📍 Statusmeldung</span>
+      </div>
+      <label>Situation beschreiben</label>
+      <textarea id="komm-input" rows="3" placeholder="z.B.: Fahrer Mehmet hat 2h Verspätung wegen Stau, Kunde wartet auf dringende Lieferung..."></textarea>
+      <div class="row">
+        <div>
+          <label>Ton</label>
+          <select id="komm-ton">
+            <option value="professionell und höflich">Professionell</option>
+            <option value="freundlich und verständnisvoll">Freundlich</option>
+            <option value="direkt und sachlich">Direkt</option>
+            <option value="entschuldigend und lösungsorientiert">Entschuldigend</option>
+          </select>
+        </div>
+        <div>
+          <label>Empfänger</label>
+          <select id="komm-emp">
+            <option value="Kunde">Kunde</option>
+            <option value="Fahrer">Fahrer</option>
+            <option value="Auftraggeber">Auftraggeber</option>
+            <option value="internes Team">Internes Team</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-run" id="komm-btn">E-Mail / Nachricht generieren →</button>
+      <div class="result" id="komm-result"></div>
+      <div class="err" id="komm-err"></div>
+      <div class="export-row" id="komm-exp" style="display:none">
+        <button class="btn-exp" onclick="exportText('komm')">📄 TXT</button>
+        <button class="btn-exp" onclick="exportPDF('komm','Kommunikation')">📕 PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SCHADENSMELDUNG -->
+  <div id="tab-schaden" class="panel">
+    <div class="card">
+      <h2>Schadensmeldung erstellen</h2>
+      <p class="sub">Professionelle Schadensberichte für Versicherungen, Auftraggeber und interne Dokumentation.</p>
+      <div class="row">
+        <div>
+          <label>Fahrzeug / Kennzeichen</label>
+          <input type="text" id="s-fahrzeug" placeholder="z.B. MB Actros / AB-CD 1234">
+        </div>
+        <div>
+          <label>Datum & Uhrzeit</label>
+          <input type="datetime-local" id="s-datum">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Ort des Schadens</label>
+          <input type="text" id="s-ort" placeholder="z.B. BAB A5, km 87, Frankfurt Richtung Heidelberg">
+        </div>
+        <div>
+          <label>Schadensart</label>
+          <select id="s-art">
+            <option>Verkehrsunfall</option>
+            <option>Ladungsschaden</option>
+            <option>Einbruch/Diebstahl</option>
+            <option>Reifenplatzer</option>
+            <option>Motorschaden</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+      </div>
+      <label>Schadensbeschreibung (Was ist passiert?)</label>
+      <textarea id="s-beschr" rows="4" placeholder="z.B.: Fahrzeug stand auf Rasthof, Seitentür aufgebrochen, 3 Pakete fehlen..."></textarea>
+      <label>Beteiligte Personen / Zeugen</label>
+      <input type="text" id="s-zeugen" placeholder="z.B.: Zeuge: Hr. Müller, Tel. 0172...">
+      <button class="btn-run" id="schaden-btn">Schadensmeldung generieren →</button>
+      <div class="result" id="schaden-result"></div>
+      <div class="err" id="schaden-err"></div>
+      <div class="export-row" id="schaden-exp" style="display:none">
+        <button class="btn-exp" onclick="exportText('schaden')">📄 TXT</button>
+        <button class="btn-exp" onclick="exportPDF('schaden','Schadensmeldung')">📕 PDF</button>
+        <button class="btn-exp" onclick="exportDOCX('schaden')">📘 Word</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: DISPOSITION -->
+  <div id="tab-dispo" class="panel">
+    <div class="card">
+      <h2>Disposition &amp; Tourenplanung</h2>
+      <p class="sub">KI analysiert Ihre Aufträge und empfiehlt optimale Reihenfolge, Fahrerzeiten und Engpässe.</p>
+      <label>Aufträge (je Zeile: Zeit | Ort | Priorität)</label>
+      <textarea id="dispo-input" rows="7" placeholder="08:00 | Frankfurt Osthafen | hoch&#10;09:30 | Darmstadt Depot | normal&#10;11:00 | Heidelberg, Kunde A | hoch&#10;13:00 | Mannheim Lager | normal&#10;15:30 | Karlsruhe, Rückgabe | niedrig"></textarea>
+      <div class="row">
+        <div>
+          <label>Verfügbare Fahrer</label>
+          <input type="number" id="dispo-fahrer" value="2" min="1" max="20">
+        </div>
+        <div>
+          <label>Maximale Schichtlänge</label>
+          <select id="dispo-schicht">
+            <option value="8">8 Stunden</option>
+            <option value="9" selected>9 Stunden</option>
+            <option value="10">10 Stunden</option>
+            <option value="12">12 Stunden</option>
+          </select>
+        </div>
+      </div>
+      <label>Besonderheiten / Einschränkungen</label>
+      <input type="text" id="dispo-extra" placeholder="z.B. Fahrer A hat LKW-Führerschein, Fahrer B kein ADR...">
+      <button class="btn-run" id="dispo-btn">Dispositionsplan erstellen →</button>
+      <div class="result" id="dispo-result"></div>
+      <div class="err" id="dispo-err"></div>
+      <div class="export-row" id="dispo-exp" style="display:none">
+        <button class="btn-exp" onclick="exportPDF('dispo','Dispositionsplan')">📕 PDF</button>
+        <button class="btn-exp" onclick="exportXLSX('dispo')">📗 Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ZOLL -->
+  <div id="tab-zoll" class="panel">
+    <div class="card">
+      <h2>Zoll &amp; Versanddokumente</h2>
+      <p class="sub">Erstellt Lieferschein-Texte, Zollerklärungen, CMR-Hinweise und Begleitpapier-Beschreibungen.</p>
+      <div class="chip-row">
+        <span class="chip" data-t="zoll" data-v="CMR-Frachtbrief Hinweise für LKW-Transport von DE nach PL">📄 CMR-Hinweise</span>
+        <span class="chip" data-t="zoll" data-v="Zollerklärung für Textilwaren Export von Deutschland in die Türkei">🌍 Zollerklärung</span>
+        <span class="chip" data-t="zoll" data-v="Lieferschein-Text für 5 Paletten Elektronik von Frankfurt nach Wien">📦 Lieferschein</span>
+        <span class="chip" data-t="zoll" data-v="Gefahrgut ADR Klasse 3 Begleitdokument Hinweise für Dieseltransport">⚠️ ADR-Dokument</span>
+      </div>
+      <label>Beschreiben Sie das Dokument oder die Sendung</label>
+      <textarea id="zoll-input" rows="4" placeholder="z.B.: 3 Paletten Maschinenbauteile, 800 kg, Versand von Hamburg nach Istanbul per LKW..."></textarea>
+      <button class="btn-run" id="zoll-btn">Dokument / Erklärung generieren →</button>
+      <div class="result" id="zoll-result"></div>
+      <div class="err" id="zoll-err"></div>
+      <div class="export-row" id="zoll-exp" style="display:none">
+        <button class="btn-exp" onclick="exportText('zoll')">📄 TXT</button>
+        <button class="btn-exp" onclick="exportPDF('zoll','Zolldokument')">📕 PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: KPI -->
+  <div id="tab-kpi" class="panel">
+    <div class="card">
+      <h2>KPI-Analyse &amp; Bericht</h2>
+      <p class="sub">Geben Sie Ihre Logistik-Kennzahlen ein – die KI erstellt eine Analyse mit Handlungsempfehlungen.</p>
+      <div class="row">
+        <div>
+          <label>Pünktlichkeitsquote (%)</label>
+          <input type="number" id="k-ptk" placeholder="z.B. 87" min="0" max="100">
+        </div>
+        <div>
+          <label>Auslastung Fahrzeuge (%)</label>
+          <input type="number" id="k-aus" placeholder="z.B. 74" min="0" max="100">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Durchschnittliche Lieferzeit (Std.)</label>
+          <input type="number" id="k-lz" placeholder="z.B. 4.5" step="0.1" min="0">
+        </div>
+        <div>
+          <label>Reklamationsquote (%)</label>
+          <input type="number" id="k-rek" placeholder="z.B. 2.3" step="0.1" min="0">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Kraftstoffkosten (€/100km)</label>
+          <input type="number" id="k-fuel" placeholder="z.B. 42" min="0">
+        </div>
+        <div>
+          <label>Aufträge pro Monat</label>
+          <input type="number" id="k-auftr" placeholder="z.B. 340" min="0">
+        </div>
+      </div>
+      <label>Branche / Besonderheiten</label>
+      <input type="text" id="k-branch" placeholder="z.B. Stückgut, KEP, Temperaturware, Schwertransport...">
+      <button class="btn-run" id="kpi-btn">KPI-Bericht generieren →</button>
+      <div class="result" id="kpi-result"></div>
+      <div class="err" id="kpi-err"></div>
+      <div class="export-row" id="kpi-exp" style="display:none">
+        <button class="btn-exp" onclick="exportPDF('kpi','KPI-Analyse')">📕 PDF</button>
+        <button class="btn-exp" onclick="exportXLSX('kpi')">📗 Excel</button>
+        <button class="btn-exp" onclick="exportPPTX('kpi')">📊 PowerPoint</button>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:24px">
+    Powered by Groq KI · <a href="/ki-tool/" style="color:var(--accent)">← Alle Tools</a>
+  </p>
+</div>
+
+<script>
+const WORKER = "https://ki-proxy.enesdoudouzi.workers.dev/";
+const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+// Chips
+document.querySelectorAll('.chip[data-t]').forEach(c => {
+  c.addEventListener('click', () => {
+    const inp = document.getElementById(c.dataset.t + '-input');
+    if (inp) { inp.value = c.dataset.v; inp.focus(); }
+  });
+});
+
+const lastResults = {};
+
+async function callAI(prompt, resultId, errId, expId) {
+  const res = document.getElementById(resultId);
+  const err = document.getElementById(errId);
+  const exp = document.getElementById(expId);
+  res.className = 'result show';
+  res.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  err.className = 'err';
+  if (exp) exp.style.display = 'none';
+
+  let answer = null, lastErr = null;
+  for (const model of MODELS) {
+    try {
+      const r = await fetch(WORKER, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model, temperature: 0.4, max_tokens: 1200,
+          messages: [{role:'user', content: prompt}]
+        })
+      });
+      const d = await r.json();
+      if (r.ok && d.choices?.[0]?.message?.content) {
+        answer = d.choices[0].message.content.trim(); break;
+      }
+      lastErr = d.error?.message || d.error || 'HTTP ' + r.status;
+      if (!/model|decommission|not exist|access/i.test(String(lastErr))) break;
+    } catch(e) { lastErr = e.message; break; }
+  }
+
+  if (answer) {
+    res.textContent = answer;
+    lastResults[resultId] = answer;
+    if (exp) exp.style.display = 'flex';
+  } else {
+    res.className = 'result';
+    err.className = 'err show';
+    err.textContent = '⚠️ Fehler: ' + lastErr;
+  }
+}
+
+// KOMMUNIKATION
+document.getElementById('komm-btn').addEventListener('click', () => {
+  const v = document.getElementById('komm-input').value.trim();
+  if (!v) return;
+  const ton = document.getElementById('komm-ton').value;
+  const emp = document.getElementById('komm-emp').value;
+  callAI(`Du bist Logistik-Disponent. Erstelle eine ${ton} Nachricht/E-Mail an: ${emp}.
+Situation: ${v}
+Format: Betreffzeile, dann E-Mail-Text. Kurz, professionell, praxisnah. Auf Deutsch.`, 'komm-result', 'komm-err', 'komm-exp');
+});
+
+// SCHADENSMELDUNG
+document.getElementById('schaden-btn').addEventListener('click', () => {
+  const fz = document.getElementById('s-fahrzeug').value;
+  const dt = document.getElementById('s-datum').value;
+  const ort = document.getElementById('s-ort').value;
+  const art = document.getElementById('s-art').value;
+  const beschr = document.getElementById('s-beschr').value.trim();
+  const zeugen = document.getElementById('s-zeugen').value;
+  if (!beschr) return;
+  callAI(`Erstelle eine professionelle Schadensmeldung für eine Spedition:
+- Fahrzeug: ${fz}
+- Datum/Uhrzeit: ${dt}
+- Ort: ${ort}
+- Schadensart: ${art}
+- Beschreibung: ${beschr}
+- Beteiligte/Zeugen: ${zeugen}
+Format: Offizielle Schadensmeldung mit allen Pflichtfeldern für Versicherung und Auftraggeber. Professionell, vollständig, auf Deutsch.`, 'schaden-result', 'schaden-err', 'schaden-exp');
+});
+
+// DISPOSITION
+document.getElementById('dispo-btn').addEventListener('click', () => {
+  const auftr = document.getElementById('dispo-input').value.trim();
+  const fahrer = document.getElementById('dispo-fahrer').value;
+  const schicht = document.getElementById('dispo-schicht').value;
+  const extra = document.getElementById('dispo-extra').value;
+  if (!auftr) return;
+  callAI(`Du bist erfahrener Disponent. Erstelle einen optimalen Tourenplan:
+Aufträge:
+${auftr}
+Verfügbare Fahrer: ${fahrer}
+Max. Schichtlänge: ${schicht} Stunden
+Einschränkungen: ${extra || 'keine'}
+
+Erstelle:
+1. Optimierte Tour-Zuweisung pro Fahrer
+2. Empfohlene Reihenfolge mit Begründung
+3. Zeitplan (Start bis Ende)
+4. Risiken / Engpässe
+Auf Deutsch, strukturiert mit Tabellen/Listen.`, 'dispo-result', 'dispo-err', 'dispo-exp');
+});
+
+// ZOLL
+document.getElementById('zoll-btn').addEventListener('click', () => {
+  const v = document.getElementById('zoll-input').value.trim();
+  if (!v) return;
+  callAI(`Du bist Spezialist für Logistik-Dokumentation und Zollwesen.
+Erstelle folgendes Dokument / diese Erklärung (professionell, vollständig, auf Deutsch):
+${v}
+Gib alle relevanten Felder, Pflichtangaben und Hinweise an. Professionelles Format.`, 'zoll-result', 'zoll-err', 'zoll-exp');
+});
+
+// KPI
+document.getElementById('kpi-btn').addEventListener('click', () => {
+  const ptk = document.getElementById('k-ptk').value;
+  const aus = document.getElementById('k-aus').value;
+  const lz = document.getElementById('k-lz').value;
+  const rek = document.getElementById('k-rek').value;
+  const fuel = document.getElementById('k-fuel').value;
+  const auftr = document.getElementById('k-auftr').value;
+  const branch = document.getElementById('k-branch').value;
+  callAI(`Du bist Logistik-Consultant. Analysiere diese KPIs und erstelle einen Bericht mit Handlungsempfehlungen:
+- Pünktlichkeitsquote: ${ptk}%
+- Fahrzeugauslastung: ${aus}%
+- Ø Lieferzeit: ${lz} Stunden
+- Reklamationsquote: ${rek}%
+- Kraftstoffkosten: ${fuel} €/100km
+- Aufträge/Monat: ${auftr}
+- Branche: ${branch || 'allgemeine Logistik'}
+
+Erstelle:
+1. Bewertung jedes KPIs (gut/ok/kritisch) mit Branchenvergleich
+2. Top 3 Verbesserungsprioritäten
+3. Konkrete Maßnahmen (sofort / mittelfristig)
+4. Erwartetes Einsparpotenzial
+Professionell, mit Zahlen, auf Deutsch.`, 'kpi-result', 'kpi-err', 'kpi-exp');
+});
+
+// Exports
+function exportText(id) {
+  const t = lastResults[id + '-result'];
+  if (!t) return;
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(t);
+  a.download = id + '-ergebnis.txt'; a.click();
+}
+function exportPDF(id, title) {
+  const t = lastResults[id + '-result'];
+  if (!t) return;
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(14); doc.text(title, 14, 18);
+    doc.setFontSize(10);
+    const lines = doc.splitTextToSize(t, 180);
+    doc.text(lines, 14, 28);
+    doc.save(id + '-bericht.pdf');
+  };
+  document.head.appendChild(script);
+}
+function exportXLSX(id) {
+  const t = lastResults[id + '-result'];
+  if (!t) return;
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  script.onload = () => {
+    const ws = XLSX.utils.aoa_to_sheet([[id.toUpperCase() + ' Analyse'], [t]]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Ergebnis');
+    XLSX.writeFile(wb, id + '-bericht.xlsx');
+  };
+  document.head.appendChild(script);
+}
+function exportPPTX(id) {
+  const t = lastResults[id + '-result'];
+  if (!t) return;
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js';
+  script.onload = () => {
+    const pptx = new PptxGenJS();
+    const slide = pptx.addSlide();
+    slide.addText('KPI-Analyse – Doudouzi & Ergün', {x:0.5,y:0.3,fontSize:18,bold:true,color:'16a34a'});
+    slide.addText(t, {x:0.5,y:1.0,w:9,h:5.5,fontSize:10});
+    pptx.writeFile({fileName:'kpi-analyse.pptx'});
+  };
+  document.head.appendChild(script);
+}
+function exportDOCX(id) { exportText(id); }
+</script>
+</body>
+</html>
