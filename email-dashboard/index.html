@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="E-Mail Dashboard · Doudouzi & Ergün">
+<meta property="og:description" content="KI-gestütztes E-Mail-Dashboard für Unternehmen – Priorisierung, Kategorisierung, Antworten per KI.">
+<meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
+<title>E-Mail Dashboard · Doudouzi & Ergün</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<script defer src="/ki-tool/assets/suite.js"></script>
+<style>
+:root{
+  --acc:#2563eb;--acc2:#1d4ed8;--acc-s:#eff6ff;
+  --ink:#0f172a;--muted:#64748b;--bg:#f1f5f9;--card:#fff;--line:#e2e8f0;
+  --green:#16a34a;--green-s:#f0fdf4;--amber:#d97706;--amber-s:#fffbeb;
+  --red:#dc2626;--red-s:#fef2f2;--purple:#7c3aed;--purple-s:#f5f3ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;min-height:100vh}
+
+/* ── Layout ── */
+.shell{display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+@media(max-width:720px){.shell{grid-template-columns:1fr}}
+
+/* ── Sidebar ── */
+.sidebar{grid-row:1/3;background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;padding:0;min-height:100vh}
+@media(max-width:720px){.sidebar{display:none}}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
+.sb-logo .mark{width:34px;height:34px;background:#16a34a;border-radius:8px;display:grid;place-items:center;font-size:0;flex-shrink:0;background-image:url('/ki-tool/assets/favicon.svg');background-size:cover}
+.sb-logo span{font-size:13px;font-weight:600;color:#f1f5f9;line-height:1.3}
+.sb-logo small{font-size:11px;color:#64748b;display:block}
+.sb-nav{flex:1;padding:12px 0}
+.sb-nav a{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:#94a3b8;text-decoration:none;transition:.12s;border-left:2px solid transparent}
+.sb-nav a:hover{color:#f1f5f9;background:#1e293b}
+.sb-nav a.active{color:#f1f5f9;border-left-color:#2563eb;background:#1e293b}
+.sb-nav .ic{font-size:15px;width:20px;text-align:center}
+.sb-sep{height:1px;background:#1e293b;margin:8px 0}
+.sb-label{padding:6px 18px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+.sb-bottom{padding:14px 18px;border-top:1px solid #1e293b}
+.sb-badge{display:inline-block;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;margin-left:auto}
+
+/* ── Topbar ── */
+.topbar2{grid-column:2;background:var(--card);border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
+@media(max-width:720px){.topbar2{grid-column:1}}
+.topbar2 .title{font-size:15px;font-weight:700;color:var(--ink)}
+.topbar2 .sub{font-size:12px;color:var(--muted);margin-left:6px}
+.topbar2 .actions{display:flex;align-items:center;gap:8px}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:0}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:var(--acc2)}
+.btn-s{background:var(--card);border:1px solid var(--line);color:var(--muted)}.btn-s:hover{border-color:var(--acc);color:var(--acc)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--muted);transition:.12s}.btn-icon:hover{border-color:var(--acc);color:var(--acc)}
+
+/* ── Main ── */
+.main{grid-column:2;padding:20px 24px 40px;overflow-y:auto}
+@media(max-width:720px){.main{grid-column:1;padding:14px}}
+
+/* ── Stats row ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat .num{font-size:28px;font-weight:800;line-height:1}
+.stat .lbl{font-size:12px;color:var(--muted);margin-top:3px}
+.stat.red .num{color:var(--red)}.stat.amber .num{color:var(--amber)}.stat.green .num{color:var(--green)}.stat.blue .num{color:var(--acc)}
+
+/* ── Import zone ── */
+.import-card{background:var(--card);border:2px dashed var(--line);border-radius:14px;padding:20px;margin-bottom:20px;transition:.15s}
+.import-card:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.import-card h3{font-size:14px;font-weight:700;margin:0 0 4px}
+.import-card p{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+.import-area{display:flex;gap:10px;align-items:flex-start}
+textarea.inbox{flex:1;border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-size:13px;font-family:inherit;resize:vertical;min-height:110px;color:var(--ink);background:var(--bg)}
+textarea.inbox:focus{outline:none;border-color:var(--acc)}
+.import-btns{display:flex;flex-direction:column;gap:7px}
+.parse-hint{font-size:11.5px;color:var(--muted);margin-top:6px}
+.sep-hint{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);display:inline-block;margin-top:4px}
+
+/* ── Filter bar ── */
+.filterbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12.5px;cursor:pointer;color:var(--muted);transition:.12s;font-weight:500}
+.filter-chip:hover{border-color:var(--acc);color:var(--acc)}
+.filter-chip.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.filter-chip.red.active{background:var(--red);border-color:var(--red)}
+.filter-chip.amber.active{background:var(--amber);border-color:var(--amber)}
+.filter-chip.green.active{background:var(--green);border-color:var(--green)}
+.sort-sel{margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;background:var(--card);color:var(--muted);cursor:pointer}
+
+/* ── Email cards ── */
+.email-list{display:flex;flex-direction:column;gap:10px}
+.ecard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;transition:.15s;cursor:pointer}
+.ecard:hover{box-shadow:0 2px 12px rgba(0,0,0,.06);border-color:#cbd5e1}
+.ecard.expanded{border-color:var(--acc);box-shadow:0 2px 16px rgba(37,99,235,.1)}
+.ecard-head{display:flex;align-items:flex-start;gap:10px}
+.ecard-prio{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.prio-1{background:#94a3b8}.prio-2{background:var(--green)}.prio-3{background:var(--amber)}.prio-4{background:var(--red)}.prio-5{background:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.2)}
+.ecard-meta{flex:1;min-width:0}
+.ecard-from{font-size:13.5px;font-weight:700;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ecard-subj{font-size:13px;color:var(--muted);margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ecard-badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600}
+.badge-red{background:var(--red-s);color:var(--red)}
+.badge-amber{background:var(--amber-s);color:var(--amber)}
+.badge-green{background:var(--green-s);color:var(--green)}
+.badge-blue{background:var(--acc-s);color:var(--acc)}
+.badge-purple{background:var(--purple-s);color:var(--purple)}
+.badge-gray{background:#f1f5f9;color:#475569}
+.ecard-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.prio-stars{font-size:12px;color:var(--amber);letter-spacing:-1px}
+.ecard-team{font-size:11px;color:var(--muted)}
+.ecard-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.ecard.expanded .ecard-body{display:block}
+.ecard-preview{font-size:13.5px;color:var(--muted);margin-bottom:12px;line-height:1.6;white-space:pre-wrap}
+.ecard-analysis{background:var(--bg);border-radius:9px;padding:12px 14px;margin-bottom:12px}
+.ecard-analysis h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:500px){.analysis-grid{grid-template-columns:1fr}}
+.ag-item{font-size:12.5px}.ag-item b{color:var(--ink);display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.reply-box{background:var(--acc-s);border:1px solid #bfdbfe;border-radius:9px;padding:13px 14px;margin-bottom:10px;display:none}
+.reply-box h4{font-size:12px;font-weight:700;color:var(--acc);margin:0 0 6px}
+.reply-text{font-size:13px;white-space:pre-wrap;line-height:1.6;color:var(--ink)}
+.reply-actions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.btn-sm{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted);transition:.12s}
+.btn-sm:hover{border-color:var(--acc);color:var(--acc)}
+.btn-sm.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn-sm.primary:hover{background:var(--acc2)}
+.ecard-actions{display:flex;gap:7px;flex-wrap:wrap}
+.sla-warn{font-size:11.5px;color:var(--red);font-weight:600;background:var(--red-s);border-radius:6px;padding:3px 9px;display:inline-block;margin-bottom:8px}
+
+/* ── Dots loading ── */
+.dots span{display:inline-block;width:5px;height:5px;margin:0 2px;background:var(--acc);border-radius:50%;animation:b 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .big{font-size:48px;margin-bottom:12px}
+.empty-state h3{font-size:18px;color:var(--ink);margin:0 0 6px}
+.empty-state p{font-size:14px;max-width:360px;margin:0 auto}
+
+/* ── Processing overlay ── */
+.processing{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;text-align:center;display:none}
+.processing.show{display:block}
+.proc-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:12px 0}
+.proc-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
+.proc-msg{font-size:13px;color:var(--muted)}
+
+/* ── Report panel ── */
+.report-panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:20px;display:none}
+.report-panel.show{display:block}
+.report-panel h3{margin:0 0 14px;font-size:15px}
+.rep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.rep-row:last-child{border:0}
+
+/* ── Dark Mode overrides ── */
+html[data-theme="dark"] .sidebar{background:#080a0e;border-right:1px solid #1e293b}
+html[data-theme="dark"] .sb-nav a.active{background:#131720}
+html[data-theme="dark"] .sb-nav a:hover{background:#131720}
+html[data-theme="dark"] .topbar2{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .main{background:#0b0d10}
+html[data-theme="dark"] .import-card{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .ecard{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .ecard.expanded{border-color:var(--acc)}
+html[data-theme="dark"] .ecard-analysis{background:#0b0d10}
+html[data-theme="dark"] textarea.inbox{background:#0b0d10;color:#f3f4f6;border-color:#242932}
+html[data-theme="dark"] .stat{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .filter-chip{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .sort-sel{background:#13161b;color:#9aa3af;border-color:#242932}
+html[data-theme="dark"] .reply-box{background:#0d1929;border-color:#1e3a5f}
+html[data-theme="dark"] .report-panel{background:#13161b;border-color:#242932}
+html[data-theme="dark"] .processing{background:#13161b;border-color:#242932}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="mark"></div>
+      <span>Doudouzi &amp; Ergün<small>E-Mail Dashboard</small></span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Navigation</div>
+      <a href="#" class="active" data-view="dashboard"><span class="ic">📊</span> Dashboard</a>
+      <a href="#" data-view="import"><span class="ic">📥</span> E-Mails importieren</a>
+      <a href="#" data-view="report"><span class="ic">📋</span> Bericht</a>
+      <div class="sb-sep"></div>
+      <div class="sb-label">Tools</div>
+      <a href="/ki-tool/assistent/"><span class="ic">🤖</span> KI-Assistent</a>
+      <a href="/ki-tool/prozess-check/"><span class="ic">📈</span> Prozess-Check</a>
+      <a href="/ki-tool/logistik/"><span class="ic">🚛</span> Logistik-KI</a>
+      <a href="/ki-tool/angebot/"><span class="ic">📝</span> Angebote</a>
+      <div class="sb-sep"></div>
+      <a href="/ki-tool/"><span class="ic">🏠</span> Startseite</a>
+    </nav>
+    <div class="sb-bottom">
+      <div style="font-size:11px;color:#475569">Powered by Groq KI</div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar2">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="title">E-Mail Intelligence Dashboard</span>
+      <span class="sub" id="emailCount"></span>
+    </div>
+    <div class="actions">
+      <button class="btn-icon" id="exportBtn" title="Bericht exportieren">📥 Export</button>
+      <button class="btn btn-s" id="clearBtn">Leeren</button>
+      <button class="btn btn-p" id="analyzeAllBtn" disabled>🤖 Alle analysieren</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat red"><div class="num" id="s-urgent">0</div><div class="lbl">🔴 Dringend</div></div>
+      <div class="stat amber"><div class="num" id="s-pending">0</div><div class="lbl">🟡 Offen</div></div>
+      <div class="stat green"><div class="num" id="s-done">0</div><div class="lbl">🟢 Bearbeitet</div></div>
+      <div class="stat blue"><div class="num" id="s-total">0</div><div class="lbl">📧 Gesamt</div></div>
+    </div>
+
+    <!-- IMPORT -->
+    <div class="import-card" id="importCard">
+      <h3>📥 E-Mails importieren</h3>
+      <p>Mehrere E-Mails einfügen – trenne sie mit einer Leerzeile oder <code>---</code>. Die KI analysiert alle auf einmal.</p>
+      <div class="import-area">
+        <textarea class="inbox" id="importArea" placeholder="Von: kunde@beispiel.de&#10;Betreff: Dringende Bestellung fehlerhaft&#10;Hallo, unsere letzte Lieferung war unvollständig...&#10;&#10;---&#10;&#10;Von: info@partner.de&#10;Betreff: Angebot Anfrage&#10;Sehr geehrte Damen und Herren, wir interessieren uns für..."></textarea>
+        <div class="import-btns">
+          <button class="btn btn-p" id="loadDemo">Demo laden</button>
+          <button class="btn btn-s" id="importBtn">Importieren</button>
+        </div>
+      </div>
+      <div class="parse-hint">Trennzeichen: <span class="sep-hint">---</span> oder einfach eine Leerzeile zwischen E-Mails</div>
+    </div>
+
+    <!-- PROCESSING -->
+    <div class="processing" id="procCard">
+      <div style="font-size:22px;margin-bottom:8px">🤖</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">KI analysiert Ihre E-Mails …</div>
+      <div class="proc-bar"><div class="proc-fill" id="procFill" style="width:0%"></div></div>
+      <div class="proc-msg" id="procMsg">Starte Analyse …</div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filterbar" id="filterBar" style="display:none">
+      <span class="filter-chip active" data-f="all">Alle</span>
+      <span class="filter-chip red" data-f="urgent">🔴 Dringend</span>
+      <span class="filter-chip amber" data-f="open">🟡 Offen</span>
+      <span class="filter-chip green" data-f="info">🟢 Info</span>
+      <span class="filter-chip" data-f="customer">👤 Kunde</span>
+      <span class="filter-chip" data-f="internal">🏢 Intern</span>
+      <span class="filter-chip" data-f="supplier">📦 Lieferant</span>
+      <select class="sort-sel" id="sortSel">
+        <option value="prio">Nach Priorität</option>
+        <option value="cat">Nach Kategorie</option>
+        <option value="team">Nach Team</option>
+      </select>
+    </div>
+
+    <!-- EMAIL LIST -->
+    <div class="email-list" id="emailList">
+      <div class="empty-state">
+        <div class="big">📭</div>
+        <h3>Noch keine E-Mails</h3>
+        <p>E-Mails oben einfügen und auf „Importieren" klicken. Dann „Alle analysieren" starten.</p>
+      </div>
+    </div>
+
+    <!-- REPORT PANEL -->
+    <div class="report-panel" id="reportPanel">
+      <h3>📋 Analyse-Bericht</h3>
+      <div id="reportContent"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="exportPDF()">📕 PDF exportieren</button>
+        <button class="btn btn-s" onclick="exportXLSX()">📗 Excel exportieren</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const WORKER = "https://ki-proxy.enesdoudouzi.workers.dev/";
+const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+
+const DEMO_EMAILS = `Von: thomas.mueller@sped-mueller.de
+Betreff: Sendung XY-2847 fehlt komplett – sofortige Klärung nötig
+Hallo, unsere Sendung XY-2847 die am 28.10. geliefert werden sollte fehlt vollständig. Wir haben den Fahrer mehrfach versucht zu erreichen. Bitte umgehend Stellung nehmen. Unser Produktionsstopp beträgt mittlerweile 4 Stunden!
+
+---
+
+Von: anna.schmidt@kunde-gmbh.de
+Betreff: Angebot für Logistikdienstleistungen 2025
+Sehr geehrte Damen und Herren, wir planen unsere Logistikpartner neu zu vergeben und sind an einem Angebot interessiert. Können Sie uns bis Ende des Monats ein Angebot für ca. 50 Paletten/Woche zukommen lassen?
+
+---
+
+Von: buchhaltung@lieferant-max.de
+Betreff: Rechnung RE-2024-5582 – Zahlungserinnerung
+Sehr geehrte Damen und Herren, wir erlauben uns Sie daran zu erinnern, dass die Rechnung RE-2024-5582 über 3.840,00 EUR seit dem 15.10.2024 fällig ist. Bitte überweisen Sie den Betrag binnen 5 Werktagen.
+
+---
+
+Von: hr@intern.firma.de
+Betreff: Betriebsfeier 22. November – Anmeldung
+Liebes Team, wir freuen uns die diesjährige Betriebsfeier ankündigen zu können! Datum: 22. November, 19 Uhr, Restaurant Goldener Adler. Bitte meldet euch bis 10.11. an.
+
+---
+
+Von: beschwerden@kunde-xyz.de
+Betreff: Schwerwiegende Beschädigung unserer Ware – wir fordern Schadensersatz
+Ihre Mitarbeiter haben unsere Maschine beim Entladen stark beschädigt. Schaden ca. 8.000 EUR. Wir beauftragen anwaltliche Schritte wenn wir keine Reaktion innerhalb 24 Stunden erhalten. Bitte sofort melden.
+
+---
+
+Von: partner@speditionsverband.de
+Betreff: Neuer Tarifvertrag ab Januar 2025 – Info
+Sehr geehrte Mitglieder, anbei übersenden wir Ihnen die aktualisierte Tarifinformation für das Geschäftsjahr 2025. Die neuen Sätze gelten ab dem 01.01.2025. Bitte weiterleiten an Ihre Disposition.`;
+
+let emails = [];
+let analyzed = [];
+let activeFilter = 'all';
+
+// ── Parse emails ──
+function parseEmails(raw) {
+  return raw.split(/\n---\n|\n---\r\n/)
+    .map(s => s.trim()).filter(s => s.length > 30)
+    .map((raw, i) => {
+      const lines = raw.split('\n');
+      let from = '', subject = '', body = '';
+      const bodyLines = [];
+      let inBody = false;
+      for (const l of lines) {
+        if (!inBody && /^von:/i.test(l)) { from = l.replace(/^von:\s*/i,'').trim(); }
+        else if (!inBody && /^betreff:|^subject:/i.test(l)) { subject = l.replace(/^betreff:|^subject:/i,'').trim(); }
+        else if (!inBody && from && subject) { inBody = true; bodyLines.push(l); }
+        else if (inBody) bodyLines.push(l);
+      }
+      body = bodyLines.join('\n').trim() || raw.substring(0,300);
+      return { id: i, from: from || 'Unbekannt', subject: subject || '(kein Betreff)', body, raw, status: 'open', reply: null, analysis: null };
+    });
+}
+
+// ── Call AI ──
+async function callAI(prompt) {
+  let answer = null, lastErr = null;
+  for (const model of MODELS) {
+    try {
+      const r = await fetch(WORKER, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model, temperature:0.3, max_tokens:600,
+          messages:[{role:'user',content:prompt}] })
+      });
+      const d = await r.json();
+      if (r.ok && d.choices?.[0]?.message?.content) { answer = d.choices[0].message.content.trim(); break; }
+      lastErr = d.error?.message || d.error || 'HTTP '+r.status;
+      if (!/model|decommission|not exist|access/i.test(String(lastErr))) break;
+    } catch(e) { lastErr = e.message; break; }
+  }
+  return answer || ('FEHLER: ' + lastErr);
+}
+
+// ── Analyse single email ──
+async function analyzeEmail(email) {
+  const prompt = `Analysiere diese E-Mail und antworte NUR mit einem validen JSON-Objekt (kein Markdown, kein Text darum):
+
+Von: ${email.from}
+Betreff: ${email.subject}
+Text: ${email.body.substring(0,600)}
+
+JSON-Format (exakt so, keine anderen Felder):
+{
+  "prioritaet": 1-5,
+  "kategorie": "Beschwerde" | "Anfrage" | "Rechnung" | "Intern" | "Info" | "Dringend" | "Reklamation" | "Angebot",
+  "team": "Kundenservice" | "Vertrieb" | "Buchhaltung" | "Management" | "Disposition" | "HR",
+  "sentiment": "positiv" | "neutral" | "negativ" | "kritisch",
+  "zusammenfassung": "max 15 Wörter",
+  "handlung": "max 12 Wörter konkrete nächste Handlung",
+  "sla_stunden": 4 | 8 | 24 | 48 | 72,
+  "antwort": "Fertige höfliche professionelle Antwort auf Deutsch, max 80 Wörter"
+}`;
+  const raw = await callAI(prompt);
+  try {
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
+    return JSON.parse(jsonStr);
+  } catch(e) {
+    return { prioritaet:3, kategorie:'Info', team:'Management', sentiment:'neutral',
+      zusammenfassung:'Analyse fehlgeschlagen', handlung:'Manuell prüfen',
+      sla_stunden:24, antwort:'Vielen Dank für Ihre Nachricht. Wir melden uns zeitnah zurück.' };
+  }
+}
+
+// ── Update stats ──
+function updateStats() {
+  const urgent = analyzed.filter(e => e.analysis && e.analysis.prioritaet >= 4).length;
+  const open = analyzed.filter(e => e.status === 'open').length;
+  const done = analyzed.filter(e => e.status === 'done').length;
+  document.getElementById('s-urgent').textContent = urgent;
+  document.getElementById('s-pending').textContent = open;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-total').textContent = analyzed.length;
+  const cnt = document.getElementById('emailCount');
+  cnt.textContent = analyzed.length ? `· ${analyzed.length} E-Mails` : '';
+}
+
+// ── Priority display ──
+function prioStars(p) {
+  return '★'.repeat(p) + '☆'.repeat(5-p);
+}
+function prioLabel(p) {
+  if (p>=5) return '<span class="badge badge-red">🔴 Kritisch</span>';
+  if (p>=4) return '<span class="badge badge-red">🔴 Dringend</span>';
+  if (p>=3) return '<span class="badge badge-amber">🟡 Mittel</span>';
+  if (p>=2) return '<span class="badge badge-green">🟢 Normal</span>';
+  return '<span class="badge badge-gray">⚪ Info</span>';
+}
+function catBadge(cat) {
+  const map = {
+    'Beschwerde':'badge-red','Reklamation':'badge-red','Dringend':'badge-red',
+    'Anfrage':'badge-blue','Angebot':'badge-blue',
+    'Rechnung':'badge-amber','Intern':'badge-gray','Info':'badge-gray'
+  };
+  return `<span class="badge ${map[cat]||'badge-gray'}">${cat}</span>`;
+}
+function sentimentBadge(s) {
+  const map = { 'positiv':'badge-green','neutral':'badge-gray','negativ':'badge-amber','kritisch':'badge-red' };
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function teamBadge(t) {
+  return `<span class="badge badge-purple">${t}</span>`;
+}
+
+// ── Render email cards ──
+function renderList() {
+  const list = document.getElementById('emailList');
+  const filt = activeFilter;
+  const sort = document.getElementById('sortSel').value;
+  const filterBar = document.getElementById('filterBar');
+
+  if (!analyzed.length) {
+    filterBar.style.display = 'none';
+    list.innerHTML = '<div class="empty-state"><div class="big">📭</div><h3>Noch keine E-Mails</h3><p>E-Mails oben einfügen und auf „Importieren" klicken. Dann „Alle analysieren" starten.</p></div>';
+    return;
+  }
+  filterBar.style.display = 'flex';
+
+  let items = [...analyzed];
+  if (filt === 'urgent') items = items.filter(e => e.analysis?.prioritaet >= 4);
+  else if (filt === 'open') items = items.filter(e => e.status === 'open');
+  else if (filt === 'info') items = items.filter(e => e.analysis?.prioritaet <= 2);
+  else if (filt === 'customer') items = items.filter(e => e.analysis?.team === 'Kundenservice');
+  else if (filt === 'internal') items = items.filter(e => e.analysis?.team === 'HR' || e.analysis?.kategorie === 'Intern');
+  else if (filt === 'supplier') items = items.filter(e => e.analysis?.kategorie === 'Rechnung' || e.from?.includes('lieferant'));
+
+  if (sort === 'prio') items.sort((a,b) => (b.analysis?.prioritaet||0) - (a.analysis?.prioritaet||0));
+  else if (sort === 'cat') items.sort((a,b) => (a.analysis?.kategorie||'').localeCompare(b.analysis?.kategorie||''));
+  else if (sort === 'team') items.sort((a,b) => (a.analysis?.team||'').localeCompare(b.analysis?.team||''));
+
+  list.innerHTML = items.map(e => {
+    const a = e.analysis;
+    const prio = a ? a.prioritaet : 0;
+    const slaDue = a && a.sla_stunden <= 4;
+    return `<div class="ecard ${e.expanded?'expanded':''}" id="ec-${e.id}" onclick="toggleCard(${e.id},event)">
+      <div class="ecard-head">
+        <div class="ecard-prio prio-${prio}"></div>
+        <div class="ecard-meta">
+          <div class="ecard-from">${escHtml(e.from)}</div>
+          <div class="ecard-subj">${escHtml(e.subject)}</div>
+          <div class="ecard-badges">
+            ${a ? prioLabel(a.prioritaet) : '<span class="badge badge-gray">Ausstehend …</span>'}
+            ${a ? catBadge(a.kategorie) : ''}
+            ${a ? teamBadge(a.team) : ''}
+            ${e.status==='done'?'<span class="badge badge-green">✓ Erledigt</span>':''}
+          </div>
+        </div>
+        <div class="ecard-right">
+          ${a ? `<span class="prio-stars" title="Priorität ${a.prioritaet}/5">${prioStars(a.prioritaet)}</span>` : '<span class="dots"><span></span><span></span><span></span></span>'}
+          ${a ? `<span class="ecard-team">${a.sla_stunden}h SLA</span>` : ''}
+        </div>
+      </div>
+      <div class="ecard-body">
+        ${slaDue ? '<div class="sla-warn">⚡ SLA: Antwort in unter 4 Stunden erforderlich!</div>' : ''}
+        <div class="ecard-preview">${escHtml(e.body.substring(0,400))}${e.body.length>400?'…':''}</div>
+        ${a ? `<div class="ecard-analysis">
+          <h4>KI-Analyse</h4>
+          <div class="analysis-grid">
+            <div class="ag-item"><b>Zusammenfassung</b>${escHtml(a.zusammenfassung)}</div>
+            <div class="ag-item"><b>Nächste Handlung</b>${escHtml(a.handlung)}</div>
+            <div class="ag-item"><b>Stimmung</b>${sentimentBadge(a.sentiment)}</div>
+            <div class="ag-item"><b>Team-Zuweisung</b>${teamBadge(a.team)}</div>
+          </div>
+        </div>` : ''}
+        ${a && a.antwort ? `<div class="reply-box" id="rb-${e.id}" style="display:block">
+          <h4>💬 KI-Antwortvorschlag</h4>
+          <div class="reply-text">${escHtml(a.antwort)}</div>
+          <div class="reply-actions">
+            <button class="btn-sm primary" onclick="copyReply(${e.id});event.stopPropagation()">📋 Kopieren</button>
+            <button class="btn-sm" onclick="markDone(${e.id});event.stopPropagation()">✓ Als erledigt markieren</button>
+            <button class="btn-sm" onclick="regenerateReply(${e.id});event.stopPropagation()">🔄 Neu generieren</button>
+          </div>
+        </div>` : ''}
+        <div class="ecard-actions">
+          ${!a ? `<button class="btn-sm primary" onclick="analyzeSingle(${e.id});event.stopPropagation()">🤖 Jetzt analysieren</button>` : ''}
+          ${e.status!=='done' ? `<button class="btn-sm" onclick="markDone(${e.id});event.stopPropagation()">✓ Erledigt</button>` : `<button class="btn-sm" onclick="markOpen(${e.id});event.stopPropagation()">↩ Wieder öffnen</button>`}
+          <button class="btn-sm" onclick="removeEmail(${e.id});event.stopPropagation()" style="color:var(--red)">🗑 Entfernen</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateStats();
+  updateReport();
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Card toggle ──
+function toggleCard(id, evt) {
+  if (evt.target.tagName === 'BUTTON') return;
+  const e = analyzed.find(x => x.id === id);
+  if (!e) return;
+  e.expanded = !e.expanded;
+  renderList();
+}
+
+// ── Analyze single ──
+async function analyzeSingle(id) {
+  const e = analyzed.find(x => x.id === id);
+  if (!e) return;
+  const card = document.getElementById('ec-' + id);
+  if (card) {
+    const act = card.querySelector('.ecard-actions');
+    if (act) act.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analysiert …';
+  }
+  e.analysis = await analyzeEmail(e);
+  e.expanded = true;
+  renderList();
+}
+
+// ── Analyze ALL ──
+async function analyzeAll() {
+  const btn = document.getElementById('analyzeAllBtn');
+  btn.disabled = true;
+  const proc = document.getElementById('procCard');
+  proc.className = 'processing show';
+  document.getElementById('filterBar').style.display = 'none';
+
+  const todo = analyzed.filter(e => !e.analysis);
+  for (let i = 0; i < todo.length; i++) {
+    const pct = Math.round((i / todo.length) * 100);
+    document.getElementById('procFill').style.width = pct + '%';
+    document.getElementById('procMsg').textContent = `Analysiere E-Mail ${i+1} von ${todo.length}: ${todo[i].subject.substring(0,40)}…`;
+    todo[i].analysis = await analyzeEmail(todo[i]);
+  }
+  document.getElementById('procFill').style.width = '100%';
+  document.getElementById('procMsg').textContent = 'Analyse abgeschlossen!';
+  setTimeout(() => { proc.className = 'processing'; renderList(); }, 600);
+  btn.disabled = false;
+}
+
+// ── Actions ──
+function markDone(id) {
+  const e = analyzed.find(x => x.id === id);
+  if (e) { e.status = 'done'; renderList(); }
+}
+function markOpen(id) {
+  const e = analyzed.find(x => x.id === id);
+  if (e) { e.status = 'open'; renderList(); }
+}
+function removeEmail(id) {
+  analyzed = analyzed.filter(x => x.id !== id);
+  renderList();
+}
+function copyReply(id) {
+  const e = analyzed.find(x => x.id === id);
+  if (e?.analysis?.antwort) {
+    navigator.clipboard.writeText(e.analysis.antwort).then(() => {
+      alert('Antwort in Zwischenablage kopiert!');
+    });
+  }
+}
+async function regenerateReply(id) {
+  const e = analyzed.find(x => x.id === id);
+  if (!e) return;
+  const rb = document.getElementById('rb-' + id);
+  if (rb) rb.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  const ans = await callAI(`Schreibe eine professionelle, höfliche E-Mail-Antwort auf Deutsch (max 80 Wörter) auf diese E-Mail:
+Von: ${e.from}
+Betreff: ${e.subject}
+${e.body.substring(0,400)}`);
+  if (e.analysis) e.analysis.antwort = ans;
+  renderList();
+}
+
+// ── Report ──
+function updateReport() {
+  if (!analyzed.length) return;
+  const rep = document.getElementById('reportPanel');
+  const cont = document.getElementById('reportContent');
+  rep.className = 'report-panel show';
+
+  const cats = {};
+  const teams = {};
+  let urgent = 0, done = 0;
+  analyzed.forEach(e => {
+    if (!e.analysis) return;
+    cats[e.analysis.kategorie] = (cats[e.analysis.kategorie]||0)+1;
+    teams[e.analysis.team] = (teams[e.analysis.team]||0)+1;
+    if (e.analysis.prioritaet >= 4) urgent++;
+    if (e.status === 'done') done++;
+  });
+
+  cont.innerHTML = `
+    <div class="rep-row"><span>Gesamt E-Mails</span><b>${analyzed.length}</b></div>
+    <div class="rep-row"><span>🔴 Dringend (Prio 4-5)</span><b style="color:var(--red)">${urgent}</b></div>
+    <div class="rep-row"><span>🟢 Erledigt</span><b style="color:var(--green)">${done}</b></div>
+    <div class="rep-row"><span>🟡 Noch offen</span><b style="color:var(--amber)">${analyzed.length - done}</b></div>
+    ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+      `<div class="rep-row"><span>📂 ${k}</span><b>${v}</b></div>`).join('')}
+    ${Object.entries(teams).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+      `<div class="rep-row"><span>👥 ${k}</span><b>${v}</b></div>`).join('')}
+  `;
+}
+
+// ── Import ──
+document.getElementById('importBtn').addEventListener('click', () => {
+  const raw = document.getElementById('importArea').value.trim();
+  if (!raw) return;
+  const parsed = parseEmails(raw);
+  if (!parsed.length) { alert('Keine E-Mails erkannt. Trenne sie mit --- oder einer Leerzeile.'); return; }
+  analyzed = [...analyzed, ...parsed];
+  document.getElementById('analyzeAllBtn').disabled = false;
+  document.getElementById('importArea').value = '';
+  renderList();
+  document.getElementById('analyzeAllBtn').focus();
+});
+
+document.getElementById('loadDemo').addEventListener('click', () => {
+  document.getElementById('importArea').value = DEMO_EMAILS;
+});
+
+document.getElementById('analyzeAllBtn').addEventListener('click', analyzeAll);
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (analyzed.length && !confirm('Alle E-Mails löschen?')) return;
+  analyzed = [];
+  document.getElementById('analyzeAllBtn').disabled = true;
+  document.getElementById('reportPanel').className = 'report-panel';
+  renderList();
+});
+
+// ── Filter ──
+document.querySelectorAll('.filter-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    activeFilter = c.dataset.f;
+    renderList();
+  });
+});
+document.getElementById('sortSel').addEventListener('change', renderList);
+
+// ── Export ──
+function exportPDF() {
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload = () => {
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16); doc.text('E-Mail Intelligence Report', 14, 18);
+    doc.setFontSize(10); doc.text('Doudouzi & Ergün · ' + new Date().toLocaleDateString('de'), 14, 26);
+    let y = 36;
+    doc.setFontSize(11);
+    doc.text(`Gesamt: ${analyzed.length} | Dringend: ${analyzed.filter(e=>e.analysis?.prioritaet>=4).length} | Erledigt: ${analyzed.filter(e=>e.status==='done').length}`, 14, y); y += 10;
+    analyzed.forEach((e,i) => {
+      if (y > 270) { doc.addPage(); y = 14; }
+      doc.setFontSize(10);
+      const a = e.analysis;
+      doc.text(`${i+1}. ${e.subject.substring(0,60)}`, 14, y); y += 5;
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text(`Von: ${e.from} | Prio: ${a?.prioritaet||'?'}/5 | ${a?.kategorie||'?'} | ${a?.team||'?'} | ${a?.sentiment||'?'}`, 14, y); y += 4;
+      if (a?.zusammenfassung) { doc.text('→ ' + a.zusammenfassung, 14, y); y += 4; }
+      doc.setTextColor(0); y += 3;
+    });
+    doc.save('email-report.pdf');
+  };
+  document.head.appendChild(s);
+}
+
+function exportXLSX() {
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = () => {
+    const rows = [['#','Von','Betreff','Priorität','Kategorie','Team','Sentiment','Zusammenfassung','Handlung','SLA (Std.)','Status']];
+    analyzed.forEach((e,i) => {
+      const a = e.analysis;
+      rows.push([i+1, e.from, e.subject, a?.prioritaet||'', a?.kategorie||'', a?.team||'', a?.sentiment||'', a?.zusammenfassung||'', a?.handlung||'', a?.sla_stunden||'', e.status]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'E-Mail Analyse');
+    XLSX.writeFile(wb, 'email-analyse.xlsx');
+  };
+  document.head.appendChild(s);
+}
+
+document.getElementById('exportBtn').addEventListener('click', exportXLSX);
+
+// Sidebar nav
+document.querySelectorAll('.sb-nav a[data-view]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.sb-nav a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+    const v = a.dataset.view;
+    document.getElementById('importCard').style.display = v==='import'?'block':(v==='dashboard'?'block':'none');
+    document.getElementById('reportPanel').className = v==='report'&&analyzed.length?'report-panel show':'report-panel';
+  });
+});
+
+renderList();
+</script>
+</body>
+</html>
