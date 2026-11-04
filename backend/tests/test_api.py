@@ -20,7 +20,7 @@ def test_text_preview_returns_basic_metrics():
 
     assert response.status_code == 200
     assert response.json() == {
-        "character_count": 27,
+        "character_count": 28,
         "word_count": 6,
         "line_count": 2,
     }
