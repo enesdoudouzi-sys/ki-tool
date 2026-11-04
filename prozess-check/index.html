@@ -276,11 +276,39 @@ const STEPS0 = [
 const stepsBody = $('steps');
 function addStepRow(s){
   const tr = document.createElement('tr');
-  tr.innerHTML = `<td><input type="text" class="s-n" value="${s? s.n.replace(/"/g,'&quot;'):''}" placeholder="z. B. Freigabe"></td>
-    <td><input type="number" class="s-d" min="0" value="${s? s.d:''}"></td>
-    <td><select class="s-v"><option value="1"${s&&s.v?' selected':''}>✅ Ja (Wert)</option><option value="0"${s&&!s.v?' selected':''}>⏳ Nein (Warten/Verschw.)</option></select></td>
-    <td><button class="delrow" title="Entfernen">✕</button></td>`;
-  tr.querySelector('.delrow').addEventListener('click', ()=>{ tr.remove(); drawVSM(); });
+  const nameCell = document.createElement('td');
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.className = 's-n';
+  nameInput.placeholder = 'z. B. Freigabe';
+  nameInput.value = s ? String(s.n ?? '') : '';
+  nameCell.appendChild(nameInput);
+
+  const durationCell = document.createElement('td');
+  const durationInput = document.createElement('input');
+  durationInput.type = 'number';
+  durationInput.className = 's-d';
+  durationInput.min = '0';
+  durationInput.value = s ? String(s.d ?? '') : '';
+  durationCell.appendChild(durationInput);
+
+  const valueCell = document.createElement('td');
+  const valueSelect = document.createElement('select');
+  valueSelect.className = 's-v';
+  valueSelect.add(new Option('✅ Ja (Wert)', '1', false, !!(s && s.v)));
+  valueSelect.add(new Option('⏳ Nein (Warten/Verschw.)', '0', false, !!(s && !s.v)));
+  valueCell.appendChild(valueSelect);
+
+  const actionCell = document.createElement('td');
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.className = 'delrow';
+  deleteButton.title = 'Entfernen';
+  deleteButton.textContent = '✕';
+  actionCell.appendChild(deleteButton);
+
+  tr.append(nameCell, durationCell, valueCell, actionCell);
+  deleteButton.addEventListener('click', ()=>{ tr.remove(); drawVSM(); });
   tr.querySelectorAll('input,select').forEach(el=> el.addEventListener('input', drawVSM));
   stepsBody.appendChild(tr);
 }
