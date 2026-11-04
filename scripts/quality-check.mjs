@@ -34,7 +34,7 @@ for (const file of htmlFiles) {
     if (!pathname) continue;
     let target;
     if (pathname.startsWith("/")) {
-      const repoPath = pathname === "/ki-tool" || pathname.startsWith("/ki-tool/") ? pathname.slice(8) : pathname.slice(1);
+      const repoPath = pathname === "/ki-tool" ? "" : pathname.startsWith("/ki-tool/") ? pathname.slice("/ki-tool/".length) : pathname.slice(1);
       target = path.resolve(root, repoPath);
     } else target = path.resolve(path.dirname(file), pathname);
     if (!existsAsFileOrIndex(target)) fail(`${rel}: broken local reference "${value}"`);
