@@ -363,8 +363,22 @@ function parseEntities(out) {
 
 function renderEntities(uniq) {
   const el = $('entOut');
-  if (!uniq.length) { el.innerHTML = '<span class="hint">Keine Personen/Firmen/Orte erkannt.</span>'; return; }
-  el.innerHTML = uniq.map(e => `<span class="ent ent-${e.type}">${e.text}</span>`).join('');
+  el.replaceChildren();
+  if (!uniq.length) {
+    const hint = document.createElement('span');
+    hint.className = 'hint';
+    hint.textContent = 'Keine Personen/Firmen/Orte erkannt.';
+    el.appendChild(hint);
+    return;
+  }
+  const allowedTypes = new Set(['PER', 'ORG', 'LOC', 'MISC']);
+  uniq.forEach(e => {
+    const item = document.createElement('span');
+    const type = String(e.type || '').toUpperCase();
+    item.className = 'ent ent-' + (allowedTypes.has(type) ? type.toLowerCase() : 'misc');
+    item.textContent = e.text;
+    el.appendChild(item);
+  });
 }
 
 function renderPriority(topCat, sentLabel) {
