@@ -92,6 +92,12 @@
 
   /* Feature strip */
   .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:48px}
+  .analysis-cta{margin-top:24px;padding:clamp(24px,5vw,48px);border:1px solid rgba(22,163,74,.25);border-radius:18px;background:linear-gradient(135deg,var(--accent-soft),var(--bg));display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;overflow:hidden}
+  .analysis-copy{max-width:690px;position:relative;z-index:1}.analysis-kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .analysis-copy h2{font-size:clamp(24px,3.5vw,34px);line-height:1.15;letter-spacing:-.03em;margin:10px 0 12px;max-width:650px}
+  .analysis-copy p,.analysis-copy li{font-size:14px;color:var(--muted)}.analysis-copy ul{padding-left:20px;margin:14px 0 22px}.analysis-copy li{margin:6px 0}
+  .analysis-copy small{display:block;margin-top:12px;color:var(--muted);font-size:12px}.analysis-mark{font-size:130px;line-height:1;color:var(--accent);opacity:.14;flex-shrink:0}
+  @media(max-width:640px){.analysis-mark{display:none}.analysis-cta{padding:24px}}
   @media(max-width:720px){.feat{grid-template-columns:1fr}}
   .f{background:var(--bg);padding:22px 24px}
   .f b{display:block;font-size:14.5px;font-weight:600;margin-bottom:4px}
@@ -137,8 +143,8 @@
       <h1 data-i18n="hero.h1">KI-Tools, die Unternehmen wirklich voranbringen.</h1>
       <p class="lead" data-i18n="hero.lead">E-Mail-Management, Prozessoptimierung, Logistik, Gastro & Angebote – alles per KI, direkt im Browser, ohne Installation.</p>
       <div class="cta-row">
-        <a class="btn btn-dark" href="/ki-tool/email-dashboard/"><span data-i18n="hero.cta1">E-Mail Dashboard starten</span> <span>→</span></a>
-        <a class="btn btn-ghost" href="#tools" data-i18n="hero.cta2">Alle Tools ansehen</a>
+        <a class="btn btn-dark" href="https://enesdoudouzi-sys.github.io/ae-consulting-website/#termin" data-i18n="hero.cta1">Kostenlose KI-Potenzialanalyse anfragen →</a>
+        <a class="btn btn-ghost" href="#tools" data-i18n="hero.cta2">Tools selbst testen</a>
       </div>
       <div class="trust">
         <span data-i18n="trust.1">🔒 DSGVO-freundlich</span>
@@ -205,6 +211,22 @@
         <div class="f"><b data-i18n="feat2.t">Für jede Branche</b><span data-i18n="feat2.d">Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.</span></div>
         <div class="f"><b data-i18n="feat3.t">Sofort einsatzbereit</b><span data-i18n="feat3.d">Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.</span></div>
       </div>
+
+      <section class="analysis-cta" aria-labelledby="analysis-title">
+        <div class="analysis-copy">
+          <span class="analysis-kicker" data-i18n="analysis.kicker">Ihr nächster Schritt</span>
+          <h2 id="analysis-title" data-i18n="analysis.title">Finden wir heraus, wo KI Ihrem Unternehmen wirklich hilft.</h2>
+          <p data-i18n="analysis.text">Im kostenlosen und unverbindlichen Erstgespräch betrachten wir Ihre Abläufe, identifizieren mögliche Automatisierungen und besprechen konkrete nächste Schritte.</p>
+          <ul>
+            <li data-i18n="analysis.point1">Wiederkehrende und zeitaufwendige Prozesse erkennen</li>
+            <li data-i18n="analysis.point2">2–3 sinnvolle KI- und Automatisierungsansätze identifizieren</li>
+            <li data-i18n="analysis.point3">Eine erste Einschätzung zu Nutzen und Umsetzung erhalten</li>
+          </ul>
+          <a class="btn btn-dark" href="https://enesdoudouzi-sys.github.io/ae-consulting-website/#termin" data-i18n="analysis.button">Kostenloses Erstgespräch vereinbaren →</a>
+          <small data-i18n="analysis.note">Ca. 30 Minuten · kostenlos · unverbindlich · per Telefon oder Video</small>
+        </div>
+        <div class="analysis-mark" aria-hidden="true">⌕</div>
+      </section>
     </section>
   </main>
 
@@ -225,7 +247,7 @@
     /* --- Mehrsprachigkeit --- */
     const I18N = {
       de:{ "nav.emaildash":"E-Mail Dashboard","nav.prozess":"Prozess-Check","nav.logistik":"Logistik-KI","nav.gastro":"Gastro","nav.angebot":"Angebote","nav.assistant":"KI-Assistent",
-        "hero.eyebrow":"KI-Tools für Unternehmen","hero.h1":"KI-Tools, die Unternehmen wirklich voranbringen.","hero.lead":"E-Mail-Management, Prozessoptimierung, Logistik, Gastro & Angebote – alles per KI, direkt im Browser, ohne Installation.","hero.cta1":"E-Mail Dashboard starten","hero.cta2":"Alle Tools ansehen",
+        "hero.eyebrow":"KI-Tools für Unternehmen","hero.h1":"KI-Tools, die Unternehmen wirklich voranbringen.","hero.lead":"E-Mail-Management, Prozessoptimierung, Logistik, Gastro & Angebote – alles per KI, direkt im Browser, ohne Installation.","hero.cta1":"Kostenlose KI-Potenzialanalyse anfragen →","hero.cta2":"Tools selbst testen",
         "trust.1":"🔒 DSGVO-freundlich","trust.2":"⚡ Ergebnis in Sekunden","trust.3":"💶 Kostenlos","sec.k":"Die Werkzeuge","sec.h2":"Fünf Tools, ein System",
         "t.emaildash":"E-Mail Dashboard","d.emaildash":"Posteingang intelligent managen: KI priorisiert, kategorisiert und generiert Antworten für alle E-Mails auf einmal – mit Statistik und Export.","go.emaildash":"Dashboard öffnen",
         "t.prozess":"Prozess-Check","d.prozess":"Automatisierungspotenzial in Minuten ermitteln – nach Lean & Six Sigma, mit konkreter Zeit- und Kostenersparnis.","go.prozess":"Potenzial berechnen",
@@ -234,9 +256,9 @@
         "t.angebot":"Angebots-Generator","d.angebot":"Professionelle Beratungsangebote in 3 Schritten: Kundendaten, Leistungen, Konditionen – die KI schreibt das versandfertige Angebot.","go.angebot":"Angebot erstellen",
         "t.assistant":"KI-Assistent","d.assistant":"Echter Chat: Fragen beantworten, E-Mails schreiben, Texte zusammenfassen, übersetzen – wie ein digitaler Mitarbeiter.","go.assistant":"Assistent öffnen",
         "feat1.t":"Datenschutz zuerst","feat1.d":"Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.","feat2.t":"Für jede Branche","feat2.d":"Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.","feat3.t":"Sofort einsatzbereit","feat3.d":"Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.",
-        "foot.tag":"Prozessoptimierung & KI","foot.website":"Website","foot.datenschutz":"Datenschutz","foot.impressum":"Impressum" },
+        "analysis.kicker":"Ihr nächster Schritt","analysis.title":"Finden wir heraus, wo KI Ihrem Unternehmen wirklich hilft.","analysis.text":"Im kostenlosen und unverbindlichen Erstgespräch betrachten wir Ihre Abläufe, identifizieren mögliche Automatisierungen und besprechen konkrete nächste Schritte.","analysis.point1":"Wiederkehrende und zeitaufwendige Prozesse erkennen","analysis.point2":"2–3 sinnvolle KI- und Automatisierungsansätze identifizieren","analysis.point3":"Eine erste Einschätzung zu Nutzen und Umsetzung erhalten","analysis.button":"Kostenloses Erstgespräch vereinbaren →","analysis.note":"Ca. 30 Minuten · kostenlos · unverbindlich · per Telefon oder Video","foot.tag":"Prozessoptimierung & KI","foot.website":"Website","foot.datenschutz":"Datenschutz","foot.impressum":"Impressum" },
       en:{ "nav.emaildash":"Email Dashboard","nav.prozess":"Process Check","nav.logistik":"Logistics AI","nav.gastro":"Gastro","nav.angebot":"Proposals","nav.assistant":"AI Assistant",
-        "hero.eyebrow":"AI tools for businesses","hero.h1":"AI tools that truly move businesses forward.","hero.lead":"Email management, process optimization, logistics, gastronomy & proposals – all via AI, right in your browser, no installation.","hero.cta1":"Open Email Dashboard","hero.cta2":"See all tools",
+        "hero.eyebrow":"AI tools for businesses","hero.h1":"AI tools that truly move businesses forward.","hero.lead":"Email management, process optimization, logistics, gastronomy & proposals – all via AI, right in your browser, no installation.","hero.cta1":"Request a free AI potential analysis →","hero.cta2":"Try the tools",
         "trust.1":"🔒 GDPR-friendly","trust.2":"⚡ Results in seconds","trust.3":"💶 Free","sec.k":"The tools","sec.h2":"Five tools, one system",
         "t.emaildash":"Email Dashboard","d.emaildash":"Intelligent inbox management: AI prioritizes, categorizes and generates replies for all emails at once – with stats and export.","go.emaildash":"Open dashboard",
         "t.prozess":"Process Check","d.prozess":"Find your automation potential in minutes – based on Lean & Six Sigma, with estimated time and cost savings.","go.prozess":"Calculate potential",
@@ -245,9 +267,9 @@
         "t.angebot":"Proposal Generator","d.angebot":"Professional consulting proposals in 3 steps: client data, services, terms – the AI writes the ready-to-send proposal.","go.angebot":"Create proposal",
         "t.assistant":"AI Assistant","d.assistant":"Real chat: answer questions, write emails, summarize texts, translate – like a digital employee.","go.assistant":"Open assistant",
         "feat1.t":"Privacy first","feat1.d":"Most tools run right in your browser – data is not stored.","feat2.t":"For every industry","feat2.d":"Logistics, retail, hospitality, legal, services, healthcare – fully customizable.","feat3.t":"Ready to use","feat3.d":"No installation, no account, no cost. Just open and start.",
-        "foot.tag":"Process optimization & AI","foot.website":"Website","foot.datenschutz":"Privacy","foot.impressum":"Imprint" },
+        "analysis.kicker":"Your next step","analysis.title":"Let’s find where AI can make a real difference in your business.","analysis.text":"In a free, no-obligation introductory call, we review your workflows, identify automation opportunities and discuss practical next steps.","analysis.point1":"Identify repetitive, time-consuming processes","analysis.point2":"Find 2–3 relevant AI and automation opportunities","analysis.point3":"Get an initial view of benefits and implementation","analysis.button":"Book a free introductory call →","analysis.note":"About 30 minutes · free · no obligation · phone or video","foot.tag":"Process optimization & AI","foot.website":"Website","foot.datenschutz":"Privacy","foot.impressum":"Imprint" },
       tr:{ "nav.emaildash":"E-posta Panosu","nav.prozess":"Süreç Kontrolü","nav.logistik":"Lojistik YZ","nav.gastro":"Gastro","nav.angebot":"Teklifler","nav.assistant":"Yapay Zekâ Asistanı",
-        "hero.eyebrow":"İşletmeler için yapay zekâ araçları","hero.h1":"İşletmeleri gerçekten ileriye taşıyan YZ araçları.","hero.lead":"E-posta yönetimi, süreç optimizasyonu, lojistik, gastronomi & teklifler – hepsi yapay zekâ ile, doğrudan tarayıcıda.","hero.cta1":"E-posta Panosunu Aç","hero.cta2":"Tüm araçları gör",
+        "hero.eyebrow":"İşletmeler için yapay zekâ araçları","hero.h1":"İşletmeleri gerçekten ileriye taşıyan YZ araçları.","hero.lead":"E-posta yönetimi, süreç optimizasyonu, lojistik, gastronomi & teklifler – hepsi yapay zekâ ile, doğrudan tarayıcıda.","hero.cta1":"Ücretsiz yapay zekâ potansiyel analizi iste →","hero.cta2":"Araçları dene",
         "trust.1":"🔒 KVKK/GDPR uyumlu","trust.2":"⚡ Saniyeler içinde sonuç","trust.3":"💶 Ücretsiz","sec.k":"Araçlar","sec.h2":"Beş araç, tek sistem",
         "t.emaildash":"E-posta Panosu","d.emaildash":"Gelen kutusunu akıllıca yönetin: YZ tüm e-postaları önceliklendirir, kategorize eder ve yanıt oluşturur – istatistik ve dışa aktarma ile.","go.emaildash":"Panoyu aç",
         "t.prozess":"Süreç Kontrolü","d.prozess":"Dakikalar içinde otomasyon potansiyelinizi öğrenin – Lean & Six Sigma'ya göre, tahmini tasarruflarla.","go.prozess":"Potansiyeli hesapla",
@@ -256,9 +278,9 @@
         "t.angebot":"Teklif Oluşturucu","d.angebot":"3 adımda profesyonel danışmanlık teklifi: müşteri verileri, hizmetler, koşullar – yapay zekâ teklifi yazar.","go.angebot":"Teklif oluştur",
         "t.assistant":"Yapay Zekâ Asistanı","d.assistant":"Gerçek sohbet: soruları yanıtlar, e-posta yazar, özetler ve çevirir – dijital bir çalışan gibi.","go.assistant":"Asistanı aç",
         "feat1.t":"Önce gizlilik","feat1.d":"Çoğu araç doğrudan tarayıcıda çalışır – veriler saklanmaz.","feat2.t":"Her sektör için","feat2.d":"Lojistik, perakende, gastronomi, hukuk, hizmet, sağlık – tamamen uyarlanabilir.","feat3.t":"Hemen kullanıma hazır","feat3.d":"Kurulum yok, hesap yok, ücret yok. Aç ve başla.",
-        "foot.tag":"Süreç optimizasyonu & YZ","foot.website":"Web sitesi","foot.datenschutz":"Gizlilik","foot.impressum":"Künye" },
+        "analysis.kicker":"Sonraki adımınız","analysis.title":"Yapay zekânın işletmenize nerede gerçekten fayda sağlayacağını bulalım.","analysis.text":"Ücretsiz ve bağlayıcı olmayan ilk görüşmede süreçlerinizi inceler, otomasyon fırsatlarını belirler ve somut sonraki adımları konuşuruz.","analysis.point1":"Tekrarlanan ve zaman alan süreçleri belirleme","analysis.point2":"2–3 uygun yapay zekâ ve otomasyon fırsatı bulma","analysis.point3":"Fayda ve uygulama hakkında ilk değerlendirme alma","analysis.button":"Ücretsiz ilk görüşmeyi planlayın →","analysis.note":"Yaklaşık 30 dakika · ücretsiz · bağlayıcı değil · telefon veya video","foot.tag":"Süreç optimizasyonu & YZ","foot.website":"Web sitesi","foot.datenschutz":"Gizlilik","foot.impressum":"Künye" },
       fr:{ "nav.emaildash":"Tableau e-mails","nav.prozess":"Contrôle de processus","nav.logistik":"IA Logistique","nav.gastro":"Gastro","nav.angebot":"Devis","nav.assistant":"Assistant IA",
-        "hero.eyebrow":"Outils d'IA pour les entreprises","hero.h1":"Des outils IA qui font vraiment avancer les entreprises.","hero.lead":"Gestion des e-mails, optimisation des processus, logistique, restauration & devis – tout par IA, dans le navigateur.","hero.cta1":"Ouvrir le tableau e-mails","hero.cta2":"Voir tous les outils",
+        "hero.eyebrow":"Outils d'IA pour les entreprises","hero.h1":"Des outils IA qui font vraiment avancer les entreprises.","hero.lead":"Gestion des e-mails, optimisation des processus, logistique, restauration & devis – tout par IA, dans le navigateur.","hero.cta1":"Demander une analyse IA gratuite →","hero.cta2":"Tester les outils",
         "trust.1":"🔒 Conforme RGPD","trust.2":"⚡ Résultats en secondes","trust.3":"💶 Gratuit","sec.k":"Les outils","sec.h2":"Cinq outils, un système",
         "t.emaildash":"Tableau E-mails","d.emaildash":"Gérez intelligemment votre boîte : l'IA priorise, catégorise et génère des réponses pour tous les e-mails – avec stats et export.","go.emaildash":"Ouvrir le tableau",
         "t.prozess":"Contrôle de processus","d.prozess":"Évaluez votre potentiel d'automatisation en minutes – selon Lean & Six Sigma.","go.prozess":"Calculer le potentiel",
@@ -267,9 +289,9 @@
         "t.angebot":"Générateur de devis","d.angebot":"Devis de conseil professionnels en 3 étapes – l'IA rédige le document prêt à envoyer.","go.angebot":"Créer un devis",
         "t.assistant":"Assistant IA","d.assistant":"Chat réel : répond, rédige, résume, traduit – comme un collaborateur numérique.","go.assistant":"Ouvrir l'assistant",
         "feat1.t":"La confidentialité d'abord","feat1.d":"La plupart des outils fonctionnent dans le navigateur – les données ne sont pas stockées.","feat2.t":"Pour chaque secteur","feat2.d":"Logistique, commerce, restauration, juridique, services, santé – entièrement personnalisable.","feat3.t":"Prêt à l'emploi","feat3.d":"Aucune installation, aucun compte, aucun coût. Ouvrez et commencez.",
-        "foot.tag":"Optimisation des processus & IA","foot.website":"Site web","foot.datenschutz":"Confidentialité","foot.impressum":"Mentions légales" },
+        "analysis.kicker":"Votre prochaine étape","analysis.title":"Découvrons où l’IA peut réellement aider votre entreprise.","analysis.text":"Lors d’un premier échange gratuit et sans engagement, nous examinons vos processus, repérons les possibilités d’automatisation et discutons des prochaines étapes.","analysis.point1":"Repérer les tâches répétitives et chronophages","analysis.point2":"Identifier 2 à 3 possibilités pertinentes d’IA et d’automatisation","analysis.point3":"Obtenir une première estimation des bénéfices et de la mise en œuvre","analysis.button":"Réserver un premier échange gratuit →","analysis.note":"Environ 30 minutes · gratuit · sans engagement · téléphone ou vidéo","foot.tag":"Optimisation des processus & IA","foot.website":"Site web","foot.datenschutz":"Confidentialité","foot.impressum":"Mentions légales" },
       es:{ "nav.emaildash":"Panel de correo","nav.prozess":"Control de procesos","nav.logistik":"IA Logística","nav.gastro":"Gastro","nav.angebot":"Propuestas","nav.assistant":"Asistente IA",
-        "hero.eyebrow":"Herramientas de IA para empresas","hero.h1":"Herramientas de IA que realmente impulsan a las empresas.","hero.lead":"Gestión de correos, optimización de procesos, logística, hostelería & propuestas – todo con IA, en el navegador.","hero.cta1":"Abrir panel de correo","hero.cta2":"Ver todas las herramientas",
+        "hero.eyebrow":"Herramientas de IA para empresas","hero.h1":"Herramientas de IA que realmente impulsan a las empresas.","hero.lead":"Gestión de correos, optimización de procesos, logística, hostelería & propuestas – todo con IA, en el navegador.","hero.cta1":"Solicitar análisis gratuito de IA →","hero.cta2":"Probar las herramientas",
         "trust.1":"🔒 Conforme al RGPD","trust.2":"⚡ Resultados en segundos","trust.3":"💶 Gratis","sec.k":"Las herramientas","sec.h2":"Cinco herramientas, un sistema",
         "t.emaildash":"Panel de Correo","d.emaildash":"Gestión inteligente: la IA prioriza, categoriza y genera respuestas para todos los correos – con estadísticas y exportación.","go.emaildash":"Abrir panel",
         "t.prozess":"Control de procesos","d.prozess":"Descubre tu potencial de automatización en minutos – según Lean & Six Sigma.","go.prozess":"Calcular potencial",
@@ -278,7 +300,7 @@
         "t.angebot":"Generador de propuestas","d.angebot":"Propuestas de consultoría en 3 pasos – la IA redacta el documento listo para enviar.","go.angebot":"Crear propuesta",
         "t.assistant":"Asistente IA","d.assistant":"Chat real: responde, escribe, resume, traduce – como un empleado digital.","go.assistant":"Abrir asistente",
         "feat1.t":"La privacidad primero","feat1.d":"La mayoría de las herramientas funcionan en el navegador – los datos no se almacenan.","feat2.t":"Para cada sector","feat2.d":"Logística, comercio, hostelería, legal, servicios, salud – totalmente personalizable.","feat3.t":"Listo para usar","feat3.d":"Sin instalación, sin cuenta, sin coste. Abre y empieza.",
-        "foot.tag":"Optimización de procesos e IA","foot.website":"Sitio web","foot.datenschutz":"Privacidad","foot.impressum":"Aviso legal" }
+        "analysis.kicker":"Su próximo paso","analysis.title":"Descubramos dónde la IA puede ayudar realmente a su empresa.","analysis.text":"En una primera conversación gratuita y sin compromiso, revisamos sus procesos, detectamos oportunidades de automatización y hablamos de los próximos pasos.","analysis.point1":"Detectar tareas repetitivas y que consumen tiempo","analysis.point2":"Identificar 2–3 oportunidades útiles de IA y automatización","analysis.point3":"Obtener una primera valoración de beneficios e implementación","analysis.button":"Solicitar una primera conversación gratuita →","analysis.note":"Unos 30 minutos · gratis · sin compromiso · por teléfono o vídeo","foot.tag":"Optimización de procesos e IA","foot.website":"Sitio web","foot.datenschutz":"Privacidad","foot.impressum":"Aviso legal" }
     };
     (function(){
       const LKEY='ki-lang', sel=document.getElementById('langsel');
