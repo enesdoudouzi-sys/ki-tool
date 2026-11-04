@@ -146,7 +146,13 @@ function addMsg(role, text){
   d.querySelector('.tx').textContent=text; $('log').appendChild(d); $('log').scrollTop=$('log').scrollHeight;
 }
 function setState(s){ $('pstate').textContent=s; }
-function showErr(t){ $('errBox').innerHTML='<div class="err">'+t+'</div>'; }
+function showErr(t){
+  const box = $('errBox');
+  const message = document.createElement('div');
+  message.className = 'err';
+  message.textContent = String(t ?? '');
+  box.replaceChildren(message);
+}
 
 function speak(text){
   return new Promise((resolve)=>{
