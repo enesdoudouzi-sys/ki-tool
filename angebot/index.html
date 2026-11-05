@@ -336,7 +336,7 @@ Professionell, überzeugend, geschäftsmäßig. Auf Deutsch. Komplett und versan
   let answer = null, lastErr = null;
   for (const model of MODELS) {
     try {
-      const r = await fetch(WORKER, {
+      const r = await KISan.requestAI(WORKER, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({model, temperature:0.5, max_tokens:2000, messages:[{role:'user',content:prompt}]})
       });

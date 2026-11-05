@@ -141,7 +141,7 @@ async function send() {
   try {
     let answer = null, lastErr = null;
     for (const model of MODELS) {
-      const res = await fetch(WORKER_URL, {
+      const res = await KISan.requestAI(WORKER_URL, {
         method:"POST", headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({ model, messages:history, temperature:0.5, max_tokens:1024 }),
       });

@@ -92,7 +92,7 @@ async function groq(messages){
   const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
   for(const model of MODELS){
     try{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.5,max_tokens:1400})});
+      const res=await KISan.requestAI(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.5,max_tokens:1400})});
       const data=await res.json();
       if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
       const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);

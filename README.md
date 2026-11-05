@@ -1,75 +1,22 @@
-<div align="center">
+# KI-Suite – Doudouzi & Ergün
 
-# 🧠 KI-Textanalyse
+Statische Sammlung browserbasierter Werkzeuge für Prozessoptimierung, E-Mail-Arbeit, Gastronomie, Logistik und Textanalyse.
 
-**Branchenübergreifende KI-Analyse für Texte – Kategorisierung, Stimmung und Entitäten.
-Läuft komplett im Browser: kein Server, kein API-Key, keine Daten-Uploads.**
+**Live-Demo:** https://enesdoudouzi-sys.github.io/ki-tool/
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-16a34a?style=for-the-badge&logo=github)](https://enesdoudouzi-sys.github.io/ki-tool/)
-&nbsp;
-![Transformers.js](https://img.shields.io/badge/Transformers.js-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+## Datenschutz und Datenverarbeitung
 
-### 👉 [**Live ausprobieren**](https://enesdoudouzi-sys.github.io/ki-tool/)
+Die Website enthält Funktionen mit unterschiedlichen Datenflüssen:
 
-</div>
-
----
-
-## Was das Tool macht
-
-Man fügt einen beliebigen Text ein (E-Mail, Bewertung, Kundenanfrage, Dokument) und erhält in Sekunden drei Analysen:
-
-| Funktion | Was sie liefert |
-|---|---|
-| 🏷 **Kategorisierung** | Ordnet den Text frei definierbaren Kategorien zu (Zero-Shot – funktioniert ohne Training für **jede** Branche). |
-| 😊 **Stimmungsanalyse** | Erkennt positive / negative / neutrale Stimmung – mehrsprachig, auch auf Deutsch. |
-| 🔍 **Entitätenerkennung** | Markiert Personen, Firmen und Orte im Text. |
-
-Mit **Branchen-Presets** für Logistik, Gastronomie, Handel, Recht, Dienstleistung und Gesundheit – oder komplett eigenen Kategorien.
-
----
-
-## Besonderheit: alles läuft lokal im Browser
-
-Die KI-Modelle (von Hugging Face, via [Transformers.js](https://github.com/huggingface/transformers.js)) werden **einmalig** in den Browser geladen und rechnen danach **auf dem Gerät des Nutzers**.
-
-- 🔒 **Datenschutz:** Der eingegebene Text verlässt den Browser nie.
-- 💸 **Kostenlos:** kein API-Key, kein Backend, kein Konto.
-- ⚡ **Offline-fähig** nach dem ersten Laden.
-
-### Verwendete Modelle
-- `Xenova/nli-deberta-v3-xsmall` – Zero-Shot-Klassifikation
-- `Xenova/distilbert-base-multilingual-cased-sentiments-student` – Stimmung (mehrsprachig)
-- `Xenova/bert-base-multilingual-cased-ner-hrl` – Entitätenerkennung (mehrsprachig)
-
----
-
-## Technik
-
-**Frontend:** reines HTML + JavaScript (ES-Module), keine Build-Tools
-**KI:** Transformers.js 3.0.2 (WebAssembly / WebGPU im Browser)
-**Hosting:** GitHub Pages (statisch)
-
-Keine Abhängigkeit zu installieren – eine einzige `index.html`.
-
----
+- Die lokale Textanalyse lädt Modelle von Hugging Face in den Browser. Die Modellanalyse des eingegebenen Textes läuft lokal.
+- KI-gestützte Funktionen wie Assistent, E-Mail-Antworten, Angebotsgenerator und einzelne Branchenwerkzeuge senden Eingaben über den Cloudflare-Worker `ki-proxy.enesdoudouzi.workers.dev` an einen externen KI-Anbieter.
+- Vor der ersten KI-Anfrage pro Browser-Sitzung wird eine Bestätigung angezeigt. Bitte keine Passwörter oder besonders vertraulichen personenbezogenen Daten eingeben.
+- Speicher- und Aufbewahrungsregeln des Workers und KI-Anbieters müssen anhand ihrer tatsächlichen Konfiguration in der Datenschutzerklärung beschrieben werden. Die statische Website kann deren Verhalten nicht garantieren.
 
 ## Lokal starten
 
-```bash
-# einfach die Seite ausliefern (irgendein statischer Server), z. B.:
-python3 -m http.server 8000
-# dann im Browser: http://localhost:8000
-```
+Die Seiten verwenden für GitHub Pages den URL-Pfad `/ki-tool/`. Für einen lokalen Preview muss die Website unter demselben Pfad erreichbar sein. Starte einen statischen Server im übergeordneten Verzeichnis, in dem der Ordner `ki-tool` liegt, zum Beispiel `python3 -m http.server 8000`, und öffne `http://localhost:8000/ki-tool/`.
 
-> Hinweis: Beim ersten „Analysieren" lädt der Browser die KI-Modelle von Hugging Face (einige MB).
-> Danach sind sie im Cache und die Analyse ist schnell.
+## Qualitätssicherung
 
----
-
-<div align="center">
-
-Entwickelt von **Enes Doudouzi** · Demo für KI-gestützte Prozessoptimierung
-
-</div>
+GitHub Actions prüft lokale Dateiverweise und PWA-Icons. GitHub CodeQL analysiert JavaScript. Hinweise zu den Grenzen der Sicherheit und Datenverarbeitung stehen in `SECURITY.md`.

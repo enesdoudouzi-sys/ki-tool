@@ -359,7 +359,7 @@ async function callAI(prompt) {
   let answer = null, lastErr = null;
   for (const model of MODELS) {
     try {
-      const r = await fetch(WORKER, {
+      const r = await KISan.requestAI(WORKER, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ model, temperature:0.3, max_tokens:600,
           messages:[{role:'user',content:prompt}] })
@@ -433,14 +433,14 @@ function catBadge(cat) {
     'Anfrage':'badge-blue','Angebot':'badge-blue',
     'Rechnung':'badge-amber','Intern':'badge-gray','Info':'badge-gray'
   };
-  return `<span class="badge ${map[cat]||'badge-gray'}">${cat}</span>`;
+  return `<span class="badge ${map[cat]||'badge-gray'}">${escHtml(cat)}</span>`;
 }
 function sentimentBadge(s) {
   const map = { 'positiv':'badge-green','neutral':'badge-gray','negativ':'badge-amber','kritisch':'badge-red' };
-  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+  return `<span class="badge ${map[s]||'badge-gray'}">${escHtml(s)}</span>`;
 }
 function teamBadge(t) {
-  return `<span class="badge badge-purple">${t}</span>`;
+  return `<span class="badge badge-purple">${escHtml(t)}</span>`;
 }
 
 // ── Render email cards ──
@@ -526,7 +526,7 @@ function renderList() {
 }
 
 function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return KISan.html(s);
 }
 
 // ── Card toggle ──

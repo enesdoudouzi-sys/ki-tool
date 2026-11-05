@@ -146,7 +146,7 @@ function addMsg(role, text){
   d.querySelector('.tx').textContent=text; $('log').appendChild(d); $('log').scrollTop=$('log').scrollHeight;
 }
 function setState(s){ $('pstate').textContent=s; }
-function showErr(t){ $('errBox').innerHTML='<div class="err">'+t+'</div>'; }
+function showErr(t){ const box=$('errBox'); box.replaceChildren(); const msg=document.createElement('div'); msg.className='err'; msg.textContent=String(t); box.appendChild(msg); }
 
 function speak(text){
   return new Promise((resolve)=>{
@@ -167,7 +167,7 @@ async function groq(messages, temp, maxTok){
   const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
   for(const model of MODELS){
     try{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:temp,max_tokens:maxTok})});
+      const res=await KISan.requestAI(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:temp,max_tokens:maxTok})});
       const data=await res.json();
       if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
       const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);

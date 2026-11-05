@@ -256,7 +256,7 @@ $('leadForm').addEventListener('submit', async (e)=>{
     ? `Durchlaufzeit: ${p.lead} Min | Flow-Effizienz: ${p.flow}% | Verschwendungs-Level: ${p.wPct}% | Größte Verschwendung: ${p.wtop}\nMaßnahmen:\n` + p.measures.map(m=>`- [${m[0]}] ${m[1]}`).join('\n')
     : '(Prozess-Check wurde nicht ausgefüllt)';
   try{
-    const res=await fetch(WORKER_URL+'lead', { method:'POST', headers:{'Content-Type':'application/json'},
+    const res=await KISan.requestAI(WORKER_URL+'lead', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ quelle:'Prozess-Check', name:f.name.value, firma:f.firma.value, email:f.email.value, telefon:f.telefon.value, nachricht:f.nachricht.value, ergebnis }) });
     const data = await res.json().catch(()=>({}));
     if(res.ok && data.ok){ f.reset(); setLead('✅ Vielen Dank! Ihre Anfrage wurde gesendet – wir melden uns zeitnah bei Ihnen.'); }
