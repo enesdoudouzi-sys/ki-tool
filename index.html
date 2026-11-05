@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev https://huggingface.co https://cdn.jsdelivr.net; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/ki-tool/manifest.json">
@@ -201,7 +200,7 @@
       </div>
 
       <div class="feat">
-        <div class="f"><b data-i18n="feat1.t">Datenschutz zuerst</b><span data-i18n="feat1.d">Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.</span></div>
+        <div class="f"><b data-i18n="feat1.t">Datenschutz zuerst</b><span data-i18n="feat1.d">Lokale Analyse bleibt im Browser; KI-Funktionen senden Texte an einen externen Dienst.</span></div>
         <div class="f"><b data-i18n="feat2.t">Für jede Branche</b><span data-i18n="feat2.d">Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.</span></div>
         <div class="f"><b data-i18n="feat3.t">Sofort einsatzbereit</b><span data-i18n="feat3.d">Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.</span></div>
       </div>
@@ -233,7 +232,7 @@
         "t.gastro":"Gastro-Paket","d.gastro":"Komplett-Paket für Restaurants: KI-Telefonassistent, Bewertungsanalyse und Social-Media-Generator – weniger Aufwand, mehr Gäste.","go.gastro":"Gastro-Tools öffnen",
         "t.angebot":"Angebots-Generator","d.angebot":"Professionelle Beratungsangebote in 3 Schritten: Kundendaten, Leistungen, Konditionen – die KI schreibt das versandfertige Angebot.","go.angebot":"Angebot erstellen",
         "t.assistant":"KI-Assistent","d.assistant":"Echter Chat: Fragen beantworten, E-Mails schreiben, Texte zusammenfassen, übersetzen – wie ein digitaler Mitarbeiter.","go.assistant":"Assistent öffnen",
-        "feat1.t":"Datenschutz zuerst","feat1.d":"Die meisten Tools rechnen direkt im Browser – Daten werden nicht gespeichert.","feat2.t":"Für jede Branche","feat2.d":"Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.","feat3.t":"Sofort einsatzbereit","feat3.d":"Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.",
+        "feat1.t":"Datenschutz zuerst","feat1.d":"Lokale Analyse bleibt im Browser; KI-Funktionen senden Texte an einen externen Dienst.","feat2.t":"Für jede Branche","feat2.d":"Logistik, Handel, Gastronomie, Recht, Dienstleistung, Gesundheit – frei anpassbar.","feat3.t":"Sofort einsatzbereit","feat3.d":"Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.",
         "foot.tag":"Prozessoptimierung & KI","foot.website":"Website","foot.datenschutz":"Datenschutz","foot.impressum":"Impressum" },
       en:{ "nav.emaildash":"Email Dashboard","nav.prozess":"Process Check","nav.logistik":"Logistics AI","nav.gastro":"Gastro","nav.angebot":"Proposals","nav.assistant":"AI Assistant",
         "hero.eyebrow":"AI tools for businesses","hero.h1":"AI tools that truly move businesses forward.","hero.lead":"Email management, process optimization, logistics, gastronomy & proposals – all via AI, right in your browser, no installation.","hero.cta1":"Open Email Dashboard","hero.cta2":"See all tools",
@@ -244,7 +243,7 @@
         "t.gastro":"Gastro Package","d.gastro":"Complete package for restaurants: AI phone assistant, review analysis and social media generator – less effort, more guests.","go.gastro":"Open gastro tools",
         "t.angebot":"Proposal Generator","d.angebot":"Professional consulting proposals in 3 steps: client data, services, terms – the AI writes the ready-to-send proposal.","go.angebot":"Create proposal",
         "t.assistant":"AI Assistant","d.assistant":"Real chat: answer questions, write emails, summarize texts, translate – like a digital employee.","go.assistant":"Open assistant",
-        "feat1.t":"Privacy first","feat1.d":"Most tools run right in your browser – data is not stored.","feat2.t":"For every industry","feat2.d":"Logistics, retail, hospitality, legal, services, healthcare – fully customizable.","feat3.t":"Ready to use","feat3.d":"No installation, no account, no cost. Just open and start.",
+        "feat1.t":"Privacy first","feat1.d":"Local analysis stays in your browser; AI features send text to an external service.","feat2.t":"For every industry","feat2.d":"Logistics, retail, hospitality, legal, services, healthcare – fully customizable.","feat3.t":"Ready to use","feat3.d":"No installation, no account, no cost. Just open and start.",
         "foot.tag":"Process optimization & AI","foot.website":"Website","foot.datenschutz":"Privacy","foot.impressum":"Imprint" },
       tr:{ "nav.emaildash":"E-posta Panosu","nav.prozess":"Süreç Kontrolü","nav.logistik":"Lojistik YZ","nav.gastro":"Gastro","nav.angebot":"Teklifler","nav.assistant":"Yapay Zekâ Asistanı",
         "hero.eyebrow":"İşletmeler için yapay zekâ araçları","hero.h1":"İşletmeleri gerçekten ileriye taşıyan YZ araçları.","hero.lead":"E-posta yönetimi, süreç optimizasyonu, lojistik, gastronomi & teklifler – hepsi yapay zekâ ile, doğrudan tarayıcıda.","hero.cta1":"E-posta Panosunu Aç","hero.cta2":"Tüm araçları gör",
@@ -266,7 +265,7 @@
         "t.gastro":"Pack Restauration","d.gastro":"Pack complet : assistant téléphonique IA, analyse d'avis, générateur réseaux sociaux.","go.gastro":"Ouvrir restauration",
         "t.angebot":"Générateur de devis","d.angebot":"Devis de conseil professionnels en 3 étapes – l'IA rédige le document prêt à envoyer.","go.angebot":"Créer un devis",
         "t.assistant":"Assistant IA","d.assistant":"Chat réel : répond, rédige, résume, traduit – comme un collaborateur numérique.","go.assistant":"Ouvrir l'assistant",
-        "feat1.t":"La confidentialité d'abord","feat1.d":"La plupart des outils fonctionnent dans le navigateur – les données ne sont pas stockées.","feat2.t":"Pour chaque secteur","feat2.d":"Logistique, commerce, restauration, juridique, services, santé – entièrement personnalisable.","feat3.t":"Prêt à l'emploi","feat3.d":"Aucune installation, aucun compte, aucun coût. Ouvrez et commencez.",
+        "feat1.t":"La confidentialité d'abord","feat1.d":"L’analyse locale reste dans votre navigateur ; les fonctions IA envoient le texte à un service externe.","feat2.t":"Pour chaque secteur","feat2.d":"Logistique, commerce, restauration, juridique, services, santé – entièrement personnalisable.","feat3.t":"Prêt à l'emploi","feat3.d":"Aucune installation, aucun compte, aucun coût. Ouvrez et commencez.",
         "foot.tag":"Optimisation des processus & IA","foot.website":"Site web","foot.datenschutz":"Confidentialité","foot.impressum":"Mentions légales" },
       es:{ "nav.emaildash":"Panel de correo","nav.prozess":"Control de procesos","nav.logistik":"IA Logística","nav.gastro":"Gastro","nav.angebot":"Propuestas","nav.assistant":"Asistente IA",
         "hero.eyebrow":"Herramientas de IA para empresas","hero.h1":"Herramientas de IA que realmente impulsan a las empresas.","hero.lead":"Gestión de correos, optimización de procesos, logística, hostelería & propuestas – todo con IA, en el navegador.","hero.cta1":"Abrir panel de correo","hero.cta2":"Ver todas las herramientas",
@@ -277,7 +276,7 @@
         "t.gastro":"Paquete Restauración","d.gastro":"Paquete completo: asistente telefónico IA, análisis de reseñas, generador redes sociales.","go.gastro":"Abrir restauración",
         "t.angebot":"Generador de propuestas","d.angebot":"Propuestas de consultoría en 3 pasos – la IA redacta el documento listo para enviar.","go.angebot":"Crear propuesta",
         "t.assistant":"Asistente IA","d.assistant":"Chat real: responde, escribe, resume, traduce – como un empleado digital.","go.assistant":"Abrir asistente",
-        "feat1.t":"La privacidad primero","feat1.d":"La mayoría de las herramientas funcionan en el navegador – los datos no se almacenan.","feat2.t":"Para cada sector","feat2.d":"Logística, comercio, hostelería, legal, servicios, salud – totalmente personalizable.","feat3.t":"Listo para usar","feat3.d":"Sin instalación, sin cuenta, sin coste. Abre y empieza.",
+        "feat1.t":"La privacidad primero","feat1.d":"El análisis local permanece en el navegador; las funciones de IA envían texto a un servicio externo.","feat2.t":"Para cada sector","feat2.d":"Logística, comercio, hostelería, legal, servicios, salud – totalmente personalizable.","feat3.t":"Listo para usar","feat3.d":"Sin instalación, sin cuenta, sin coste. Abre y empieza.",
         "foot.tag":"Optimización de procesos e IA","foot.website":"Sitio web","foot.datenschutz":"Privacidad","foot.impressum":"Aviso legal" }
     };
     (function(){

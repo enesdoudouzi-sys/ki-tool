@@ -1,5 +1,5 @@
 /* Service Worker – KI-Suite v1 */
-const CACHE = 'ki-suite-v1';
+const CACHE = 'ki-suite-v2';
 const PRECACHE = [
   '/ki-tool/',
   '/ki-tool/index.html',
@@ -33,18 +33,16 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  // Groq/Worker API calls: immer live
-  if (url.hostname.includes('workers.dev') || url.hostname.includes('groq')) return;
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      const net = fetch(e.request).then(res => {
-        if (res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      });
-      return cached || net;
-    })
-  );
+  if (url.origin !== self.location.origin) return;
+
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    try {
+      const response = await fetch(e.request);
+      if (response.ok) await cache.put(e.request, response.clone());
+      return response;
+    } catch (_) {
+      return (await cache.match(e.request)) || Response.error();
+    }
+  })());
 });

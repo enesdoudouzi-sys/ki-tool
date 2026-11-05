@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(self), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev https://huggingface.co https://cdn.jsdelivr.net; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <title>KI-Telefonassistent (Demo) · Gastronomie · Doudouzi & Ergün</title>
@@ -146,7 +145,7 @@ function addMsg(role, text){
   d.querySelector('.tx').textContent=text; $('log').appendChild(d); $('log').scrollTop=$('log').scrollHeight;
 }
 function setState(s){ $('pstate').textContent=s; }
-function showErr(t){ $('errBox').innerHTML='<div class="err">'+t+'</div>'; }
+function showErr(t){ const box=$('errBox'); box.replaceChildren(); const msg=document.createElement('div'); msg.className='err'; msg.textContent=String(t); box.appendChild(msg); }
 
 function speak(text){
   return new Promise((resolve)=>{
@@ -167,7 +166,7 @@ async function groq(messages, temp, maxTok){
   const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
   for(const model of MODELS){
     try{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:temp,max_tokens:maxTok})});
+      const res=await KISan.requestAI(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:temp,max_tokens:maxTok})});
       const data=await res.json();
       if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
       const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);

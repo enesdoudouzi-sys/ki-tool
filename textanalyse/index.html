@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev https://huggingface.co https://cdn.jsdelivr.net; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
@@ -198,7 +197,7 @@
   </div>
 
   <div class="note">
-    <b>So funktioniert's:</b> Die KI-Modelle (von Hugging Face) werden einmalig in Ihren Browser geladen und rechnen <b>lokal auf Ihrem Gerät</b> – Ihre Texte verlassen den Browser nicht und werden nirgends gespeichert. Entwickelt von <b>Doudouzi &amp; Ergün</b> als Demo für KI-gestützte Prozessoptimierung. ·
+    <b>So funktioniert's:</b> Kategorisierung, Stimmung und Begriffe laufen mit im Browser geladenen Modellen lokal. Zusammenfassungen und Antwortentwürfe nutzen einen externen KI-Dienst und senden dafür den eingegebenen Text nach Bestätigung. Entwickelt von <b>Doudouzi &amp; Ergün</b> als Demo für KI-gestützte Prozessoptimierung. ·
     <a href="../">← zur Website</a> · <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/datenschutz.html">Datenschutz</a> · <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/impressum.html">Impressum</a>
   </div>
 
@@ -316,7 +315,7 @@ async function aiReply(text, cat) {
   const messages = [{ role:"system", content:sys }, { role:"user", content:text }];
   for (const model of MODELS) {
     try {
-      const res = await fetch(WORKER_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
+      const res = await KISan.requestAI(WORKER_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({ model, messages, temperature:0.4, max_tokens:320 }) });
       const data = await res.json();
       if (res.ok && !data.error && data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
@@ -332,7 +331,7 @@ function renderClass(out) {
   out.labels.forEach((lab, i) => {
     const pct = Math.round(out.scores[i] * 100);
     const row = document.createElement('div'); row.className = 'classline' + (i === 0 ? ' top' : '');
-    row.innerHTML = `<span class="name">${lab}</span><span class="track"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span>`;
+    row.innerHTML = `<span class="name">${KISan.html(lab)}</span><span class="track"><i style="width:${pct}%"></i></span><span class="pct">${pct}%</span>`;
     el.appendChild(row);
   });
 }
@@ -350,7 +349,8 @@ function renderSentiment(out) {
 function parseEntities(out) {
   const ents = []; let cur = null;
   for (const t of out) {
-    const type = (t.entity || '').replace(/^B-|^I-/, '');
+    const rawType = (t.entity || '').replace(/^B-|^I-/, '');
+    const type = ['PER','ORG','LOC','MISC'].includes(rawType) ? rawType : 'MISC';
     const word = t.word.replace(/^##/, '');
     const isCont = t.word.startsWith('##') || (cur && cur.type === type && (t.entity||'').startsWith('I-'));
     if (isCont && cur) { cur.text += (t.word.startsWith('##') ? '' : ' ') + word; }
@@ -364,7 +364,7 @@ function parseEntities(out) {
 function renderEntities(uniq) {
   const el = $('entOut');
   if (!uniq.length) { el.innerHTML = '<span class="hint">Keine Personen/Firmen/Orte erkannt.</span>'; return; }
-  el.innerHTML = uniq.map(e => `<span class="ent ent-${e.type}">${e.text}</span>`).join('');
+  el.innerHTML = uniq.map(e => `<span class="ent ent-${e.type}">${KISan.html(e.text)}</span>`).join('');
 }
 
 function renderPriority(topCat, sentLabel) {

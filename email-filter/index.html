@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev https://huggingface.co https://cdn.jsdelivr.net; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
@@ -197,7 +196,7 @@ async function aiReply(text, cat){
   const messages=[{role:"system",content:sys},{role:"user",content:text}];
   for(const model of MODELS){
     try{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.4,max_tokens:320})});
+      const res=await KISan.requestAI(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.4,max_tokens:320})});
       const data=await res.json();
       if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
       const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);
@@ -232,10 +231,10 @@ runBtn.addEventListener('click', async ()=>{
       const el=document.createElement('div'); el.className='mail '+it.prio;
       el.innerHTML = `<div class="top">
           <span class="tag ${it.prio}">${PRTXT[it.prio]}</span>
-          <span class="tag cat">🏷 ${it.cat} (${it.catPct}%)</span>
+          <span class="tag cat">🏷 ${KISan.html(it.cat)} (${it.catPct}%)</span>
           <span class="tag sent">${SENTTXT[it.sent]||it.sent}</span>
         </div>
-        <div class="body">${snip.replace(/</g,'&lt;')}</div>
+        <div class="body">${KISan.html(snip)}</div>
         <div class="acts"><button class="btn-sec reply-btn">✍️ KI-Antwort entwerfen</button></div>
         <div class="reply"><div class="rhead"></div><textarea></textarea><div class="tools"><button class="btn-sec copy-reply">📋 Antwort kopieren</button></div></div>`;
       const replyBox=el.querySelector('.reply');
