@@ -10,6 +10,18 @@
     // E-Mail-Format prüfen
     email: function(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s||'').trim()); },
     // KI-Anfragen senden Eingaben an unseren Worker und einen externen KI-Anbieter.
+    requestLead: async function(url, options){
+      var key = 'ki-lead-transfer-consent-v1';
+      var accepted = false;
+      try { accepted = sessionStorage.getItem(key) === 'accepted'; } catch (_) {}
+      if (!accepted) {
+        if (!window.confirm('Ihre eingegebenen Kontaktangaben werden an unseren Cloudflare-Worker übermittelt, damit wir Ihre Anfrage bearbeiten können. Fortfahren?')) {
+          throw new Error('Kontaktanfrage abgebrochen.');
+        }
+        try { sessionStorage.setItem(key, 'accepted'); } catch (_) {}
+      }
+      return fetch(url, options);
+    },
     requestAI: async function(url, options){
       var key = 'ki-ai-transfer-consent-v1';
       var accepted = false;
