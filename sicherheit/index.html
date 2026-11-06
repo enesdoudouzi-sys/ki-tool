@@ -195,6 +195,10 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
           </div>
         </div>
         <div class="progress-wrap"><div class="progress-bar" id="wc-progress" style="width:0%;background:#dc2626"></div></div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-s" id="wc-pdf-btn" onclick="exportWebcheckPDF()" style="display:none">📄 PDF-Bericht herunterladen</button>
+          <button class="btn btn-s" id="wc-copy-btn" onclick="copyWebcheckReport()" style="display:none">📋 Bericht kopieren</button>
+        </div>
       </div>
 
       <!-- Kategorie: HTTPS -->
@@ -711,7 +715,229 @@ Schreibe klar und ohne Fachjargon.`;
     } catch { aiDiv.style.display = 'none'; }
   }
 
+  // Buttons einblenden + Scan-Daten global speichern für Export
+  window._wcScanData = { domain, score, grade: document.getElementById('wc-grade').textContent, allChecks, aiRec: document.getElementById('wc-ai-rec').textContent };
+  document.getElementById('wc-pdf-btn').style.display = 'inline-flex';
+  document.getElementById('wc-copy-btn').style.display = 'inline-flex';
+
   btn.innerHTML = '🔍 Vollständig prüfen';
+  btn.disabled = false;
+}
+
+// ===== EXPORT HELPERS =====
+function buildReportText() {
+  const d = window._wcScanData;
+  if (!d) return '';
+  const now = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  const lines = [
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '  WEBSITE-SICHERHEITS-BERICHT',
+    '  Doudouzi & Ergün – Prozessoptimierung & KI',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    `Domain:       ${d.domain}`,
+    `Datum:        ${now}`,
+    `Gesamt-Note:  ${d.grade}  (${d.score}% Prüfpunkte bestanden)`,
+    '',
+  ];
+
+  const cats = [
+    { label: '🔒 HTTPS & VERSCHLÜSSELUNG', id: 'wc-checks-https' },
+    { label: '🛡️ SECURITY-HEADERS',        id: 'wc-checks-headers' },
+    { label: '📧 E-MAIL-SICHERHEIT (DNS)', id: 'wc-checks-email' },
+    { label: '📄 WEITERE PRÜFUNGEN',        id: 'wc-checks-misc' },
+  ];
+
+  cats.forEach(cat => {
+    const el = document.getElementById(cat.id);
+    if (!el) return;
+    lines.push('─────────────────────────────────────────────');
+    lines.push(cat.label);
+    lines.push('─────────────────────────────────────────────');
+    el.querySelectorAll('.hcheck').forEach(row => {
+      const name  = row.querySelector('.hcheck-name')?.textContent || '';
+      const val   = row.querySelector('.hcheck-val')?.textContent  || '';
+      const tip   = row.querySelectorAll('div')[2]?.textContent     || '';
+      const icon  = row.querySelector('.hcheck-icon')?.textContent  || '';
+      lines.push(`${icon} ${name}`);
+      lines.push(`   ${val}`);
+      if (tip.trim()) lines.push(`   → ${tip.replace('💡 ','')}`);
+      lines.push('');
+    });
+  });
+
+  if (d.aiRec && !d.aiRec.includes('KI erstellt')) {
+    lines.push('─────────────────────────────────────────────');
+    lines.push('🤖 KI-EMPFEHLUNG FÜR DIE GESCHÄFTSFÜHRUNG');
+    lines.push('─────────────────────────────────────────────');
+    lines.push(d.aiRec.replace('🤖 KI-Empfehlung für die Geschäftsführung:\n\n', ''));
+    lines.push('');
+  }
+
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('Erstellt mit Doudouzi & Ergün KI-Suite');
+  lines.push('https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/');
+  return lines.join('\n');
+}
+
+function copyWebcheckReport() {
+  const text = buildReportText();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('wc-copy-btn');
+    btn.textContent = '✅ Kopiert!';
+    setTimeout(() => { btn.innerHTML = '📋 Bericht kopieren'; }, 2000);
+  });
+}
+
+async function exportWebcheckPDF() {
+  const btn = document.getElementById('wc-pdf-btn');
+  btn.innerHTML = '<span class="spinner"></span> Erstelle PDF…';
+  btn.disabled = true;
+
+  // Lazy-load jsPDF
+  if (!window.jspdf) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const d = window._wcScanData;
+  const now = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  const W = 210, margin = 18, cw = W - margin * 2;
+
+  // ── Header ──
+  doc.setFillColor(21, 128, 61);
+  doc.rect(0, 0, W, 32, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+  doc.text('Website-Sicherheits-Bericht', margin, 13);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.text('Doudouzi & Ergün – Prozessoptimierung & KI', margin, 20);
+  doc.text(`Erstellt: ${now}`, margin, 27);
+
+  // ── Score-Box ──
+  const gradeColor = d.score >= 70 ? [21,128,61] : d.score >= 55 ? [217,119,6] : [220,38,38];
+  doc.setFillColor(...gradeColor);
+  doc.roundedRect(W - margin - 32, 36, 32, 32, 4, 4, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(28);
+  doc.text(d.grade, W - margin - 32 + 10, 58);
+
+  doc.setTextColor(31,41,55);
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text(d.domain, margin, 46);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.setTextColor(107,114,128);
+  doc.text(`${d.score}% Prüfpunkte bestanden`, margin, 54);
+
+  // Progress bar
+  doc.setFillColor(229,231,235);
+  doc.roundedRect(margin, 60, cw - 36, 4, 2, 2, 'F');
+  doc.setFillColor(...gradeColor);
+  doc.roundedRect(margin, 60, (cw - 36) * d.score / 100, 4, 2, 2, 'F');
+
+  let y = 76;
+
+  // ── Kategorien ──
+  const catColors = {
+    'wc-checks-https':   { label: 'HTTPS & Verschlüsselung',    r:21,  g:128, b:61  },
+    'wc-checks-headers': { label: 'Security-Headers',            r:29,  g:78,  b:216 },
+    'wc-checks-email':   { label: 'E-Mail-Sicherheit (DNS)',     r:109, g:40,  b:217 },
+    'wc-checks-misc':    { label: 'Weitere Prüfungen',           r:161, g:98,  b:7   },
+  };
+
+  for (const [id, cfg] of Object.entries(catColors)) {
+    const el = document.getElementById(id);
+    if (!el || el.querySelectorAll('.hcheck').length === 0) continue;
+
+    if (y > 255) { doc.addPage(); y = 20; }
+
+    // Category header
+    doc.setFillColor(cfg.r, cfg.g, cfg.b);
+    doc.roundedRect(margin, y, cw, 7, 2, 2, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(cfg.label.toUpperCase(), margin + 3, y + 5);
+    y += 10;
+
+    el.querySelectorAll('.hcheck').forEach(row => {
+      if (y > 268) { doc.addPage(); y = 20; }
+      const pass = row.classList.contains('pass');
+      const warn = row.classList.contains('warn');
+      const name = row.querySelector('.hcheck-name')?.textContent || '';
+      const val  = row.querySelector('.hcheck-val')?.textContent  || '';
+
+      // Status dot
+      const dotColor = pass ? [21,128,61] : warn ? [217,119,6] : [220,38,38];
+      doc.setFillColor(...dotColor);
+      doc.circle(margin + 3, y + 2.5, 2, 'F');
+
+      // Name
+      doc.setTextColor(31,41,55);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.text(name, margin + 8, y + 4);
+
+      // Value
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      doc.setTextColor(107,114,128);
+      const valLines = doc.splitTextToSize(val, cw - 10);
+      doc.text(valLines, margin + 8, y + 9);
+      y += 7 + valLines.length * 4;
+
+      // Tip for failed
+      if (!pass) {
+        const tipEl = row.querySelectorAll('div')[2];
+        if (tipEl) {
+          const tip = tipEl.textContent.replace('💡 ','');
+          doc.setTextColor(217,119,6);
+          doc.setFontSize(7.5);
+          const tipLines = doc.splitTextToSize('→ ' + tip, cw - 12);
+          doc.text(tipLines, margin + 8, y);
+          y += tipLines.length * 3.5 + 2;
+        }
+      }
+      y += 2;
+    });
+    y += 4;
+  }
+
+  // ── KI-Empfehlung ──
+  const aiText = d.aiRec?.replace('🤖 KI-Empfehlung für die Geschäftsführung:\n\n','');
+  if (aiText && !aiText.includes('KI erstellt')) {
+    if (y > 220) { doc.addPage(); y = 20; }
+    doc.setFillColor(21,128,61);
+    doc.roundedRect(margin, y, cw, 7, 2, 2, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('KI-EMPFEHLUNG FÜR DIE GESCHÄFTSFÜHRUNG', margin + 3, y + 5);
+    y += 11;
+    doc.setTextColor(31,41,55);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    const aiLines = doc.splitTextToSize(aiText, cw);
+    if (y + aiLines.length * 4.5 > 280) { doc.addPage(); y = 20; }
+    doc.text(aiLines, margin, y);
+    y += aiLines.length * 4.5 + 6;
+  }
+
+  // ── Footer ──
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    doc.setFillColor(249,250,251);
+    doc.rect(0, 285, W, 12, 'F');
+    doc.setTextColor(156,163,175);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text('Doudouzi & Ergün · ki-tool.enesdoudouzi-sys.github.io', margin, 291);
+    doc.text(`Seite ${i} / ${pages}`, W - margin, 291, { align: 'right' });
+  }
+
+  doc.save(`Sicherheitsbericht_${d.domain}_${new Date().toISOString().slice(0,10)}.pdf`);
+  btn.innerHTML = '📄 PDF-Bericht herunterladen';
   btn.disabled = false;
 }
 
