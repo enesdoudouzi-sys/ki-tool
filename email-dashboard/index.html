@@ -2,739 +2,465 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
-<meta property="og:title" content="E-Mail Dashboard · Doudouzi & Ergün">
-<meta property="og:description" content="KI-gestütztes E-Mail-Dashboard für Unternehmen – Priorisierung, Kategorisierung, Antworten per KI.">
-<meta property="og:image" content="https://enesdoudouzi-sys.github.io/ki-tool/assets/og-image.png">
-<title>E-Mail Dashboard · Doudouzi & Ergün</title>
+<title>E-Mail Dashboard · Doudouzi &amp; Ergün</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/ki-tool/assets/suite.css">
 <script defer src="/ki-tool/assets/suite.js"></script>
-<script defer src="/ki-tool/assets/sanitize.js"></script>
 <style>
-:root{
-  --acc:#2563eb;--acc2:#1d4ed8;--acc-s:#eff6ff;
-  --ink:#0f172a;--muted:#64748b;--bg:#f1f5f9;--card:#fff;--line:#e2e8f0;
-  --green:#16a34a;--green-s:#f0fdf4;--amber:#d97706;--amber-s:#fffbeb;
-  --red:#dc2626;--red-s:#fef2f2;--purple:#7c3aed;--purple-s:#f5f3ff;
-}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;min-height:100vh}
-
-/* ── Layout ── */
-.shell{display:grid;grid-template-columns:220px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
-@media(max-width:720px){.shell{grid-template-columns:1fr}}
-
-/* ── Sidebar ── */
-.sidebar{grid-row:1/3;background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;padding:0;min-height:100vh}
-@media(max-width:720px){.sidebar{display:none}}
-.sb-logo{padding:20px 18px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
-.sb-logo .mark{width:34px;height:34px;background:#16a34a;border-radius:8px;display:grid;place-items:center;font-size:0;flex-shrink:0;background-image:url('/ki-tool/assets/favicon.svg');background-size:cover}
-.sb-logo span{font-size:13px;font-weight:600;color:#f1f5f9;line-height:1.3}
-.sb-logo small{font-size:11px;color:#64748b;display:block}
-.sb-nav{flex:1;padding:12px 0}
-.sb-nav a{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:#94a3b8;text-decoration:none;transition:.12s;border-left:2px solid transparent}
-.sb-nav a:hover{color:#f1f5f9;background:#1e293b}
-.sb-nav a.active{color:#f1f5f9;border-left-color:#2563eb;background:#1e293b}
-.sb-nav .ic{font-size:15px;width:20px;text-align:center}
-.sb-sep{height:1px;background:#1e293b;margin:8px 0}
-.sb-label{padding:6px 18px;font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em}
-.sb-bottom{padding:14px 18px;border-top:1px solid #1e293b}
-.sb-badge{display:inline-block;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 7px;margin-left:auto}
-
-/* ── Topbar ── */
-.topbar2{grid-column:2;background:var(--card);border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
-@media(max-width:720px){.topbar2{grid-column:1}}
-.topbar2 .title{font-size:15px;font-weight:700;color:var(--ink)}
-.topbar2 .sub{font-size:12px;color:var(--muted);margin-left:6px}
-.topbar2 .actions{display:flex;align-items:center;gap:8px}
-.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;border:0}
-.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:var(--acc2)}
-.btn-s{background:var(--card);border:1px solid var(--line);color:var(--muted)}.btn-s:hover{border-color:var(--acc);color:var(--acc)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-icon{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--muted);transition:.12s}.btn-icon:hover{border-color:var(--acc);color:var(--acc)}
-
-/* ── Main ── */
-.main{grid-column:2;padding:20px 24px 40px;overflow-y:auto}
-@media(max-width:720px){.main{grid-column:1;padding:14px}}
-
-/* ── Stats row ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.stat .num{font-size:28px;font-weight:800;line-height:1}
-.stat .lbl{font-size:12px;color:var(--muted);margin-top:3px}
-.stat.red .num{color:var(--red)}.stat.amber .num{color:var(--amber)}.stat.green .num{color:var(--green)}.stat.blue .num{color:var(--acc)}
-
-/* ── Import zone ── */
-.import-card{background:var(--card);border:2px dashed var(--line);border-radius:14px;padding:20px;margin-bottom:20px;transition:.15s}
-.import-card:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.07)}
-.import-card h3{font-size:14px;font-weight:700;margin:0 0 4px}
-.import-card p{font-size:12.5px;color:var(--muted);margin:0 0 10px}
-.import-area{display:flex;gap:10px;align-items:flex-start}
-textarea.inbox{flex:1;border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-size:13px;font-family:inherit;resize:vertical;min-height:110px;color:var(--ink);background:var(--bg)}
-textarea.inbox:focus{outline:none;border-color:var(--acc)}
-.import-btns{display:flex;flex-direction:column;gap:7px}
-.parse-hint{font-size:11.5px;color:var(--muted);margin-top:6px}
-.sep-hint{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);display:inline-block;margin-top:4px}
-
-/* ── Filter bar ── */
-.filterbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.filter-chip{padding:5px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12.5px;cursor:pointer;color:var(--muted);transition:.12s;font-weight:500}
-.filter-chip:hover{border-color:var(--acc);color:var(--acc)}
-.filter-chip.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.filter-chip.red.active{background:var(--red);border-color:var(--red)}
-.filter-chip.amber.active{background:var(--amber);border-color:var(--amber)}
-.filter-chip.green.active{background:var(--green);border-color:var(--green)}
-.sort-sel{margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;background:var(--card);color:var(--muted);cursor:pointer}
-
-/* ── Email cards ── */
-.email-list{display:flex;flex-direction:column;gap:10px}
-.ecard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;transition:.15s;cursor:pointer}
-.ecard:hover{box-shadow:0 2px 12px rgba(0,0,0,.06);border-color:#cbd5e1}
-.ecard.expanded{border-color:var(--acc);box-shadow:0 2px 16px rgba(37,99,235,.1)}
-.ecard-head{display:flex;align-items:flex-start;gap:10px}
-.ecard-prio{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.prio-1{background:#94a3b8}.prio-2{background:var(--green)}.prio-3{background:var(--amber)}.prio-4{background:var(--red)}.prio-5{background:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.2)}
-.ecard-meta{flex:1;min-width:0}
-.ecard-from{font-size:13.5px;font-weight:700;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ecard-subj{font-size:13px;color:var(--muted);margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ecard-badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600}
-.badge-red{background:var(--red-s);color:var(--red)}
-.badge-amber{background:var(--amber-s);color:var(--amber)}
-.badge-green{background:var(--green-s);color:var(--green)}
-.badge-blue{background:var(--acc-s);color:var(--acc)}
-.badge-purple{background:var(--purple-s);color:var(--purple)}
-.badge-gray{background:#f1f5f9;color:#475569}
-.ecard-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.prio-stars{font-size:12px;color:var(--amber);letter-spacing:-1px}
-.ecard-team{font-size:11px;color:var(--muted)}
-.ecard-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-.ecard.expanded .ecard-body{display:block}
-.ecard-preview{font-size:13.5px;color:var(--muted);margin-bottom:12px;line-height:1.6;white-space:pre-wrap}
-.ecard-analysis{background:var(--bg);border-radius:9px;padding:12px 14px;margin-bottom:12px}
-.ecard-analysis h4{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px}
-.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:500px){.analysis-grid{grid-template-columns:1fr}}
-.ag-item{font-size:12.5px}.ag-item b{color:var(--ink);display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
-.reply-box{background:var(--acc-s);border:1px solid #bfdbfe;border-radius:9px;padding:13px 14px;margin-bottom:10px;display:none}
-.reply-box h4{font-size:12px;font-weight:700;color:var(--acc);margin:0 0 6px}
-.reply-text{font-size:13px;white-space:pre-wrap;line-height:1.6;color:var(--ink)}
-.reply-actions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
-.btn-sm{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted);transition:.12s}
-.btn-sm:hover{border-color:var(--acc);color:var(--acc)}
-.btn-sm.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
-.btn-sm.primary:hover{background:var(--acc2)}
-.ecard-actions{display:flex;gap:7px;flex-wrap:wrap}
-.sla-warn{font-size:11.5px;color:var(--red);font-weight:600;background:var(--red-s);border-radius:6px;padding:3px 9px;display:inline-block;margin-bottom:8px}
-
-/* ── Dots loading ── */
-.dots span{display:inline-block;width:5px;height:5px;margin:0 2px;background:var(--acc);border-radius:50%;animation:b 1.2s infinite}
-.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
-@keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
-
-/* ── Empty state ── */
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty-state .big{font-size:48px;margin-bottom:12px}
-.empty-state h3{font-size:18px;color:var(--ink);margin:0 0 6px}
-.empty-state p{font-size:14px;max-width:360px;margin:0 auto}
-
-/* ── Processing overlay ── */
-.processing{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;text-align:center;display:none}
-.processing.show{display:block}
-.proc-bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:12px 0}
-.proc-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s}
-.proc-msg{font-size:13px;color:var(--muted)}
-
-/* ── Report panel ── */
-.report-panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:20px;display:none}
-.report-panel.show{display:block}
-.report-panel h3{margin:0 0 14px;font-size:15px}
-.rep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
-.rep-row:last-child{border:0}
-
-/* ── Dark Mode overrides ── */
-html[data-theme="dark"] .sidebar{background:#080a0e;border-right:1px solid #1e293b}
-html[data-theme="dark"] .sb-nav a.active{background:#131720}
-html[data-theme="dark"] .sb-nav a:hover{background:#131720}
-html[data-theme="dark"] .topbar2{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .main{background:#0b0d10}
-html[data-theme="dark"] .import-card{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .ecard{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .ecard.expanded{border-color:var(--acc)}
-html[data-theme="dark"] .ecard-analysis{background:#0b0d10}
-html[data-theme="dark"] textarea.inbox{background:#0b0d10;color:#f3f4f6;border-color:#242932}
-html[data-theme="dark"] .stat{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .filter-chip{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .sort-sel{background:#13161b;color:#9aa3af;border-color:#242932}
-html[data-theme="dark"] .reply-box{background:#0d1929;border-color:#1e3a5f}
-html[data-theme="dark"] .report-panel{background:#13161b;border-color:#242932}
-html[data-theme="dark"] .processing{background:#13161b;border-color:#242932}
+:root{
+  --acc:#635bff;--acc2:#4f46e5;
+  --navy:#0a2540;
+  --ink:#1a1f36;--muted:#697386;--bg:#f6f9fc;--card:#fff;--line:#e3e8ef;
+  --green:#0ea65e;--amber:#e8930a;--red:#df1b41;
+  font-feature-settings:"cv02","cv03","cv04","cv11";
+}
+[data-theme=dark]{--ink:#e3e8ef;--muted:#8898aa;--bg:#0d1117;--card:#161b22;--line:#21262d;}
+body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:768px){.shell{grid-template-columns:1fr}}
+.sidebar{background:var(--navy);color:#c8d8e8;display:flex;flex-direction:column}
+@media(max-width:768px){.sidebar{display:none}}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px}
+.sb-mark{width:38px;height:38px;background:linear-gradient(135deg,#635bff,#00d4aa);border-radius:10px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:14px;flex-shrink:0}
+.sb-logo-text{font-size:13px;font-weight:700;color:#e3e8ef;line-height:1.25}
+.sb-logo-text small{font-size:11px;color:#6b7c93;font-weight:400;display:block;margin-top:1px}
+.sb-nav{flex:1;padding:14px 0}
+.sb-lbl{padding:6px 20px;font-size:10px;font-weight:700;color:#4f6b8a;text-transform:uppercase;letter-spacing:.08em}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#8898aa;text-decoration:none;transition:.12s;border-left:2px solid transparent;cursor:pointer;background:none;border-right:0;border-top:0;border-bottom:0;width:100%;font-family:inherit}
+.sb-link:hover{color:#e3e8ef;background:rgba(255,255,255,.04)}
+.sb-link.active{color:#e3e8ef;border-left-color:#635bff;background:rgba(99,91,255,.12)}
+.sb-ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:#df1b41;color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 7px}
+.sb-sep{height:1px;background:rgba(255,255,255,.06);margin:8px 0}
+.sb-bottom{padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#635bff,#00d4aa);display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-name{font-size:12px;color:#c8d8e8;font-weight:600}
+.sb-email-txt{font-size:11px;color:#4f6b8a}
+.main-wrap{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
+.topbar2{background:var(--card);border-bottom:1px solid var(--line);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:20;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.topbar2 h1{font-size:15px;font-weight:700;margin:0;letter-spacing:-.2px}
+.topbar2 .sub{font-size:12px;color:var(--muted);margin-left:8px}
+.tb-actions{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;font-family:inherit;letter-spacing:-.1px}
+.btn-p{background:linear-gradient(135deg,#635bff,#4f46e5);color:#fff;box-shadow:0 2px 8px rgba(99,91,255,.35)}.btn-p:hover{box-shadow:0 4px 14px rgba(99,91,255,.45);transform:translateY(-1px)}
+.btn-s{background:var(--card);border:1px solid var(--line);color:var(--muted)}.btn-s:hover{border-color:#635bff;color:#635bff}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--muted);transition:.12s}.btn-icon:hover{border-color:#635bff;color:#635bff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.content{flex:1;padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;transition:.15s}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-red::before{background:linear-gradient(90deg,#df1b41,#ff6584)}
+.stat-amber::before{background:linear-gradient(90deg,#e8930a,#fbbf24)}
+.stat-blue::before{background:linear-gradient(90deg,#635bff,#00d4aa)}
+.stat-green::before{background:linear-gradient(90deg,#0ea65e,#34d399)}
+.stat .num{font-size:28px;font-weight:800;line-height:1;letter-spacing:-.5px;margin-top:6px}
+.stat .lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.stat-red .num{color:#df1b41}.stat-amber .num{color:#e8930a}.stat-blue .num{color:#635bff}.stat-green .num{color:#0ea65e}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
+.filter-tab{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--muted);transition:.12s;letter-spacing:-.1px}
+.filter-tab:hover{border-color:#635bff;color:#635bff}
+.filter-tab.active{background:#635bff;color:#fff;border-color:#635bff;box-shadow:0 2px 8px rgba(99,91,255,.3)}
+.email-list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.email-item{display:flex;align-items:center;gap:13px;padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+.email-item:last-child{border-bottom:none}
+.email-item:hover{background:#f8faff}
+.email-item.unread{background:#fafbff}
+.email-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
+.email-body{flex:1;min-width:0}
+.email-from{font-size:13px;font-weight:700;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-item:not(.unread) .email-from{font-weight:500;color:var(--muted)}
+.email-subject{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.email-item.unread .email-subject{font-weight:600}
+.email-item:not(.unread) .email-subject{color:var(--muted)}
+.email-snippet{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.email-meta{flex-shrink:0;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.email-time{font-size:11.5px;color:var(--muted);font-weight:500}
+.email-cat{font-size:10px;padding:2px 9px;border-radius:999px;font-weight:700}
+.cat-job{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.cat-werbung{background:#fff1f2;color:#9f1239;border:1px solid #fecdd3}
+.cat-updates{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.cat-wichtig{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.cat-social{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:#635bff;flex-shrink:0;box-shadow:0 0 0 2px rgba(99,91,255,.2)}
+.detail-panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;display:none;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.detail-panel.open{display:block}
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.detail-subject{font-size:17px;font-weight:700;line-height:1.3;letter-spacing:-.3px}
+.detail-from{font-size:13px;color:var(--muted);margin-top:5px}
+.detail-body{font-size:12.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:var(--ink);max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg);margin-bottom:18px;font-family:ui-monospace,"JetBrains Mono",monospace}
+.ai-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ai-label{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ai-box{border-radius:12px;padding:16px 18px;font-size:13.5px;line-height:1.75;white-space:pre-wrap;border:1px solid #ddd6fe;background:linear-gradient(135deg,#faf5ff,#f5f3ff)}
+.ai-box.loading{font-style:italic;color:var(--muted);background:var(--bg);border-color:var(--line)}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;text-align:center;background:linear-gradient(160deg,#f6f9fc 60%,#eff0ff)}
+.login-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:44px 40px;max-width:440px;width:100%;box-shadow:0 4px 24px rgba(99,91,255,.1),0 1px 4px rgba(0,0,0,.05)}
+.login-icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#635bff,#00d4aa);display:grid;place-items:center;font-size:28px;margin:0 auto 20px;box-shadow:0 4px 16px rgba(99,91,255,.3)}
+.login-card h2{font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:-.4px}
+.login-card p{font-size:14px;color:var(--muted);margin:0 0 10px;line-height:1.65}
+.login-account{background:#f6f9fc;border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:0 0 20px;display:flex;align-items:center;gap:10px;text-align:left}
+.login-account .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#635bff,#00d4aa);display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.login-account .acct-name{font-size:13px;font-weight:700;color:var(--ink)}
+.login-account .acct-email{font-size:11.5px;color:var(--muted)}
+.google-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;width:100%;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.google-btn:hover{border-color:#635bff;box-shadow:0 4px 14px rgba(99,91,255,.18);transform:translateY(-1px)}
+.setup-notice{background:#faf5ff;border:1px solid #ddd6fe;border-radius:12px;padding:16px;font-size:13px;line-height:1.65;color:#4c1d95;margin-top:16px;text-align:left}
+.setup-notice a{color:#635bff;font-weight:600}
+.setup-notice code{background:#ede9fe;padding:1px 5px;border-radius:4px;font-size:11.5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(99,91,255,.2);border-top-color:#635bff;border-radius:50%;animation:spin .7s linear infinite}
+.empty{text-align:center;padding:44px;color:var(--muted);font-size:14px}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-hd h2{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0}
 </style>
 </head>
 <body>
 <div class="shell">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-logo">
-      <div class="mark"></div>
-      <span>Doudouzi &amp; Ergün<small>E-Mail Dashboard</small></span>
+      <div class="sb-mark">DE</div>
+      <div class="sb-logo-text">Doudouzi &amp; Ergün<small>KI-Suite Professional</small></div>
     </div>
     <nav class="sb-nav">
-      <div class="sb-label">Navigation</div>
-      <a href="#" class="active" data-view="dashboard"><span class="ic">📊</span> Dashboard</a>
-      <a href="#" data-view="import"><span class="ic">📥</span> E-Mails importieren</a>
-      <a href="#" data-view="report"><span class="ic">📋</span> Bericht</a>
+      <div class="sb-lbl">E-Mail</div>
+      <button class="sb-link active" onclick="setFilter('inbox',this)"><span class="sb-ic">📥</span> Posteingang<span class="sb-badge" id="sb-unread-count">–</span></button>
+      <button class="sb-link" onclick="setFilter('wichtig',this)"><span class="sb-ic">⭐</span> Wichtig</button>
+      <button class="sb-link" onclick="setFilter('job',this)"><span class="sb-ic">💼</span> Job / Bewerbung</button>
+      <button class="sb-link" onclick="setFilter('social',this)"><span class="sb-ic">👤</span> Social</button>
+      <button class="sb-link" onclick="setFilter('werbung',this)"><span class="sb-ic">🛒</span> Werbung</button>
       <div class="sb-sep"></div>
-      <div class="sb-label">Tools</div>
-      <a href="/ki-tool/assistent/"><span class="ic">🤖</span> KI-Assistent</a>
-      <a href="/ki-tool/prozess-check/"><span class="ic">📈</span> Prozess-Check</a>
-      <a href="/ki-tool/logistik/"><span class="ic">🚛</span> Logistik-KI</a>
-      <a href="/ki-tool/angebot/"><span class="ic">📝</span> Angebote</a>
-      <div class="sb-sep"></div>
-      <a href="/ki-tool/"><span class="ic">🏠</span> Startseite</a>
+      <div class="sb-lbl">Navigation</div>
+      <a class="sb-link" href="/ki-tool/"><span class="sb-ic">🏠</span> Übersicht</a>
+      <a class="sb-link" href="/ki-tool/sicherheit/"><span class="sb-ic">🛡️</span> Sicherheit</a>
+      <a class="sb-link" href="/ki-tool/assistent/"><span class="sb-ic">🤖</span> KI-Assistent</a>
     </nav>
     <div class="sb-bottom">
-      <div style="font-size:11px;color:#475569">Powered by Groq KI</div>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">EN</div>
+        <div>
+          <div class="sb-name" id="sb-name">Enes</div>
+          <div class="sb-email-txt" id="sb-email-label">enesdoudouzi@gmail.com</div>
+        </div>
+      </div>
     </div>
   </aside>
 
-  <!-- TOPBAR -->
-  <header class="topbar2">
-    <div style="display:flex;align-items:center;gap:6px">
-      <span class="title">E-Mail Intelligence Dashboard</span>
-      <span class="sub" id="emailCount"></span>
-    </div>
-    <div class="actions">
-      <button class="btn-icon" id="exportBtn" title="Bericht exportieren">📥 Export</button>
-      <button class="btn btn-s" id="clearBtn">Leeren</button>
-      <button class="btn btn-p" id="analyzeAllBtn" disabled>🤖 Alle analysieren</button>
-    </div>
-  </header>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat red"><div class="num" id="s-urgent">0</div><div class="lbl">🔴 Dringend</div></div>
-      <div class="stat amber"><div class="num" id="s-pending">0</div><div class="lbl">🟡 Offen</div></div>
-      <div class="stat green"><div class="num" id="s-done">0</div><div class="lbl">🟢 Bearbeitet</div></div>
-      <div class="stat blue"><div class="num" id="s-total">0</div><div class="lbl">📧 Gesamt</div></div>
+  <div class="main-wrap">
+    <div class="topbar2">
+      <div style="display:flex;align-items:center">
+        <h1>E-Mail Dashboard</h1>
+        <span class="sub" id="tb-status">· Nicht verbunden</span>
+      </div>
+      <div class="tb-actions">
+        <button class="btn-icon" onclick="refreshEmails()" id="refresh-btn" style="display:none" title="Aktualisieren">🔄</button>
+        <button class="btn btn-s" onclick="signOut()" id="signout-btn" style="display:none">Abmelden</button>
+        <a href="/ki-tool/" class="btn btn-s">← Zurück</a>
+      </div>
     </div>
 
-    <!-- IMPORT -->
-    <div class="import-card" id="importCard">
-      <h3>📥 E-Mails importieren</h3>
-      <p>Mehrere E-Mails einfügen – trenne sie mit einer Leerzeile oder <code>---</code>. Die KI analysiert alle auf einmal.</p>
-      <div class="import-area">
-        <textarea class="inbox" id="importArea" placeholder="Von: kunde@beispiel.de&#10;Betreff: Dringende Bestellung fehlerhaft&#10;Hallo, unsere letzte Lieferung war unvollständig...&#10;&#10;---&#10;&#10;Von: info@partner.de&#10;Betreff: Angebot Anfrage&#10;Sehr geehrte Damen und Herren, wir interessieren uns für..."></textarea>
-        <div class="import-btns">
-          <button class="btn btn-p" id="loadDemo">Demo laden</button>
-          <button class="btn btn-s" id="importBtn">Importieren</button>
+    <div class="content">
+
+      <!-- LOGIN -->
+      <div class="login-wrap" id="login-screen">
+        <div class="login-card">
+          <div class="login-icon">📧</div>
+          <h2>E-Mail Dashboard</h2>
+          <p>KI-gestütztes Postfach mit automatischer Kategorisierung, Prioritätsbewertung und smarten Zusammenfassungen.</p>
+          <div class="login-account">
+            <div class="av">EN</div>
+            <div>
+              <div class="acct-name">Enes Doudouzi</div>
+              <div class="acct-email">enesdoudouzi@gmail.com</div>
+            </div>
+          </div>
+          <button class="google-btn" onclick="signInWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.6 2.6 13.8l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 7.2-16.9z"/><path fill="#FBBC05" d="M10.4 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.7-4.6l-7.8-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.9 2.3-8.5 2.3-6.3 0-11.7-4.3-13.6-10l-7.8 6.1C6.5 42.4 14.6 48 24 48z"/></svg>
+            Mit Google anmelden
+          </button>
+          <div class="setup-notice" id="setup-notice">
+            <strong>⚙️ Einmalige Einrichtung:</strong> Google OAuth Client-ID eintragen.
+            <div style="margin-top:10px">
+              <input type="text" id="client-id-input" placeholder="xxx.apps.googleusercontent.com"
+                style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid #ddd6fe;font-size:12px;font-family:ui-monospace,monospace;background:#fff;color:#1a1f36;margin-bottom:8px;outline:none">
+              <button class="btn btn-p" onclick="saveClientId()" style="width:100%;justify-content:center">Client-ID speichern</button>
+            </div>
+            <div style="margin-top:12px;font-size:12px;line-height:1.75">
+              <strong>Schritt-für-Schritt:</strong><br>
+              1. <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console öffnen</a><br>
+              2. Neues Projekt → Gmail API aktivieren<br>
+              3. OAuth 2.0 Client-ID → Typ: Web-Anwendung<br>
+              4. Autorisierte Origins: <code>https://enesdoudouzi-sys.github.io</code><br>
+              5. Client-ID oben speichern → Anmelden
+            </div>
+          </div>
         </div>
       </div>
-      <div class="parse-hint">Trennzeichen: <span class="sep-hint">---</span> oder einfach eine Leerzeile zwischen E-Mails</div>
-    </div>
 
-    <!-- PROCESSING -->
-    <div class="processing" id="procCard">
-      <div style="font-size:22px;margin-bottom:8px">🤖</div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">KI analysiert Ihre E-Mails …</div>
-      <div class="proc-bar"><div class="proc-fill" id="procFill" style="width:0%"></div></div>
-      <div class="proc-msg" id="procMsg">Starte Analyse …</div>
-    </div>
-
-    <!-- FILTER BAR -->
-    <div class="filterbar" id="filterBar" style="display:none">
-      <span class="filter-chip active" data-f="all">Alle</span>
-      <span class="filter-chip red" data-f="urgent">🔴 Dringend</span>
-      <span class="filter-chip amber" data-f="open">🟡 Offen</span>
-      <span class="filter-chip green" data-f="info">🟢 Info</span>
-      <span class="filter-chip" data-f="customer">👤 Kunde</span>
-      <span class="filter-chip" data-f="internal">🏢 Intern</span>
-      <span class="filter-chip" data-f="supplier">📦 Lieferant</span>
-      <select class="sort-sel" id="sortSel">
-        <option value="prio">Nach Priorität</option>
-        <option value="cat">Nach Kategorie</option>
-        <option value="team">Nach Team</option>
-      </select>
-    </div>
-
-    <!-- EMAIL LIST -->
-    <div class="email-list" id="emailList">
-      <div class="empty-state">
-        <div class="big">📭</div>
-        <h3>Noch keine E-Mails</h3>
-        <p>E-Mails oben einfügen und auf „Importieren" klicken. Dann „Alle analysieren" starten.</p>
+      <!-- DASHBOARD -->
+      <div id="dashboard" style="display:none;flex-direction:column;gap:18px">
+        <div>
+          <div class="sec-hd">
+            <h2>Übersicht</h2>
+            <span style="font-size:12px;color:var(--muted)" id="last-sync"></span>
+          </div>
+          <div class="stats">
+            <div class="stat stat-red"><div class="lbl">Ungelesen</div><div class="num" id="stat-unread">–</div></div>
+            <div class="stat stat-amber"><div class="lbl">Job / Bewerbung</div><div class="num" id="stat-job">–</div></div>
+            <div class="stat stat-blue"><div class="lbl">Heute</div><div class="num" id="stat-heute">–</div></div>
+            <div class="stat stat-green"><div class="lbl">Geladen</div><div class="num" id="stat-gesamt">–</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-hd" style="margin-bottom:10px"><h2>Filter</h2></div>
+          <div class="filter-row">
+            <button class="filter-tab active" onclick="filterEmails('alle',this)">Alle</button>
+            <button class="filter-tab" onclick="filterEmails('unread',this)">🔵 Ungelesen</button>
+            <button class="filter-tab" onclick="filterEmails('wichtig',this)">⭐ Wichtig</button>
+            <button class="filter-tab" onclick="filterEmails('job',this)">💼 Job</button>
+            <button class="filter-tab" onclick="filterEmails('social',this)">👤 Social</button>
+            <button class="filter-tab" onclick="filterEmails('werbung',this)">🛒 Werbung</button>
+            <button class="filter-tab" onclick="filterEmails('updates',this)">📋 Updates</button>
+          </div>
+        </div>
+        <div>
+          <div class="sec-hd">
+            <h2>Posteingang</h2>
+            <button class="btn btn-s" onclick="loadMoreEmails()" id="load-more-btn" style="display:none;font-size:12px;padding:4px 12px">+ Weitere laden</button>
+          </div>
+          <div class="email-list" id="email-list"><div class="empty">⏳ Lade E-Mails…</div></div>
+        </div>
+        <div class="detail-panel" id="detail-panel">
+          <div class="detail-header">
+            <div>
+              <div class="detail-subject" id="detail-subject">–</div>
+              <div class="detail-from" id="detail-from">–</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0">
+              <a class="btn btn-s" id="detail-open-btn" href="#" target="_blank" style="font-size:12px">↗ In Gmail</a>
+              <button class="btn btn-s" onclick="closeDetail()" style="font-size:12px">✕</button>
+            </div>
+          </div>
+          <div class="detail-body" id="detail-body">–</div>
+          <div class="ai-row">
+            <div class="ai-label">🤖 KI-Analyse</div>
+            <button class="btn btn-p" onclick="summarizeEmail()" style="font-size:12px;padding:7px 16px">Analysieren</button>
+          </div>
+          <div class="ai-box" id="ai-summary" style="display:none"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- REPORT PANEL -->
-    <div class="report-panel" id="reportPanel">
-      <h3>📋 Analyse-Bericht</h3>
-      <div id="reportContent"></div>
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-p" onclick="exportPDF()">📕 PDF exportieren</button>
-        <button class="btn btn-s" onclick="exportXLSX()">📗 Excel exportieren</button>
-      </div>
     </div>
-
-  </main>
+  </div>
 </div>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
-const WORKER = "https://ki-proxy.enesdoudouzi.workers.dev/";
-const MODELS = ["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
+const PROXY='https://ki-proxy.enesdoudouzi.workers.dev';
+const SCOPES='https://www.googleapis.com/auth/gmail.readonly';
+const GMAIL_API='https://gmail.googleapis.com/gmail/v1';
+const MY_EMAIL='enesdoudouzi@gmail.com';
 
-const DEMO_EMAILS = `Von: thomas.mueller@sped-mueller.de
-Betreff: Sendung XY-2847 fehlt komplett – sofortige Klärung nötig
-Hallo, unsere Sendung XY-2847 die am 28.10. geliefert werden sollte fehlt vollständig. Wir haben den Fahrer mehrfach versucht zu erreichen. Bitte umgehend Stellung nehmen. Unser Produktionsstopp beträgt mittlerweile 4 Stunden!
+let accessToken=null,emailCache=[],nextPageToken=null,currentFilter='alle',currentEmail=null;
 
----
-
-Von: anna.schmidt@kunde-gmbh.de
-Betreff: Angebot für Logistikdienstleistungen 2025
-Sehr geehrte Damen und Herren, wir planen unsere Logistikpartner neu zu vergeben und sind an einem Angebot interessiert. Können Sie uns bis Ende des Monats ein Angebot für ca. 50 Paletten/Woche zukommen lassen?
-
----
-
-Von: buchhaltung@lieferant-max.de
-Betreff: Rechnung RE-2024-5582 – Zahlungserinnerung
-Sehr geehrte Damen und Herren, wir erlauben uns Sie daran zu erinnern, dass die Rechnung RE-2024-5582 über 3.840,00 EUR seit dem 15.10.2024 fällig ist. Bitte überweisen Sie den Betrag binnen 5 Werktagen.
-
----
-
-Von: hr@intern.firma.de
-Betreff: Betriebsfeier 22. November – Anmeldung
-Liebes Team, wir freuen uns die diesjährige Betriebsfeier ankündigen zu können! Datum: 22. November, 19 Uhr, Restaurant Goldener Adler. Bitte meldet euch bis 10.11. an.
-
----
-
-Von: beschwerden@kunde-xyz.de
-Betreff: Schwerwiegende Beschädigung unserer Ware – wir fordern Schadensersatz
-Ihre Mitarbeiter haben unsere Maschine beim Entladen stark beschädigt. Schaden ca. 8.000 EUR. Wir beauftragen anwaltliche Schritte wenn wir keine Reaktion innerhalb 24 Stunden erhalten. Bitte sofort melden.
-
----
-
-Von: partner@speditionsverband.de
-Betreff: Neuer Tarifvertrag ab Januar 2025 – Info
-Sehr geehrte Mitglieder, anbei übersenden wir Ihnen die aktualisierte Tarifinformation für das Geschäftsjahr 2025. Die neuen Sätze gelten ab dem 01.01.2025. Bitte weiterleiten an Ihre Disposition.`;
-
-let emails = [];
-let analyzed = [];
-let activeFilter = 'all';
-
-// ── Parse emails ──
-function parseEmails(raw) {
-  return raw.split(/\n---\n|\n---\r\n/)
-    .map(s => s.trim()).filter(s => s.length > 30)
-    .map((raw, i) => {
-      const lines = raw.split('\n');
-      let from = '', subject = '', body = '';
-      const bodyLines = [];
-      let inBody = false;
-      for (const l of lines) {
-        if (!inBody && /^von:/i.test(l)) { from = l.replace(/^von:\s*/i,'').trim(); }
-        else if (!inBody && /^betreff:|^subject:/i.test(l)) { subject = l.replace(/^betreff:|^subject:/i,'').trim(); }
-        else if (!inBody && from && subject) { inBody = true; bodyLines.push(l); }
-        else if (inBody) bodyLines.push(l);
-      }
-      body = bodyLines.join('\n').trim() || raw.substring(0,300);
-      return { id: i, from: from || 'Unbekannt', subject: subject || '(kein Betreff)', body, raw, status: 'open', reply: null, analysis: null };
-    });
+function getClientId(){return localStorage.getItem('gmail_client_id')||'';}
+function saveClientId(){
+  const v=document.getElementById('client-id-input').value.trim();
+  if(!v||!v.includes('.apps.googleusercontent.com')){alert('Ungültige Client-ID');return;}
+  localStorage.setItem('gmail_client_id',v);
+  document.getElementById('setup-notice').innerHTML='<strong>✅ Gespeichert!</strong> Jetzt anmelden.';
 }
 
-// ── Call AI ──
-async function callAI(prompt) {
-  let answer = null, lastErr = null;
-  for (const model of MODELS) {
-    try {
-      const r = await fetch(WORKER, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ model, temperature:0.3, max_tokens:600,
-          messages:[{role:'user',content:prompt}] })
-      });
-      const d = await r.json();
-      if (r.ok && d.choices?.[0]?.message?.content) { answer = d.choices[0].message.content.trim(); break; }
-      lastErr = d.error?.message || d.error || 'HTTP '+r.status;
-      if (!/model|decommission|not exist|access/i.test(String(lastErr))) break;
-    } catch(e) { lastErr = e.message; break; }
-  }
-  return answer || ('FEHLER: ' + lastErr);
+function signInWithGoogle(){
+  const id=getClientId();
+  if(!id){alert('Bitte zuerst die OAuth Client-ID eintragen.');return;}
+  google.accounts.oauth2.initTokenClient({
+    client_id:id,scope:SCOPES,hint:MY_EMAIL,
+    callback(res){
+      if(res.error){alert('Fehler: '+res.error);return;}
+      accessToken=res.access_token;onSignedIn();
+    }
+  }).requestAccessToken();
 }
 
-// ── Analyse single email ──
-async function analyzeEmail(email) {
-  const prompt = `Analysiere diese E-Mail und antworte NUR mit einem validen JSON-Objekt (kein Markdown, kein Text darum):
-
-Von: ${email.from}
-Betreff: ${email.subject}
-Text: ${email.body.substring(0,600)}
-
-JSON-Format (exakt so, keine anderen Felder):
-{
-  "prioritaet": 1-5,
-  "kategorie": "Beschwerde" | "Anfrage" | "Rechnung" | "Intern" | "Info" | "Dringend" | "Reklamation" | "Angebot",
-  "team": "Kundenservice" | "Vertrieb" | "Buchhaltung" | "Management" | "Disposition" | "HR",
-  "sentiment": "positiv" | "neutral" | "negativ" | "kritisch",
-  "zusammenfassung": "max 15 Wörter",
-  "handlung": "max 12 Wörter konkrete nächste Handlung",
-  "sla_stunden": 4 | 8 | 24 | 48 | 72,
-  "antwort": "Fertige höfliche professionelle Antwort auf Deutsch, max 80 Wörter"
-}`;
-  const raw = await callAI(prompt);
-  try {
-    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
-    return JSON.parse(jsonStr);
-  } catch(e) {
-    return { prioritaet:3, kategorie:'Info', team:'Management', sentiment:'neutral',
-      zusammenfassung:'Analyse fehlgeschlagen', handlung:'Manuell prüfen',
-      sla_stunden:24, antwort:'Vielen Dank für Ihre Nachricht. Wir melden uns zeitnah zurück.' };
-  }
+function signOut(){
+  accessToken=null;emailCache=[];
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  ['signout-btn','refresh-btn'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('tb-status').textContent='· Nicht verbunden';
 }
 
-// ── Update stats ──
-function updateStats() {
-  const urgent = analyzed.filter(e => e.analysis && e.analysis.prioritaet >= 4).length;
-  const open = analyzed.filter(e => e.status === 'open').length;
-  const done = analyzed.filter(e => e.status === 'done').length;
-  document.getElementById('s-urgent').textContent = urgent;
-  document.getElementById('s-pending').textContent = open;
-  document.getElementById('s-done').textContent = done;
-  document.getElementById('s-total').textContent = analyzed.length;
-  const cnt = document.getElementById('emailCount');
-  cnt.textContent = analyzed.length ? `· ${analyzed.length} E-Mails` : '';
+async function onSignedIn(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('dashboard').style.display='flex';
+  document.getElementById('signout-btn').style.display='inline-flex';
+  document.getElementById('refresh-btn').style.display='inline-block';
+  try{
+    const p=await gmailFetch('/users/me/profile');
+    const em=p.emailAddress||MY_EMAIL;
+    document.getElementById('sb-email-label').textContent=em;
+    document.getElementById('sb-name').textContent=em.split('@')[0];
+    document.getElementById('sb-avatar').textContent=em.substring(0,2).toUpperCase();
+    document.getElementById('tb-status').textContent='· '+em;
+  }catch{}
+  loadEmails();
 }
 
-// ── Priority display ──
-function prioStars(p) {
-  return '★'.repeat(p) + '☆'.repeat(5-p);
-}
-function prioLabel(p) {
-  if (p>=5) return '<span class="badge badge-red">🔴 Kritisch</span>';
-  if (p>=4) return '<span class="badge badge-red">🔴 Dringend</span>';
-  if (p>=3) return '<span class="badge badge-amber">🟡 Mittel</span>';
-  if (p>=2) return '<span class="badge badge-green">🟢 Normal</span>';
-  return '<span class="badge badge-gray">⚪ Info</span>';
-}
-function catBadge(cat) {
-  const map = {
-    'Beschwerde':'badge-red','Reklamation':'badge-red','Dringend':'badge-red',
-    'Anfrage':'badge-blue','Angebot':'badge-blue',
-    'Rechnung':'badge-amber','Intern':'badge-gray','Info':'badge-gray'
-  };
-  return `<span class="badge ${map[cat]||'badge-gray'}">${cat}</span>`;
-}
-function sentimentBadge(s) {
-  const map = { 'positiv':'badge-green','neutral':'badge-gray','negativ':'badge-amber','kritisch':'badge-red' };
-  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
-}
-function teamBadge(t) {
-  return `<span class="badge badge-purple">${t}</span>`;
+async function gmailFetch(path,params=''){
+  const r=await fetch(GMAIL_API+path+(params?'?'+params:''),{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok)throw new Error('Gmail '+r.status);
+  return r.json();
 }
 
-// ── Render email cards ──
-function renderList() {
-  const list = document.getElementById('emailList');
-  const filt = activeFilter;
-  const sort = document.getElementById('sortSel').value;
-  const filterBar = document.getElementById('filterBar');
+async function loadEmails(reset=true){
+  if(reset){emailCache=[];nextPageToken=null;}
+  document.getElementById('email-list').innerHTML='<div class="empty"><span class="spin"></span> Lade E-Mails…</div>';
+  try{
+    let p='maxResults=25&labelIds=INBOX';
+    if(nextPageToken)p+='&pageToken='+nextPageToken;
+    const data=await gmailFetch('/users/me/messages',p);
+    nextPageToken=data.nextPageToken||null;
+    if(!data.messages?.length){document.getElementById('email-list').innerHTML='<div class="empty">Keine E-Mails.</div>';return;}
+    const details=await Promise.all(data.messages.slice(0,25).map(m=>
+      gmailFetch('/users/me/messages/'+m.id,'format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date')
+    ));
+    const parsed=details.map(parseMsg);
+    emailCache=reset?parsed:[...emailCache,...parsed];
+    updateStats();renderEmails();
+    document.getElementById('load-more-btn').style.display=nextPageToken?'inline-flex':'none';
+    document.getElementById('last-sync').textContent='Sync '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){document.getElementById('email-list').innerHTML='<div class="empty">⚠️ '+e.message+'</div>';}
+}
+function loadMoreEmails(){loadEmails(false);}
+function refreshEmails(){loadEmails(true);}
 
-  if (!analyzed.length) {
-    filterBar.style.display = 'none';
-    list.innerHTML = '<div class="empty-state"><div class="big">📭</div><h3>Noch keine E-Mails</h3><p>E-Mails oben einfügen und auf „Importieren" klicken. Dann „Alle analysieren" starten.</p></div>';
-    return;
-  }
-  filterBar.style.display = 'flex';
+function parseMsg(msg){
+  const hh=msg.payload?.headers||[];
+  const get=k=>hh.find(h=>h.name===k)?.value||'';
+  const from=get('From'),subject=get('Subject')||'(kein Betreff)',date=get('Date');
+  const labels=msg.labelIds||[],isUnread=labels.includes('UNREAD');
+  const sm=from.match(/^(.+?)\s*<(.+?)>$/);
+  const senderName=sm?sm[1].replace(/"/g,'').trim():from;
+  const senderEmail=sm?sm[2]:from;
+  let cat='updates';
+  if(labels.includes('CATEGORY_SOCIAL'))cat='social';
+  else if(labels.includes('CATEGORY_PROMOTIONS'))cat='werbung';
+  else if(labels.includes('IMPORTANT'))cat='wichtig';
+  if(/bewerbung|stelle|job|karriere|stellenangebot|indeed|jobtome|michael.*page/i.test(subject+from))cat='job';
+  const pal=['#635bff','#0ea65e','#e8930a','#5b21b6','#df1b41','#0369a1','#0f766e','#b45309'];
+  const color=pal[(senderName.charCodeAt(0)||65)%pal.length];
+  const d=new Date(date),now=new Date();
+  const timeStr=d.toDateString()===now.toDateString()
+    ?d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})
+    :d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+  return{id:msg.id,threadId:msg.threadId,subject,senderName,senderEmail,snippet:msg.snippet||'',date:d,timeStr,isUnread,cat,color};
+}
 
-  let items = [...analyzed];
-  if (filt === 'urgent') items = items.filter(e => e.analysis?.prioritaet >= 4);
-  else if (filt === 'open') items = items.filter(e => e.status === 'open');
-  else if (filt === 'info') items = items.filter(e => e.analysis?.prioritaet <= 2);
-  else if (filt === 'customer') items = items.filter(e => e.analysis?.team === 'Kundenservice');
-  else if (filt === 'internal') items = items.filter(e => e.analysis?.team === 'HR' || e.analysis?.kategorie === 'Intern');
-  else if (filt === 'supplier') items = items.filter(e => e.analysis?.kategorie === 'Rechnung' || e.from?.includes('lieferant'));
-
-  if (sort === 'prio') items.sort((a,b) => (b.analysis?.prioritaet||0) - (a.analysis?.prioritaet||0));
-  else if (sort === 'cat') items.sort((a,b) => (a.analysis?.kategorie||'').localeCompare(b.analysis?.kategorie||''));
-  else if (sort === 'team') items.sort((a,b) => (a.analysis?.team||'').localeCompare(b.analysis?.team||''));
-
-  list.innerHTML = items.map(e => {
-    const a = e.analysis;
-    const prio = a ? a.prioritaet : 0;
-    const slaDue = a && a.sla_stunden <= 4;
-    return `<div class="ecard ${e.expanded?'expanded':''}" id="ec-${e.id}" onclick="toggleCard(${e.id},event)">
-      <div class="ecard-head">
-        <div class="ecard-prio prio-${prio}"></div>
-        <div class="ecard-meta">
-          <div class="ecard-from">${escHtml(e.from)}</div>
-          <div class="ecard-subj">${escHtml(e.subject)}</div>
-          <div class="ecard-badges">
-            ${a ? prioLabel(a.prioritaet) : '<span class="badge badge-gray">Ausstehend …</span>'}
-            ${a ? catBadge(a.kategorie) : ''}
-            ${a ? teamBadge(a.team) : ''}
-            ${e.status==='done'?'<span class="badge badge-green">✓ Erledigt</span>':''}
-          </div>
-        </div>
-        <div class="ecard-right">
-          ${a ? `<span class="prio-stars" title="Priorität ${a.prioritaet}/5">${prioStars(a.prioritaet)}</span>` : '<span class="dots"><span></span><span></span><span></span></span>'}
-          ${a ? `<span class="ecard-team">${a.sla_stunden}h SLA</span>` : ''}
-        </div>
+function renderEmails(){
+  let items=emailCache;
+  if(currentFilter==='unread')items=items.filter(e=>e.isUnread);
+  else if(currentFilter!=='alle')items=items.filter(e=>e.cat===currentFilter);
+  if(!items.length){document.getElementById('email-list').innerHTML='<div class="empty">Keine E-Mails in dieser Kategorie.</div>';return;}
+  document.getElementById('email-list').innerHTML=items.map(e=>`
+    <div class="email-item${e.isUnread?' unread':''}" onclick="openEmail('${e.id}')">
+      ${e.isUnread?'<div class="unread-dot"></div>':'<div style="width:8px;flex-shrink:0"></div>'}
+      <div class="email-avatar" style="background:${e.color}">${(e.senderName[0]||'?').toUpperCase()}</div>
+      <div class="email-body">
+        <div class="email-from">${esc(e.senderName)}</div>
+        <div class="email-subject">${esc(e.subject)}</div>
+        <div class="email-snippet">${esc(e.snippet.substring(0,110))}</div>
       </div>
-      <div class="ecard-body">
-        ${slaDue ? '<div class="sla-warn">⚡ SLA: Antwort in unter 4 Stunden erforderlich!</div>' : ''}
-        <div class="ecard-preview">${escHtml(e.body.substring(0,400))}${e.body.length>400?'…':''}</div>
-        ${a ? `<div class="ecard-analysis">
-          <h4>KI-Analyse</h4>
-          <div class="analysis-grid">
-            <div class="ag-item"><b>Zusammenfassung</b>${escHtml(a.zusammenfassung)}</div>
-            <div class="ag-item"><b>Nächste Handlung</b>${escHtml(a.handlung)}</div>
-            <div class="ag-item"><b>Stimmung</b>${sentimentBadge(a.sentiment)}</div>
-            <div class="ag-item"><b>Team-Zuweisung</b>${teamBadge(a.team)}</div>
-          </div>
-        </div>` : ''}
-        ${a && a.antwort ? `<div class="reply-box" id="rb-${e.id}" style="display:block">
-          <h4>💬 KI-Antwortvorschlag</h4>
-          <div class="reply-text">${escHtml(a.antwort)}</div>
-          <div class="reply-actions">
-            <button class="btn-sm primary" onclick="copyReply(${e.id});event.stopPropagation()">📋 Kopieren</button>
-            <button class="btn-sm" onclick="markDone(${e.id});event.stopPropagation()">✓ Als erledigt markieren</button>
-            <button class="btn-sm" onclick="regenerateReply(${e.id});event.stopPropagation()">🔄 Neu generieren</button>
-          </div>
-        </div>` : ''}
-        <div class="ecard-actions">
-          ${!a ? `<button class="btn-sm primary" onclick="analyzeSingle(${e.id});event.stopPropagation()">🤖 Jetzt analysieren</button>` : ''}
-          ${e.status!=='done' ? `<button class="btn-sm" onclick="markDone(${e.id});event.stopPropagation()">✓ Erledigt</button>` : `<button class="btn-sm" onclick="markOpen(${e.id});event.stopPropagation()">↩ Wieder öffnen</button>`}
-          <button class="btn-sm" onclick="removeEmail(${e.id});event.stopPropagation()" style="color:var(--red)">🗑 Entfernen</button>
-        </div>
+      <div class="email-meta">
+        <span class="email-time">${e.timeStr}</span>
+        <span class="email-cat cat-${e.cat}">${catLbl(e.cat)}</span>
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
+}
+function catLbl(c){return{job:'💼 Job',werbung:'🛒 Werbung',social:'👤 Social',wichtig:'⭐ Wichtig',updates:'📋 Updates'}[c]||c;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-  updateStats();
-  updateReport();
+function updateStats(){
+  const u=emailCache.filter(e=>e.isUnread).length;
+  document.getElementById('stat-unread').textContent=u;
+  document.getElementById('stat-job').textContent=emailCache.filter(e=>e.cat==='job').length;
+  document.getElementById('stat-heute').textContent=emailCache.filter(e=>e.date.toDateString()===new Date().toDateString()).length;
+  document.getElementById('stat-gesamt').textContent=emailCache.length;
+  document.getElementById('sb-unread-count').textContent=u||'–';
 }
 
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function filterEmails(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderEmails();
+}
+function setFilter(cat,btn){
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  filterEmails(cat,null);
 }
 
-// ── Card toggle ──
-function toggleCard(id, evt) {
-  if (evt.target.tagName === 'BUTTON') return;
-  const e = analyzed.find(x => x.id === id);
-  if (!e) return;
-  e.expanded = !e.expanded;
-  renderList();
+async function openEmail(msgId){
+  const email=emailCache.find(e=>e.id===msgId);
+  if(!email)return;
+  currentEmail=email;
+  const dp=document.getElementById('detail-panel');
+  dp.classList.add('open');
+  dp.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('detail-subject').textContent=email.subject;
+  document.getElementById('detail-from').textContent='Von: '+email.senderName+' · '+email.date.toLocaleString('de-DE');
+  document.getElementById('detail-body').textContent='⏳ Lade…';
+  document.getElementById('ai-summary').style.display='none';
+  document.getElementById('detail-open-btn').href='https://mail.google.com/mail/#inbox/'+email.threadId;
+  try{
+    const data=await gmailFetch('/users/me/messages/'+msgId,'format=full');
+    const body=extractBody(data);
+    document.getElementById('detail-body').textContent=body||email.snippet;
+    currentEmail._body=body||email.snippet;
+  }catch{document.getElementById('detail-body').textContent=email.snippet;currentEmail._body=email.snippet;}
 }
 
-// ── Analyze single ──
-async function analyzeSingle(id) {
-  const e = analyzed.find(x => x.id === id);
-  if (!e) return;
-  const card = document.getElementById('ec-' + id);
-  if (card) {
-    const act = card.querySelector('.ecard-actions');
-    if (act) act.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analysiert …';
+function extractBody(msg){
+  const fp=(ps,m)=>{for(const p of ps){if(p.mimeType===m)return p;if(p.parts){const r=fp(p.parts,m);if(r)return r;}}return null;};
+  const ps=msg.payload?.parts||[];
+  const pt=fp(ps,'text/plain')||fp(ps,'text/html');
+  if(pt?.body?.data)return atob(pt.body.data.replace(/-/g,'+').replace(/_/g,'/'));
+  if(msg.payload?.body?.data)return atob(msg.payload.body.data.replace(/-/g,'+').replace(/_/g,'/'));
+  return '';
+}
+function closeDetail(){document.getElementById('detail-panel').classList.remove('open');}
+
+async function summarizeEmail(){
+  if(!currentEmail)return;
+  const ab=document.getElementById('ai-summary');
+  ab.style.display='block';ab.className='ai-box loading';ab.textContent='🤖 Analysiere E-Mail…';
+  const body=(currentEmail._body||currentEmail.snippet).substring(0,2000);
+  const prompt='Analysiere diese E-Mail professionell auf Deutsch.\n\nVon: '+currentEmail.senderName+' <'+currentEmail.senderEmail+'>\nBetreff: '+currentEmail.subject+'\n\n'+body+'\n\nFormat:\n**PRIORITÄT:** Dringend / Normal / Niedrig / Spam\n**ZUSAMMENFASSUNG:** (2-3 Sätze)\n**HANDLUNG:** Ja/Nein – wenn ja, was?\n**KATEGORIE:** Job / Wichtig / Social / Werbung / Updates';
+  try{
+    const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:380,temperature:0.2})});
+    const d=await r.json();
+    ab.textContent='🤖 KI-Analyse:\n\n'+(d.choices?.[0]?.message?.content||'–');
+    ab.className='ai-box';
+  }catch(e){ab.textContent='⚠️ Fehler: '+e.message;ab.className='ai-box';}
+}
+
+window.addEventListener('load',()=>{
+  const saved=getClientId();
+  if(saved){
+    document.getElementById('client-id-input').value=saved;
+    document.getElementById('setup-notice').innerHTML='<strong>✅ Client-ID gespeichert.</strong> Jetzt anmelden.<br><small style="color:#6b21a8;font-size:11px">ID: '+saved.substring(0,22)+'…</small>';
   }
-  e.analysis = await analyzeEmail(e);
-  e.expanded = true;
-  renderList();
-}
-
-// ── Analyze ALL ──
-async function analyzeAll() {
-  const btn = document.getElementById('analyzeAllBtn');
-  btn.disabled = true;
-  const proc = document.getElementById('procCard');
-  proc.className = 'processing show';
-  document.getElementById('filterBar').style.display = 'none';
-
-  const todo = analyzed.filter(e => !e.analysis);
-  for (let i = 0; i < todo.length; i++) {
-    const pct = Math.round((i / todo.length) * 100);
-    document.getElementById('procFill').style.width = pct + '%';
-    document.getElementById('procMsg').textContent = `Analysiere E-Mail ${i+1} von ${todo.length}: ${todo[i].subject.substring(0,40)}…`;
-    todo[i].analysis = await analyzeEmail(todo[i]);
-  }
-  document.getElementById('procFill').style.width = '100%';
-  document.getElementById('procMsg').textContent = 'Analyse abgeschlossen!';
-  setTimeout(() => { proc.className = 'processing'; renderList(); }, 600);
-  btn.disabled = false;
-}
-
-// ── Actions ──
-function markDone(id) {
-  const e = analyzed.find(x => x.id === id);
-  if (e) { e.status = 'done'; renderList(); }
-}
-function markOpen(id) {
-  const e = analyzed.find(x => x.id === id);
-  if (e) { e.status = 'open'; renderList(); }
-}
-function removeEmail(id) {
-  analyzed = analyzed.filter(x => x.id !== id);
-  renderList();
-}
-function copyReply(id) {
-  const e = analyzed.find(x => x.id === id);
-  if (e?.analysis?.antwort) {
-    navigator.clipboard.writeText(e.analysis.antwort).then(() => {
-      alert('Antwort in Zwischenablage kopiert!');
-    });
-  }
-}
-async function regenerateReply(id) {
-  const e = analyzed.find(x => x.id === id);
-  if (!e) return;
-  const rb = document.getElementById('rb-' + id);
-  if (rb) rb.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  const ans = await callAI(`Schreibe eine professionelle, höfliche E-Mail-Antwort auf Deutsch (max 80 Wörter) auf diese E-Mail:
-Von: ${e.from}
-Betreff: ${e.subject}
-${e.body.substring(0,400)}`);
-  if (e.analysis) e.analysis.antwort = ans;
-  renderList();
-}
-
-// ── Report ──
-function updateReport() {
-  if (!analyzed.length) return;
-  const rep = document.getElementById('reportPanel');
-  const cont = document.getElementById('reportContent');
-  rep.className = 'report-panel show';
-
-  const cats = {};
-  const teams = {};
-  let urgent = 0, done = 0;
-  analyzed.forEach(e => {
-    if (!e.analysis) return;
-    cats[e.analysis.kategorie] = (cats[e.analysis.kategorie]||0)+1;
-    teams[e.analysis.team] = (teams[e.analysis.team]||0)+1;
-    if (e.analysis.prioritaet >= 4) urgent++;
-    if (e.status === 'done') done++;
-  });
-
-  cont.innerHTML = `
-    <div class="rep-row"><span>Gesamt E-Mails</span><b>${analyzed.length}</b></div>
-    <div class="rep-row"><span>🔴 Dringend (Prio 4-5)</span><b style="color:var(--red)">${urgent}</b></div>
-    <div class="rep-row"><span>🟢 Erledigt</span><b style="color:var(--green)">${done}</b></div>
-    <div class="rep-row"><span>🟡 Noch offen</span><b style="color:var(--amber)">${analyzed.length - done}</b></div>
-    ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
-      `<div class="rep-row"><span>📂 ${k}</span><b>${v}</b></div>`).join('')}
-    ${Object.entries(teams).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
-      `<div class="rep-row"><span>👥 ${k}</span><b>${v}</b></div>`).join('')}
-  `;
-}
-
-// ── Import ──
-document.getElementById('importBtn').addEventListener('click', () => {
-  const raw = document.getElementById('importArea').value.trim();
-  if (!raw) return;
-  const parsed = parseEmails(raw);
-  if (!parsed.length) { alert('Keine E-Mails erkannt. Trenne sie mit --- oder einer Leerzeile.'); return; }
-  analyzed = [...analyzed, ...parsed];
-  document.getElementById('analyzeAllBtn').disabled = false;
-  document.getElementById('importArea').value = '';
-  renderList();
-  document.getElementById('analyzeAllBtn').focus();
 });
-
-document.getElementById('loadDemo').addEventListener('click', () => {
-  document.getElementById('importArea').value = DEMO_EMAILS;
-});
-
-document.getElementById('analyzeAllBtn').addEventListener('click', analyzeAll);
-
-document.getElementById('clearBtn').addEventListener('click', () => {
-  if (analyzed.length && !confirm('Alle E-Mails löschen?')) return;
-  analyzed = [];
-  document.getElementById('analyzeAllBtn').disabled = true;
-  document.getElementById('reportPanel').className = 'report-panel';
-  renderList();
-});
-
-// ── Filter ──
-document.querySelectorAll('.filter-chip').forEach(c => {
-  c.addEventListener('click', () => {
-    document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
-    c.classList.add('active');
-    activeFilter = c.dataset.f;
-    renderList();
-  });
-});
-document.getElementById('sortSel').addEventListener('change', renderList);
-
-// ── Export ──
-function exportPDF() {
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-  s.onload = () => {
-    const {jsPDF} = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(16); doc.text('E-Mail Intelligence Report', 14, 18);
-    doc.setFontSize(10); doc.text('Doudouzi & Ergün · ' + new Date().toLocaleDateString('de'), 14, 26);
-    let y = 36;
-    doc.setFontSize(11);
-    doc.text(`Gesamt: ${analyzed.length} | Dringend: ${analyzed.filter(e=>e.analysis?.prioritaet>=4).length} | Erledigt: ${analyzed.filter(e=>e.status==='done').length}`, 14, y); y += 10;
-    analyzed.forEach((e,i) => {
-      if (y > 270) { doc.addPage(); y = 14; }
-      doc.setFontSize(10);
-      const a = e.analysis;
-      doc.text(`${i+1}. ${e.subject.substring(0,60)}`, 14, y); y += 5;
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      doc.text(`Von: ${e.from} | Prio: ${a?.prioritaet||'?'}/5 | ${a?.kategorie||'?'} | ${a?.team||'?'} | ${a?.sentiment||'?'}`, 14, y); y += 4;
-      if (a?.zusammenfassung) { doc.text('→ ' + a.zusammenfassung, 14, y); y += 4; }
-      doc.setTextColor(0); y += 3;
-    });
-    doc.save('email-report.pdf');
-  };
-  document.head.appendChild(s);
-}
-
-function exportXLSX() {
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-  s.onload = () => {
-    const rows = [['#','Von','Betreff','Priorität','Kategorie','Team','Sentiment','Zusammenfassung','Handlung','SLA (Std.)','Status']];
-    analyzed.forEach((e,i) => {
-      const a = e.analysis;
-      rows.push([i+1, e.from, e.subject, a?.prioritaet||'', a?.kategorie||'', a?.team||'', a?.sentiment||'', a?.zusammenfassung||'', a?.handlung||'', a?.sla_stunden||'', e.status]);
-    });
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'E-Mail Analyse');
-    XLSX.writeFile(wb, 'email-analyse.xlsx');
-  };
-  document.head.appendChild(s);
-}
-
-document.getElementById('exportBtn').addEventListener('click', exportXLSX);
-
-// Sidebar nav
-document.querySelectorAll('.sb-nav a[data-view]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelectorAll('.sb-nav a').forEach(x => x.classList.remove('active'));
-    a.classList.add('active');
-    const v = a.dataset.view;
-    document.getElementById('importCard').style.display = v==='import'?'block':(v==='dashboard'?'block':'none');
-    document.getElementById('reportPanel').className = v==='report'&&analyzed.length?'report-panel show':'report-panel';
-  });
-});
-
-renderList();
 </script>
 </body>
 </html>
