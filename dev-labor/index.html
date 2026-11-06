@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src *; img-src 'self' data: https:; frame-ancestors 'none';">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<title>Dev-Labor · Doudouzi & Ergün</title>
+<meta name="description" content="Lern-Umgebung: SQL, API-Tester, Regex und Security direkt im Browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<script defer src="/ki-tool/assets/suite.js"></script>
+<script defer src="/ki-tool/assets/sanitize.js"></script>
+<style>
+:root{--bg:#f9fafb;--ink:#1f2937;--muted:#6b7280;--accent:#16a34a;--line:#e5e7eb;--card:#fff;--code-bg:#0f172a;--code-text:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+[data-theme=dark]{--bg:#111827;--ink:#f9fafb;--muted:#9ca3af;--line:#1f2937;--card:#1f2937}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px 60px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:24px;overflow-x:auto}
+.tab-btn{padding:10px 18px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;white-space:nowrap;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ink);background:var(--line)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:transparent}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* EDITOR */
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.editor-wrap{grid-template-columns:1fr}}
+.editor{background:var(--code-bg);border-radius:12px;overflow:hidden;border:1px solid #1e293b}
+.editor-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0d1526;border-bottom:1px solid #1e293b}
+.editor-head span{font-size:12px;font-weight:500;color:#94a3b8;font-family:"JetBrains Mono",monospace}
+.editor textarea{width:100%;background:var(--code-bg);color:var(--code-text);border:none;outline:none;font-family:"JetBrains Mono",monospace;font-size:13px;padding:14px;resize:vertical;min-height:220px;line-height:1.6;tab-size:2}
+.output-box{background:var(--code-bg);color:var(--code-text);border-radius:12px;border:1px solid #1e293b;padding:14px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.6;min-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.output-box.ok{border-color:#166534}.output-box.err{border-color:#991b1b}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.15s}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#15803d}
+.btn-s{background:var(--card);border:1px solid var(--line);color:var(--ink)}.btn-s:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:#dc2626;color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+
+/* LEARN CARDS */
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px}
+.learn-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.learn-card h4{margin:0 0 6px;font-size:14px;color:var(--ink)}
+.learn-card p{margin:0 0 10px;font-size:13px;color:var(--muted);line-height:1.5}
+.tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;background:#dcfce7;color:#15803d}
+.tag.blue{background:#dbeafe;color:#1d4ed8}
+.tag.red{background:#fee2e2;color:#991b1b}
+.tag.purple{background:#ede9fe;color:#6d28d9}
+
+/* SQL */
+.sql-example-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.sql-ex-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12px;cursor:pointer;font-family:"JetBrains Mono",monospace;transition:.12s}
+.sql-ex-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* API TESTER */
+.field-row{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.field-row label{font-size:13px;font-weight:500;color:var(--muted)}
+select,input[type=text],input[type=url],textarea.small{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:13px;background:var(--card);color:var(--ink);outline:none;font-family:"Inter",system-ui,sans-serif}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+.header-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.header-row{display:grid;grid-template-columns:1fr 1fr 32px;gap:6px}
+.header-row input{padding:7px 10px;border-radius:7px;border:1px solid var(--line);font-size:12px;background:var(--card);color:var(--ink)}
+.rm-btn{background:none;border:1px solid var(--line);border-radius:7px;cursor:pointer;color:var(--muted);font-size:16px;line-height:1}
+.status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.s2xx{background:#dcfce7;color:#15803d}.s3xx{background:#fef9c3;color:#a16207}.s4xx{background:#fee2e2;color:#991b1b}.s5xx{background:#fce7f3;color:#9d174d}
+
+/* REGEX */
+.regex-input-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.regex-wrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card);flex:1;min-width:200px}
+.regex-delim{padding:9px 10px;background:var(--bg);color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:14px;border-right:1px solid var(--line)}
+.regex-wrap input{border:none;outline:none;padding:9px 12px;font-family:"JetBrains Mono",monospace;font-size:13px;background:transparent;color:var(--ink);flex:1}
+.flags-input{width:70px;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-family:"JetBrains Mono",monospace;font-size:13px;background:var(--card);color:var(--ink)}
+.match-area{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-height:120px;font-size:14px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+mark{background:#fde68a;color:#78350f;border-radius:3px;padding:0 2px}
+.match-count{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:8px}
+
+/* SECURITY LAB */
+.sec-demo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+.sec-demo h4{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+.sec-demo p{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+.vuln-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:8px}
+.safe-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px}
+.vuln-box h5,.safe-box h5{margin:0 0 6px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.vuln-box h5{color:#c2410c}.safe-box h5{color:#15803d}
+code{font-family:"JetBrains Mono",monospace;font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px}
+
+/* SECTION */
+.sec-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+h2{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-.02em}
+h3{font-size:17px;font-weight:600;margin:0 0 14px}
+.sub{font-size:14px;color:var(--muted);margin:0 0 24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/assistent/">KI-Assistent</a>
+      <a href="/ki-tool/prozess-check/">Prozess-Check</a>
+      <a href="/ki-tool/email-dashboard/">E-Mail</a>
+      <a class="active" href="/ki-tool/dev-labor/">Dev-Labor</a>
+    </nav>
+  </div>
+
+  <div class="phero">
+    <div class="eyebrow"><span class="dot"></span>Lern-Umgebung</div>
+    <h1>Dev-Labor</h1>
+    <p class="sub">SQL · REST API · Regex · Security — alles direkt im Browser. Kein Setup, kein Account.</p>
+  </div>
+
+  <!-- LEARN OVERVIEW -->
+  <div class="learn-grid">
+    <div class="learn-card">
+      <h4>🗄️ SQL Playground</h4>
+      <p>Echte SQLite-Datenbank im Browser. Tabellen erstellen, Daten einfügen, Abfragen schreiben.</p>
+      <span class="tag">KI-Entwickler</span> <span class="tag blue">Full-Stack</span>
+    </div>
+    <div class="learn-card">
+      <h4>🌐 API Tester</h4>
+      <p>HTTP-Methoden, Headers, Body — REST APIs testen wie mit Postman, direkt hier.</p>
+      <span class="tag blue">Full-Stack</span>
+    </div>
+    <div class="learn-card">
+      <h4>🔍 Regex Tester</h4>
+      <p>Reguläre Ausdrücke schreiben und sofort gegen Text testen. Mit Erklärungen.</p>
+      <span class="tag purple">Security</span> <span class="tag blue">Full-Stack</span>
+    </div>
+    <div class="learn-card">
+      <h4>🛡️ Security Lab</h4>
+      <p>XSS, SQL-Injection und unsichere vs. sichere Code-Patterns verstehen.</p>
+      <span class="tag red">Cyber Security</span>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('sql',this)">🗄️ SQL Playground</button>
+    <button class="tab-btn" onclick="switchTab('api',this)">🌐 API Tester</button>
+    <button class="tab-btn" onclick="switchTab('regex',this)">🔍 Regex Tester</button>
+    <button class="tab-btn" onclick="switchTab('security',this)">🛡️ Security Lab</button>
+  </div>
+
+  <!-- ===== SQL PLAYGROUND ===== -->
+  <div id="tab-sql" class="tab-panel active">
+    <div class="card" style="margin-bottom:16px">
+      <h3>SQL Playground <span class="tag">SQLite im Browser</span></h3>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Die Datenbank läuft komplett in deinem Browser — keine Verbindung nach außen. Alle Daten gehen beim Neuladen verloren.</p>
+      <div class="sec-label">Schnell-Beispiele</div>
+      <div class="sql-example-row">
+        <button class="sql-ex-btn" onclick="setSql('CREATE TABLE produkte (\n  id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  preis REAL,\n  lager INTEGER DEFAULT 0\n);\n\nINSERT INTO produkte (name, preis, lager) VALUES\n  (\'Laptop\', 899.99, 15),\n  (\'Maus\', 24.90, 50),\n  (\'Monitor\', 349.00, 8),\n  (\'Tastatur\', 79.95, 30);\n\nSELECT * FROM produkte;')">Tabelle erstellen</button>
+        <button class="sql-ex-btn" onclick="setSql('SELECT name, preis\nFROM produkte\nWHERE preis > 50\nORDER BY preis DESC;')">WHERE + ORDER</button>
+        <button class="sql-ex-btn" onclick="setSql('SELECT \n  COUNT(*) AS anzahl,\n  AVG(preis) AS durchschnitt,\n  MAX(preis) AS teuerste,\n  MIN(preis) AS günstigste\nFROM produkte;')">Aggregat-Funktionen</button>
+        <button class="sql-ex-btn" onclick="setSql('-- JOIN Beispiel\nCREATE TABLE bestellungen (\n  id INTEGER PRIMARY KEY,\n  produkt_id INTEGER,\n  menge INTEGER,\n  FOREIGN KEY(produkt_id) REFERENCES produkte(id)\n);\n\nINSERT INTO bestellungen VALUES (1,1,2),(2,3,1),(3,2,5);\n\nSELECT p.name, b.menge, (p.preis * b.menge) AS gesamt\nFROM bestellungen b\nJOIN produkte p ON b.produkt_id = p.id\nORDER BY gesamt DESC;')">JOIN</button>
+        <button class="sql-ex-btn" onclick="setSql('-- GROUP BY Beispiel\nSELECT \n  CASE WHEN preis < 50 THEN \'Günstig\'\n       WHEN preis < 200 THEN \'Mittel\'\n       ELSE \'Premium\' END AS kategorie,\n  COUNT(*) AS anzahl\nFROM produkte\nGROUP BY kategorie;')">GROUP BY</button>
+        <button class="sql-ex-btn" onclick="setSql('-- Alles zurücksetzen\nDROP TABLE IF EXISTS bestellungen;\nDROP TABLE IF EXISTS produkte;')">Reset</button>
+      </div>
+    </div>
+    <div class="editor-wrap">
+      <div>
+        <div class="sec-label">SQL eingeben</div>
+        <div class="editor">
+          <div class="editor-head">
+            <span>query.sql</span>
+            <span style="color:#4ade80;font-size:11px">● SQLite</span>
+          </div>
+          <textarea id="sql-input" spellcheck="false" placeholder="-- SQL hier eingeben...
+SELECT 'Hallo, SQL!' AS nachricht;">-- Beispiel: Tabelle erstellen + befüllen
+CREATE TABLE mitarbeiter (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  abteilung TEXT,
+  gehalt REAL
+);
+
+INSERT INTO mitarbeiter (name, abteilung, gehalt) VALUES
+  ('Anna Müller', 'IT', 65000),
+  ('Ben Schmidt', 'Marketing', 52000),
+  ('Clara Weber', 'IT', 71000),
+  ('David Koch', 'HR', 48000);
+
+SELECT * FROM mitarbeiter ORDER BY gehalt DESC;</textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-p" onclick="runSQL()">▶ Ausführen</button>
+          <button class="btn btn-s" onclick="document.getElementById('sql-input').value=''">Leeren</button>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">Ergebnis</div>
+        <div class="output-box" id="sql-output">Klicke auf "Ausführen" um das Ergebnis zu sehen.</div>
+        <div id="sql-hint" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- SQL ERKLÄRUNGEN -->
+    <div style="margin-top:24px">
+      <div class="sec-label">SQL Grundlagen — Spickzettel</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">SELECT</h4>
+          <code style="display:block;background:var(--code-bg);color:var(--code-text);padding:8px;border-radius:6px;font-size:11px;line-height:1.6">SELECT spalte1, spalte2
+FROM tabelle
+WHERE bedingung
+ORDER BY spalte DESC
+LIMIT 10;</code>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">INSERT</h4>
+          <code style="display:block;background:var(--code-bg);color:var(--code-text);padding:8px;border-radius:6px;font-size:11px;line-height:1.6">INSERT INTO tabelle
+  (spalte1, spalte2)
+VALUES
+  ('Wert1', 42);</code>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">UPDATE / DELETE</h4>
+          <code style="display:block;background:var(--code-bg);color:var(--code-text);padding:8px;border-radius:6px;font-size:11px;line-height:1.6">UPDATE tabelle
+SET spalte = 'neu'
+WHERE id = 1;
+
+DELETE FROM tabelle
+WHERE id = 1;</code>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">JOIN</h4>
+          <code style="display:block;background:var(--code-bg);color:var(--code-text);padding:8px;border-radius:6px;font-size:11px;line-height:1.6">SELECT a.name, b.wert
+FROM tabelle_a a
+JOIN tabelle_b b
+  ON a.id = b.a_id;</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== API TESTER ===== -->
+  <div id="tab-api" class="tab-panel">
+    <div class="card" style="margin-bottom:16px">
+      <h3>API Tester <span class="tag blue">REST / HTTP</span></h3>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px">Teste beliebige REST APIs direkt hier. Lerne wie HTTP-Methoden, Headers und Body funktionieren.</p>
+
+      <div class="field-row">
+        <label>Methode</label>
+        <div style="display:flex;gap:8px">
+          <select id="api-method" style="width:120px">
+            <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
+          </select>
+          <input type="url" id="api-url" placeholder="https://jsonplaceholder.typicode.com/posts/1" style="flex:1">
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:8px">Schnell-Beispiele</div>
+      <div class="btn-row" style="margin-bottom:14px">
+        <button class="sql-ex-btn" onclick="setApi('GET','https://jsonplaceholder.typicode.com/posts/1','','')">GET Post</button>
+        <button class="sql-ex-btn" onclick="setApi('GET','https://jsonplaceholder.typicode.com/users','','')">GET Users</button>
+        <button class="sql-ex-btn" onclick="setApi('POST','https://jsonplaceholder.typicode.com/posts','{&quot;title&quot;:&quot;Mein Post&quot;,&quot;body&quot;:&quot;Inhalt&quot;,&quot;userId&quot;:1}','Content-Type: application/json')">POST erstellen</button>
+        <button class="sql-ex-btn" onclick="setApi('GET','https://api.github.com/users/octocat','','Accept: application/vnd.github.v3+json')">GitHub API</button>
+        <button class="sql-ex-btn" onclick="setApi('GET','https://httpbin.org/get?name=test&lang=de','','')">HTTPBin (Debug)</button>
+      </div>
+
+      <div class="sec-label">Request Headers</div>
+      <div class="header-list" id="api-headers">
+        <div class="header-row">
+          <input placeholder="Header-Name" value="Content-Type">
+          <input placeholder="Wert" value="application/json">
+          <button class="rm-btn" onclick="this.closest('.header-row').remove()">×</button>
+        </div>
+      </div>
+      <button class="btn btn-s" style="font-size:12px;padding:6px 12px;margin-bottom:14px" onclick="addHeader()">+ Header hinzufügen</button>
+
+      <div class="sec-label">Request Body (bei POST/PUT/PATCH)</div>
+      <textarea class="small" id="api-body" rows="4" placeholder='{"key": "value"}'></textarea>
+
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-p" onclick="runApi()">▶ Anfrage senden</button>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="sec-label" style="margin:0">Antwort</div>
+        <span id="api-status"></span>
+        <span id="api-time" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div class="output-box" id="api-output" style="min-height:280px">Sende eine Anfrage um die Antwort zu sehen.</div>
+    </div>
+
+    <!-- HTTP Erklärung -->
+    <div style="margin-top:24px">
+      <div class="sec-label">HTTP-Methoden — Was bedeuten sie?</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <div class="card" style="padding:14px"><b style="color:#15803d">GET</b><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Daten lesen. Keine Änderungen. Sicher + idempotent.</p></div>
+        <div class="card" style="padding:14px"><b style="color:#1d4ed8">POST</b><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Neue Ressource erstellen. Body enthält Daten.</p></div>
+        <div class="card" style="padding:14px"><b style="color:#a16207">PUT</b><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Ressource komplett ersetzen. Idempotent.</p></div>
+        <div class="card" style="padding:14px"><b style="color:#7c3aed">PATCH</b><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Ressource teilweise aktualisieren.</p></div>
+        <div class="card" style="padding:14px"><b style="color:#991b1b">DELETE</b><p style="font-size:12px;color:var(--muted);margin:4px 0 0">Ressource löschen. Idempotent.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== REGEX TESTER ===== -->
+  <div id="tab-regex" class="tab-panel">
+    <div class="card" style="margin-bottom:16px">
+      <h3>Regex Tester <span class="tag purple">Reguläre Ausdrücke</span></h3>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 16px">Reguläre Ausdrücke (Regex) werden überall gebraucht: Input-Validierung, Log-Analyse, Security-Tools, Datenbankabfragen.</p>
+
+      <div class="sec-label">Schnell-Beispiele</div>
+      <div class="btn-row" style="margin-bottom:14px">
+        <button class="sql-ex-btn" onclick="setRegex('[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}','gi')">E-Mail</button>
+        <button class="sql-ex-btn" onclick="setRegex('https?:\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+([\\w.,@?^=%&:/~+#\\-]*[\\w@?^=%&/~+#\\-])?','gi')">URL</button>
+        <button class="sql-ex-btn" onclick="setRegex('\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b','g')">IP-Adresse</button>
+        <button class="sql-ex-btn" onclick="setRegex('\\b\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}[\\s\\-]?\\d{4}\\b','g')">Kreditkarte</button>
+        <button class="sql-ex-btn" onclick="setRegex('(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}','g')">Passwort-Stärke</button>
+        <button class="sql-ex-btn" onclick="setRegex('\\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|OR|AND)\\b','gi')">SQL Injection</button>
+        <button class="sql-ex-btn" onclick="setRegex('<script[^>]*>.*?<\\/script>','gi')">XSS-Script-Tags</button>
+      </div>
+
+      <div class="regex-input-row">
+        <div class="regex-wrap">
+          <span class="regex-delim">/</span>
+          <input type="text" id="regex-pattern" placeholder="Muster eingeben..." oninput="runRegex()">
+          <span class="regex-delim">/</span>
+        </div>
+        <input type="text" class="flags-input" id="regex-flags" value="gi" placeholder="gi" oninput="runRegex()" title="Flags: g=global, i=ignoreCase, m=multiline">
+      </div>
+
+      <div class="sec-label">Testtext</div>
+      <textarea class="small" id="regex-text" rows="5" oninput="runRegex()" placeholder="Testtext hier eingeben...">Kontakte: anna.mueller@example.com, support@firma.de
+Webseite: https://www.example.com/pfad?param=wert
+Mein Passwort: Sicher123! (sollte stark sein)
+IP-Adresse des Servers: 192.168.1.100
+XSS-Test: <script>alert('hack')</script></textarea>
+    </div>
+
+    <div>
+      <div id="regex-count" class="match-count"></div>
+      <div class="match-area" id="regex-output">Gib ein Muster ein um Treffer zu sehen.</div>
+    </div>
+
+    <div style="margin-top:24px">
+      <div class="sec-label">Regex Spickzettel</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">Zeichenklassen</h4>
+          <div style="font-size:12px;line-height:1.8"><code>\d</code> Ziffer (0-9)<br><code>\w</code> Wort-Zeichen<br><code>\s</code> Leerzeichen<br><code>.</code> Beliebiges Zeichen<br><code>[abc]</code> a oder b oder c</div>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">Quantifizierer</h4>
+          <div style="font-size:12px;line-height:1.8"><code>*</code> 0 oder mehr<br><code>+</code> 1 oder mehr<br><code>?</code> 0 oder 1<br><code>{3}</code> genau 3<br><code>{2,5}</code> 2 bis 5</div>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">Anker</h4>
+          <div style="font-size:12px;line-height:1.8"><code>^</code> Zeilenanfang<br><code>$</code> Zeilenende<br><code>\b</code> Wortgrenze<br><code>(?=...)</code> Lookahead<br><code>(?!...)</code> Neg. Lookahead</div>
+        </div>
+        <div class="card" style="padding:14px">
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--accent)">Flags</h4>
+          <div style="font-size:12px;line-height:1.8"><code>g</code> Alle Treffer<br><code>i</code> Groß/Klein egal<br><code>m</code> Mehrzeilig<br><code>s</code> Punkt = newline<br><code>u</code> Unicode</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECURITY LAB ===== -->
+  <div id="tab-security" class="tab-panel">
+    <div class="card" style="margin-bottom:16px">
+      <h3>Security Lab <span class="tag red">Cyber Security</span></h3>
+      <p style="font-size:13px;color:var(--muted);margin:0">Verstehe die häufigsten Web-Angriffe — und wie du sie verhinderst. Alles läuft lokal, kein echter Angriff.</p>
+    </div>
+
+    <!-- XSS -->
+    <div class="sec-demo">
+      <h4>⚠️ 1. Cross-Site Scripting (XSS) <span class="tag red">OWASP #3</span></h4>
+      <p>Angreifer schleust JavaScript in eine Webseite ein. Wenn die App Nutzereingaben ohne Bereinigung ausgibt, wird der Code im Browser des Opfers ausgeführt.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="vuln-box">
+          <h5>❌ Verwundbar</h5>
+          <code>// Direkte HTML-Ausgabe — gefährlich!<br>div.innerHTML = userInput;<br><br>// Angreifer gibt ein:<br>// &lt;img src=x onerror="alert('XSS')"&gt;</code>
+        </div>
+        <div class="safe-box">
+          <h5>✅ Sicher</h5>
+          <code>// Text-Node oder textContent<br>div.textContent = userInput;<br><br>// Oder escapen:<br>function esc(s){<br>  return s.replace(/&/g,'&amp;amp;')<br>    .replace(/&lt;/g,'&amp;lt;')<br>    .replace(/&gt;/g,'&amp;gt;');<br>}</code>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="sec-label">XSS Live-Demo (sicher bereinigt)</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="xss-input" placeholder='<script>alert("hack")</script>' style="flex:1">
+          <button class="btn btn-s" onclick="showXss()">Test</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:11px;color:#991b1b;margin-bottom:4px">❌ innerHTML (verwundbar)</div>
+            <div id="xss-bad" style="border:1px solid #fed7aa;border-radius:6px;padding:8px;font-size:13px;min-height:36px;background:#fff7ed"></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#15803d;margin-bottom:4px">✅ textContent (sicher)</div>
+            <div id="xss-good" style="border:1px solid #bbf7d0;border-radius:6px;padding:8px;font-size:13px;min-height:36px;background:#f0fdf4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SQL INJECTION -->
+    <div class="sec-demo">
+      <h4>⚠️ 2. SQL Injection <span class="tag red">OWASP #1</span></h4>
+      <p>Angreifer manipuliert SQL-Abfragen durch Nutzereingaben. Kann zur Datenbankübernahme oder Datenleck führen.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="vuln-box">
+          <h5>❌ Verwundbar (Python)</h5>
+          <code style="display:block;line-height:1.6">username = "admin' OR '1'='1"<br><br># Generierte Query:<br># SELECT * FROM users<br># WHERE name='admin' OR '1'='1'<br># → gibt ALLE Nutzer zurück!</code>
+        </div>
+        <div class="safe-box">
+          <h5>✅ Sicher — Prepared Statements</h5>
+          <code style="display:block;line-height:1.6">cursor.execute(<br>  "SELECT * FROM users<br>  WHERE name = ?",<br>  (username,)  # Parameter separat<br>)<br><br># Kein String-Concat = sicher!</code>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="sec-label">SQL-Injection Simulator</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="sqli-input" placeholder="admin' OR '1'='1" style="flex:1">
+          <button class="btn btn-s" onclick="showSqli()">Simulieren</button>
+        </div>
+        <div class="output-box" id="sqli-output" style="min-height:60px;font-size:12px">Gib einen Nutzernamen ein — auch einen mit Injection-Versuch.</div>
+      </div>
+    </div>
+
+    <!-- UNSICHERE PASSWÖRTER -->
+    <div class="sec-demo">
+      <h4>🔐 3. Passwort-Sicherheit</h4>
+      <p>Schwache Hashing-Algorithmen (MD5, SHA1) können mit Rainbow-Tables geknackt werden. Immer bcrypt oder Argon2 verwenden.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="vuln-box">
+          <h5>❌ Unsicher</h5>
+          <code style="display:block;line-height:1.6">import hashlib<br>hash = hashlib.md5(<br>  password.encode()<br>).hexdigest()<br># MD5 ist geknackt!</code>
+        </div>
+        <div class="safe-box">
+          <h5>✅ Sicher</h5>
+          <code style="display:block;line-height:1.6">import bcrypt<br>salt = bcrypt.gensalt()<br>hash = bcrypt.hashpw(<br>  password.encode(), salt<br>)<br># bcrypt mit Salt = sicher</code>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="sec-label">Passwort-Stärke prüfen</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="pw-input" placeholder="Passwort eingeben..." style="flex:1" oninput="checkPw()">
+        </div>
+        <div id="pw-result" style="margin-top:8px;font-size:13px"></div>
+      </div>
+    </div>
+
+    <!-- CSRF -->
+    <div class="sec-demo">
+      <h4>⚠️ 4. CSRF — Cross-Site Request Forgery <span class="tag red">OWASP #5</span></h4>
+      <p>Eine fremde Seite löst im Hintergrund eine Aktion auf einer anderen Seite aus, bei der du eingeloggt bist.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="vuln-box">
+          <h5>❌ Angreifer-Seite (HTML)</h5>
+          <code style="display:block;line-height:1.6">&lt;!-- Verstecktes Formular --&gt;<br>&lt;form action="bank.de/transfer"<br>  method="POST"&gt;<br>  &lt;input name="to" value="hacker"&gt;<br>  &lt;input name="amount" value="1000"&gt;<br>&lt;/form&gt;<br>&lt;script&gt;document.forms[0].submit()&lt;/script&gt;</code>
+        </div>
+        <div class="safe-box">
+          <h5>✅ Schutz: CSRF-Token</h5>
+          <code style="display:block;line-height:1.6"># Server generiert einmaligen Token<br>csrf_token = secrets.token_hex(32)<br>session['csrf'] = csrf_token<br><br># Formular enthält Token<br># &lt;input type="hidden" <br>#   name="csrf" value="{{ token }}"&gt;<br><br># Server prüft Token bei POST</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== TABS =====
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== SQL PLAYGROUND =====
+let db = null;
+async function initSQL() {
+  if (db) return;
+  const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}` });
+  db = new SQL.Database();
+}
+
+function setSql(q) { document.getElementById('sql-input').value = q; }
+
+async function runSQL() {
+  const out = document.getElementById('sql-output');
+  const hint = document.getElementById('sql-hint');
+  const sql = document.getElementById('sql-input').value.trim();
+  if (!sql) return;
+  out.textContent = '⏳ Lädt SQL.js…';
+  out.className = 'output-box';
+  try {
+    await initSQL();
+    const results = db.exec(sql);
+    if (!results.length) {
+      out.textContent = '✅ Ausgeführt. Keine Rückgabe (z.B. CREATE/INSERT/UPDATE).';
+      out.className = 'output-box ok';
+      hint.textContent = 'Tipp: Führe danach ein SELECT aus um Daten zu sehen.';
+      return;
+    }
+    let txt = '';
+    results.forEach((res, ri) => {
+      if (ri > 0) txt += '\n\n';
+      const colWidths = res.columns.map(c => c.length);
+      res.values.forEach(row => row.forEach((v, i) => {
+        const l = String(v ?? 'NULL').length;
+        if (l > colWidths[i]) colWidths[i] = l;
+      }));
+      const sep = '+' + colWidths.map(w => '-'.repeat(w + 2)).join('+') + '+';
+      txt += sep + '\n';
+      txt += '| ' + res.columns.map((c, i) => c.padEnd(colWidths[i])).join(' | ') + ' |\n';
+      txt += sep + '\n';
+      res.values.forEach(row => {
+        txt += '| ' + row.map((v, i) => String(v ?? 'NULL').padEnd(colWidths[i])).join(' | ') + ' |\n';
+      });
+      txt += sep;
+      txt += `\n\n${res.values.length} Zeile(n)`;
+    });
+    out.textContent = txt;
+    out.className = 'output-box ok';
+    hint.textContent = '';
+  } catch (e) {
+    out.textContent = '❌ Fehler:\n' + e.message;
+    out.className = 'output-box err';
+    hint.textContent = 'Prüfe die Syntax — Tabelle existiert vielleicht noch nicht.';
+  }
+}
+
+// ===== API TESTER =====
+function setApi(method, url, body, header) {
+  document.getElementById('api-method').value = method;
+  document.getElementById('api-url').value = url;
+  document.getElementById('api-body').value = body;
+  const list = document.getElementById('api-headers');
+  if (header) {
+    const [n, ...v] = header.split(': ');
+    const rows = list.querySelectorAll('.header-row');
+    if (rows.length) { rows[0].querySelectorAll('input')[0].value = n; rows[0].querySelectorAll('input')[1].value = v.join(': '); }
+  }
+}
+function addHeader() {
+  const div = document.createElement('div');
+  div.className = 'header-row';
+  div.innerHTML = '<input placeholder="Header-Name"><input placeholder="Wert"><button class="rm-btn" onclick="this.closest(\'.header-row\').remove()">×</button>';
+  document.getElementById('api-headers').appendChild(div);
+}
+async function runApi() {
+  const out = document.getElementById('api-output');
+  const url = document.getElementById('api-url').value.trim();
+  if (!url) { out.textContent = 'Bitte URL eingeben.'; return; }
+  const method = document.getElementById('api-method').value;
+  const bodyEl = document.getElementById('api-body').value.trim();
+  const headers = {};
+  document.querySelectorAll('#api-headers .header-row').forEach(row => {
+    const [n, v] = row.querySelectorAll('input');
+    if (n.value.trim()) headers[n.value.trim()] = v.value.trim();
+  });
+  out.textContent = '⏳ Anfrage läuft…';
+  out.className = 'output-box';
+  const t0 = Date.now();
+  try {
+    const opts = { method, headers };
+    if (['POST','PUT','PATCH'].includes(method) && bodyEl) opts.body = bodyEl;
+    const res = await fetch(url, opts);
+    const ms = Date.now() - t0;
+    const statusEl = document.getElementById('api-status');
+    const cls = res.status < 300 ? 's2xx' : res.status < 400 ? 's3xx' : res.status < 500 ? 's4xx' : 's5xx';
+    statusEl.className = 'status-pill ' + cls;
+    statusEl.textContent = res.status + ' ' + res.statusText;
+    document.getElementById('api-time').textContent = ms + ' ms';
+    const ct = res.headers.get('content-type') || '';
+    let body;
+    if (ct.includes('json')) body = JSON.stringify(await res.json(), null, 2);
+    else body = await res.text();
+    let hdrs = '';
+    res.headers.forEach((v, k) => hdrs += `${k}: ${v}\n`);
+    out.textContent = `── RESPONSE HEADERS ──\n${hdrs}\n── BODY ──\n${body}`;
+    out.className = 'output-box ' + (res.ok ? 'ok' : 'err');
+  } catch (e) {
+    out.textContent = '❌ Fehler: ' + e.message + '\n\nMögliche Ursachen:\n• CORS blockiert (Server erlaubt keine Browser-Anfragen)\n• URL nicht erreichbar\n• Netzwerkfehler';
+    out.className = 'output-box err';
+  }
+}
+
+// ===== REGEX TESTER =====
+function setRegex(pattern, flags) {
+  document.getElementById('regex-pattern').value = pattern;
+  document.getElementById('regex-flags').value = flags;
+  runRegex();
+}
+function runRegex() {
+  const pattern = document.getElementById('regex-pattern').value;
+  const flags = document.getElementById('regex-flags').value;
+  const text = document.getElementById('regex-text').value;
+  const out = document.getElementById('regex-output');
+  const countEl = document.getElementById('regex-count');
+  if (!pattern) { out.textContent = text; countEl.textContent = ''; return; }
+  try {
+    const re = new RegExp(pattern, flags.replace(/[^gimsuy]/g, ''));
+    const matches = [...text.matchAll(new RegExp(pattern, flags.includes('g') ? flags : flags + 'g'))];
+    countEl.textContent = matches.length ? `${matches.length} Treffer gefunden` : 'Kein Treffer';
+    out.innerHTML = text.replace(re, m => `<mark>${m.replace(/</g,'&lt;')}</mark>`);
+  } catch (e) {
+    out.textContent = text;
+    countEl.textContent = '❌ Ungültiger Regex: ' + e.message;
+  }
+}
+
+// ===== SECURITY LAB =====
+function showXss() {
+  const v = document.getElementById('xss-input').value;
+  document.getElementById('xss-bad').innerHTML = v;
+  document.getElementById('xss-good').textContent = v;
+}
+function showSqli() {
+  const v = document.getElementById('sqli-input').value;
+  const unsafe = `SELECT * FROM users WHERE name='${v}'`;
+  const safe = `Prepared Statement:\ncursor.execute("SELECT * FROM users WHERE name = ?", ("${v.replace(/"/g,'\\"')}",))`;
+  const isInjection = /['";]|OR|AND|--|\/\*/i.test(v);
+  document.getElementById('sqli-output').textContent =
+    `❌ VERWUNDBAR:\n${unsafe}\n\n${isInjection ? '⚠️ INJECTION ERKANNT! Diese Query würde die Datenbank manipulieren.\n\n' : ''}✅ SICHER:\n${safe}`;
+  document.getElementById('sqli-output').className = 'output-box ' + (isInjection ? 'err' : 'ok');
+}
+function checkPw() {
+  const pw = document.getElementById('pw-input').value;
+  const checks = [
+    { label: 'Min. 8 Zeichen', ok: pw.length >= 8 },
+    { label: 'Großbuchstabe', ok: /[A-Z]/.test(pw) },
+    { label: 'Kleinbuchstabe', ok: /[a-z]/.test(pw) },
+    { label: 'Zahl', ok: /\d/.test(pw) },
+    { label: 'Sonderzeichen', ok: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(pw) },
+    { label: 'Min. 12 Zeichen (empfohlen)', ok: pw.length >= 12 }
+  ];
+  const score = checks.filter(c => c.ok).length;
+  const level = score <= 2 ? ['Sehr schwach','#991b1b'] : score <= 3 ? ['Schwach','#c2410c'] : score <= 4 ? ['Mittel','#a16207'] : score <= 5 ? ['Stark','#15803d'] : ['Sehr stark','#166534'];
+  document.getElementById('pw-result').innerHTML =
+    `<b style="color:${level[1]}">${level[0]}</b> (${score}/6)<br>` +
+    checks.map(c => `<span style="color:${c.ok?'#15803d':'#991b1b'}">${c.ok?'✓':'✗'} ${c.label}</span>`).join(' &nbsp; ');
+}
+
+// KEYBOARD: Ctrl+Enter = ausführen
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const active = document.querySelector('.tab-panel.active').id;
+    if (active === 'tab-sql') runSQL();
+    else if (active === 'tab-api') runApi();
+  }
+});
+</script>
+
+<!-- SQL.js lazy load -->
+<script>
+function initSqlJs(cfg) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js';
+    s.onload = () => window.initSqlJs(cfg).then(resolve).catch(reject);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+</body>
+</html>
