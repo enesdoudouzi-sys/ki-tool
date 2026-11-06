@@ -12,5 +12,6 @@
   <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/gastro/social/</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/logistik/</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
   <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/angebot/</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/dev-labor/</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/dev-labor/</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
 </urlset>

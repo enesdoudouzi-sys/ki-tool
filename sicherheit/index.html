@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev https:; img-src 'self' data: https:; frame-ancestors 'none';">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
+<title>Unternehmens-Sicherheit · Doudouzi & Ergün</title>
+<meta name="description" content="KI-gestützte Sicherheitstools für Unternehmen: Phishing-Erkennung, Website-Check, Sicherheits-Audit und Passwort-Policy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ki-tool/assets/suite.css">
+<script defer src="/ki-tool/assets/suite.js"></script>
+<script defer src="/ki-tool/assets/sanitize.js"></script>
+<style>
+*{box-sizing:border-box}
+[data-theme=dark]{--bg:#111827;--ink:#f9fafb;--muted:#9ca3af;--line:#374151;--card:#1f2937;--bg2:#1a2332}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 20px 60px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;border-bottom:2px solid var(--s-line);margin-bottom:28px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-btn{padding:11px 18px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;color:var(--s-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;white-space:nowrap;border-radius:8px 8px 0 0;font-family:"Inter",system-ui,sans-serif}
+.tab-btn:hover{color:var(--s-ink);background:var(--s-bg2)}
+.tab-btn.active{color:var(--s-accent);border-bottom-color:var(--s-accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--s-line);border-radius:14px;padding:24px;margin-bottom:16px}
+[data-theme=dark] .card{background:#1f2937}
+h3{font-size:18px;font-weight:600;margin:0 0 6px;letter-spacing:-.02em}
+.sub{font-size:13px;color:var(--s-muted);margin:0 0 20px;line-height:1.5}
+.sec-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--s-muted);margin-bottom:8px}
+
+/* INPUTS */
+textarea,input[type=text],input[type=url],select{width:100%;padding:10px 13px;border-radius:9px;border:1px solid var(--s-line);font-size:13.5px;background:#fff;color:var(--s-ink);outline:none;font-family:"Inter",system-ui,sans-serif;transition:.15s}
+[data-theme=dark] textarea,[data-theme=dark] input[type=text],[data-theme=dark] input[type=url],[data-theme=dark] select{background:#111827;border-color:#374151}
+textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:0 0 0 3px rgba(21,128,61,.1)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.15s;font-family:"Inter",system-ui,sans-serif}
+.btn-p{background:var(--s-accent);color:#fff}.btn-p:hover{background:#166534}
+.btn-s{background:#fff;border:1px solid var(--s-line);color:var(--s-ink)}.btn-s:hover{border-color:var(--s-accent);color:var(--s-accent)}
+[data-theme=dark] .btn-s{background:#1f2937}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* OUTPUT */
+.result-box{border-radius:12px;padding:20px;font-size:14px;line-height:1.75;white-space:pre-wrap;word-break:break-word;min-height:120px;border:1px solid var(--s-line);background:#fafafa;margin-top:16px}
+[data-theme=dark] .result-box{background:#111827}
+.result-box.loading{color:var(--s-muted);font-style:italic}
+.result-box.ok{border-color:#16a34a;background:#f0fdf4}
+.result-box.warn{border-color:#d97706;background:#fffbeb}
+.result-box.danger{border-color:#dc2626;background:#fef2f2}
+[data-theme=dark] .result-box.ok{background:#052e16}
+[data-theme=dark] .result-box.warn{background:#1c1400}
+[data-theme=dark] .result-box.danger{background:#1f0a0a}
+
+/* RISK BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-yellow{background:#fef9c3;color:#a16207}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+
+/* HEADER CHECK GRID */
+.header-grid{display:grid;gap:10px;margin-top:16px}
+.hcheck{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;border:1px solid var(--s-line);background:#fff}
+[data-theme=dark] .hcheck{background:#1f2937}
+.hcheck-icon{font-size:20px;flex-shrink:0}
+.hcheck-name{font-weight:600;font-size:13px}
+.hcheck-val{font-size:12px;color:var(--s-muted);font-family:"JetBrains Mono",monospace;word-break:break-all}
+.hcheck.pass{border-color:#16a34a}.hcheck.fail{border-color:#dc2626}.hcheck.warn{border-color:#d97706}
+
+/* AUDIT FORM */
+.audit-section{margin-bottom:24px}
+.audit-section h4{font-size:14px;font-weight:600;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--s-line)}
+.audit-row{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px dashed var(--s-line)}
+.audit-row:last-child{border-bottom:none}
+.audit-q{flex:1;font-size:13.5px;line-height:1.4}
+.audit-q small{display:block;color:var(--s-muted);font-size:12px;margin-top:2px}
+.audit-sel{width:140px;flex-shrink:0;padding:7px 10px;font-size:13px}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--s-line);border-radius:999px;height:8px;margin:8px 0}
+.progress-bar{height:100%;border-radius:999px;transition:.4s}
+
+/* POLICY OUTPUT */
+.policy-out{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:20px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.7;white-space:pre-wrap;min-height:200px;margin-top:16px;overflow:auto}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="logo" href="/ki-tool/"><span class="mark">EA</span><span>Doudouzi &amp; Ergün<small>Prozessoptimierung &amp; KI</small></span></a>
+    <nav class="tbnav">
+      <a href="/ki-tool/assistent/">KI-Assistent</a>
+      <a href="/ki-tool/email-dashboard/">E-Mail</a>
+      <a href="/ki-tool/logistik/">Logistik</a>
+      <a class="active" href="/ki-tool/sicherheit/">Sicherheit</a>
+    </nav>
+  </div>
+
+  <div class="phero">
+    <div class="eyebrow"><span class="dot"></span>Für Unternehmen</div>
+    <h1>Unternehmens-Sicherheit</h1>
+    <p class="sub" style="max-width:600px">KI-gestützte Sicherheitstools für KMU — ohne IT-Abteilung. Phishing erkennen, Website prüfen, Risiken bewerten und Richtlinien erstellen.</p>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('phishing',this)">🎣 Phishing-Analyse</button>
+    <button class="tab-btn" onclick="switchTab('webcheck',this)">🌐 Website-Check</button>
+    <button class="tab-btn" onclick="switchTab('audit',this)">📋 Sicherheits-Audit</button>
+    <button class="tab-btn" onclick="switchTab('policy',this)">📄 Passwort-Policy</button>
+  </div>
+
+  <!-- ===== PHISHING ANALYSE ===== -->
+  <div id="tab-phishing" class="tab-panel active">
+    <div class="card">
+      <h3>🎣 Phishing-E-Mail Analyse</h3>
+      <p class="sub">E-Mail-Text einfügen — die KI analysiert Absender, Links, Sprache und Dringlichkeit und bewertet das Betrugsrisiko.</p>
+
+      <div class="sec-label">Betreff (optional)</div>
+      <input type="text" id="ph-subject" placeholder="z.B. Ihr Konto wurde gesperrt – sofort handeln!" style="margin-bottom:12px">
+
+      <div class="sec-label">E-Mail-Inhalt einfügen</div>
+      <textarea id="ph-body" rows="9" placeholder="Kompletten E-Mail-Text hier einfügen — inkl. Links, Absenderadresse, Fußzeile..."></textarea>
+
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="analyzePhishing()" id="ph-btn">🔍 Analyse starten</button>
+        <button class="btn btn-s" onclick="loadPhishingExample()">Beispiel laden</button>
+      </div>
+    </div>
+    <div id="ph-result" class="result-box" style="display:none"></div>
+
+    <!-- INFO -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:20px">
+      <div class="card" style="padding:16px">
+        <div style="font-size:22px;margin-bottom:8px">🚨</div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px">Typische Merkmale</div>
+        <div style="font-size:12px;color:var(--s-muted);line-height:1.6">Falsche Absenderdomains, Dringlichkeit ("sofort handeln"), generische Anrede, verdächtige Links</div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:22px;margin-bottom:8px">📊</div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px">Statistik</div>
+        <div style="font-size:12px;color:var(--s-muted);line-height:1.6">91% aller Cyberangriffe starten mit einer Phishing-E-Mail. Kosten je Vorfall: Ø 4,2 Mio. €</div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:22px;margin-bottom:8px">✅</div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px">Was tun?</div>
+        <div style="font-size:12px;color:var(--s-muted);line-height:1.6">Niemals Links klicken. Absender direkt anrufen. IT-Abteilung informieren. E-Mail als Spam melden.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WEBSITE CHECK ===== -->
+  <div id="tab-webcheck" class="tab-panel">
+    <div class="card">
+      <h3>🌐 Website-Sicherheits-Check</h3>
+      <p class="sub">Firmen-URL eingeben — das Tool prüft HTTPS, Security-Headers und gibt eine Bewertung mit konkreten Empfehlungen.</p>
+
+      <div class="sec-label">Website-URL</div>
+      <div style="display:flex;gap:8px">
+        <input type="url" id="wc-url" placeholder="https://www.ihrewebseite.de" style="flex:1">
+        <button class="btn btn-p" onclick="checkWebsite()" id="wc-btn">🔍 Prüfen</button>
+      </div>
+      <div style="font-size:12px;color:var(--s-muted);margin-top:6px">Hinweis: Es wird nur der Server-Response-Header geprüft. Keine aktive Schwachstellensuche.</div>
+    </div>
+
+    <div id="wc-result" style="display:none">
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div>
+            <h3 style="margin-bottom:4px" id="wc-domain">-</h3>
+            <div id="wc-score-label" style="font-size:13px;color:var(--s-muted)">-</div>
+          </div>
+          <div style="text-align:center">
+            <div id="wc-grade" style="font-size:48px;font-weight:800;line-height:1">-</div>
+            <div style="font-size:12px;color:var(--s-muted)">Sicherheits-Note</div>
+          </div>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" id="wc-progress" style="width:0%;background:#dc2626"></div></div>
+        <div class="header-grid" id="wc-checks"></div>
+      </div>
+      <div id="wc-ai-rec" class="result-box" style="margin-top:16px;display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== SICHERHEITS-AUDIT ===== -->
+  <div id="tab-audit" class="tab-panel">
+    <div class="card">
+      <h3>📋 Sicherheits-Audit</h3>
+      <p class="sub">Beantworte 15 Fragen zu deinem Unternehmen — die KI erstellt einen individuellen Risikobericht mit Handlungsempfehlungen.</p>
+
+      <div class="audit-section">
+        <h4>🏢 Unternehmen</h4>
+        <div class="audit-row">
+          <div class="audit-q">Branche<small>Welcher Sektor?</small></div>
+          <select class="audit-sel" id="a-branche"><option value="">Bitte wählen</option><option>Handel/E-Commerce</option><option>Gesundheitswesen</option><option>Finanzdienstleistung</option><option>Produktion/Industrie</option><option>Logistik/Transport</option><option>Gastronomie/Hotel</option><option>IT/Beratung</option><option>Sonstiges</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Mitarbeiterzahl<small>Wie groß ist das Team?</small></div>
+          <select class="audit-sel" id="a-groesse"><option value="">Bitte wählen</option><option>1–10</option><option>11–50</option><option>51–250</option><option>251+</option></select>
+        </div>
+      </div>
+
+      <div class="audit-section">
+        <h4>🔐 Zugang & Authentifizierung</h4>
+        <div class="audit-row">
+          <div class="audit-q">Zwei-Faktor-Authentifizierung (2FA)<small>Für E-Mail, Cloud, VPN etc.</small></div>
+          <select class="audit-sel" id="a-2fa"><option value="">Auswählen</option><option value="ja">✅ Ja, überall</option><option value="teilweise">⚠️ Teilweise</option><option value="nein">❌ Nein</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Passwort-Richtlinie<small>Komplexität, Ablaufdatum</small></div>
+          <select class="audit-sel" id="a-pw"><option value="">Auswählen</option><option value="ja">✅ Schriftlich definiert</option><option value="teilweise">⚠️ Mündlich bekannt</option><option value="nein">❌ Keine</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Passwort-Manager im Einsatz<small>Für das gesamte Team</small></div>
+          <select class="audit-sel" id="a-pwman"><option value="">Auswählen</option><option value="ja">✅ Ja</option><option value="nein">❌ Nein / Jeder selbst</option></select>
+        </div>
+      </div>
+
+      <div class="audit-section">
+        <h4>💾 Daten & Backups</h4>
+        <div class="audit-row">
+          <div class="audit-q">Regelmäßige Backups<small>Häufigkeit und Speicherort</small></div>
+          <select class="audit-sel" id="a-backup"><option value="">Auswählen</option><option value="täglich">✅ Täglich / automatisch</option><option value="wöchentlich">⚠️ Wöchentlich</option><option value="selten">❌ Selten / nie</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Backup-Wiederherstellung getestet<small>Letzter Test wann?</small></div>
+          <select class="audit-sel" id="a-backuptest"><option value="">Auswählen</option><option value="ja">✅ Regelmäßig getestet</option><option value="einmal">⚠️ Einmal getestet</option><option value="nein">❌ Nie getestet</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">DSGVO / Datenschutz<small>Datenschutzbeauftragter, Verzeichnis</small></div>
+          <select class="audit-sel" id="a-dsgvo"><option value="">Auswählen</option><option value="ja">✅ Vollständig umgesetzt</option><option value="teilweise">⚠️ In Arbeit</option><option value="nein">❌ Noch nicht</option></select>
+        </div>
+      </div>
+
+      <div class="audit-section">
+        <h4>🌐 Netzwerk & Geräte</h4>
+        <div class="audit-row">
+          <div class="audit-q">Antivirensoftware / EDR<small>Auf allen Geräten</small></div>
+          <select class="audit-sel" id="a-av"><option value="">Auswählen</option><option value="ja">✅ Ja, alle Geräte</option><option value="teilweise">⚠️ Teilweise</option><option value="nein">❌ Nein</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Software-Updates<small>Betriebssystem, Apps</small></div>
+          <select class="audit-sel" id="a-updates"><option value="">Auswählen</option><option value="automatisch">✅ Automatisch</option><option value="manuell">⚠️ Manuell / gelegentlich</option><option value="nein">❌ Selten / nie</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Firmen-WLAN getrennt von Gäste-WLAN<small>Netzwerksegmentierung</small></div>
+          <select class="audit-sel" id="a-wifi"><option value="">Auswählen</option><option value="ja">✅ Ja, getrennt</option><option value="nein">❌ Nein, gemeinsam</option></select>
+        </div>
+      </div>
+
+      <div class="audit-section" style="margin-bottom:0">
+        <h4>👥 Mitarbeiter & Notfall</h4>
+        <div class="audit-row">
+          <div class="audit-q">Sicherheits-Schulungen<small>Phishing, Passwörter etc.</small></div>
+          <select class="audit-sel" id="a-schulung"><option value="">Auswählen</option><option value="regelmäßig">✅ Regelmäßig</option><option value="einmal">⚠️ Einmalig</option><option value="nein">❌ Keine</option></select>
+        </div>
+        <div class="audit-row">
+          <div class="audit-q">Notfallplan bei Cyberangriff<small>Wer wird informiert? Was passiert?</small></div>
+          <select class="audit-sel" id="a-notfall"><option value="">Auswählen</option><option value="ja">✅ Schriftlich vorhanden</option><option value="mündlich">⚠️ Mündlich bekannt</option><option value="nein">❌ Keiner</option></select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="runAudit()" id="audit-btn">📊 Risikobericht erstellen</button>
+      </div>
+    </div>
+    <div id="audit-result" class="result-box" style="display:none"></div>
+  </div>
+
+  <!-- ===== PASSWORT POLICY ===== -->
+  <div id="tab-policy" class="tab-panel">
+    <div class="card">
+      <h3>📄 Passwort-Policy Generator</h3>
+      <p class="sub">Angaben zum Unternehmen machen — die KI erstellt eine professionelle, rechtssichere IT-Passwort-Richtlinie zum direkten Einsetzen.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="sec-label">Unternehmensname</div>
+          <input type="text" id="pol-name" placeholder="Mustermann GmbH" style="margin-bottom:12px">
+          <div class="sec-label">Branche</div>
+          <select id="pol-branche" style="margin-bottom:12px">
+            <option value="">Bitte wählen</option>
+            <option>Handel/E-Commerce</option><option>Gesundheitswesen</option>
+            <option>Finanzdienstleistung</option><option>Produktion/Industrie</option>
+            <option>Logistik/Transport</option><option>IT/Beratung</option><option>Sonstiges</option>
+          </select>
+          <div class="sec-label">Mitarbeiterzahl</div>
+          <select id="pol-groesse" style="margin-bottom:12px">
+            <option value="">Bitte wählen</option>
+            <option>1–10</option><option>11–50</option><option>51–250</option><option>251+</option>
+          </select>
+        </div>
+        <div>
+          <div class="sec-label">Systeme/Tools im Einsatz</div>
+          <textarea id="pol-systeme" rows="3" placeholder="z.B. Microsoft 365, SAP, Cloudflare, eigene Server..." style="margin-bottom:12px"></textarea>
+          <div class="sec-label">Besondere Anforderungen</div>
+          <textarea id="pol-anforderungen" rows="3" placeholder="z.B. DSGVO, ISO 27001, Bankensektor-Regularien, Remote-Arbeit..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="generatePolicy()" id="pol-btn">📝 Policy erstellen</button>
+        <button class="btn btn-s" id="pol-copy-btn" onclick="copyPolicy()" style="display:none">📋 Kopieren</button>
+      </div>
+    </div>
+    <div id="pol-result" class="policy-out" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+const PROXY = 'https://ki-proxy.enesdoudouzi.workers.dev';
+
+// ===== TABS =====
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== KI CALL =====
+async function askKI(prompt) {
+  const r = await fetch(PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1200,
+      temperature: 0.3
+    })
+  });
+  if (!r.ok) throw new Error('KI nicht erreichbar (Status ' + r.status + ')');
+  const d = await r.json();
+  return d.choices?.[0]?.message?.content || d.error?.message || 'Keine Antwort erhalten.';
+}
+
+// ===== PHISHING =====
+function loadPhishingExample() {
+  document.getElementById('ph-subject').value = 'Dringende Sicherheitswarnung: Ihr PayPal-Konto wurde gesperrt!';
+  document.getElementById('ph-body').value = `Von: security-alert@paypal-support-team.net
+An: kunde@firma.de
+
+Sehr geehrter Kunde,
+
+wir haben ungewöhnliche Aktivitäten auf Ihrem PayPal-Konto festgestellt. Um Ihre Daten zu schützen, wurde Ihr Konto vorübergehend gesperrt.
+
+Bitte klicken Sie SOFORT auf den folgenden Link um Ihr Konto zu entsperren:
+http://www.paypal-verifizierung-konto.ru/entsperren?id=847382
+
+Sie haben NUR 24 STUNDEN um zu reagieren! Danach wird Ihr Konto dauerhaft gelöscht.
+
+Mit freundlichen Grüßen,
+PayPal Sicherheitsteam`;
+}
+
+async function analyzePhishing() {
+  const subject = document.getElementById('ph-subject').value.trim();
+  const body = document.getElementById('ph-body').value.trim();
+  if (!body) { alert('Bitte E-Mail-Text einfügen.'); return; }
+
+  const btn = document.getElementById('ph-btn');
+  const result = document.getElementById('ph-result');
+  btn.innerHTML = '<span class="spinner"></span> Analysiere…';
+  btn.disabled = true;
+  result.style.display = 'block';
+  result.className = 'result-box loading';
+  result.textContent = '🔍 KI analysiert die E-Mail…';
+
+  const prompt = `Du bist ein Cyber-Security-Experte. Analysiere diese E-Mail auf Phishing-Merkmale.
+
+Betreff: ${subject || '(kein Betreff)'}
+
+Inhalt:
+${body}
+
+Erstelle eine strukturierte Analyse auf Deutsch:
+
+**RISIKOBEWERTUNG:** [KRITISCH / HOCH / MITTEL / GERING]
+
+**Erkannte Phishing-Merkmale:**
+(Liste alle verdächtigen Punkte auf)
+
+**Sichere vs. verdächtige Elemente:**
+(Was spricht dafür/dagegen?)
+
+**Empfehlung:**
+(Was soll der Empfänger konkret tun?)
+
+**Fazit in einem Satz:**`;
+
+  try {
+    const text = await askKI(prompt);
+    result.textContent = text;
+    if (text.includes('KRITISCH') || text.includes('HOCH')) result.className = 'result-box danger';
+    else if (text.includes('MITTEL')) result.className = 'result-box warn';
+    else result.className = 'result-box ok';
+  } catch(e) {
+    result.className = 'result-box danger';
+    result.textContent = '❌ Fehler: ' + e.message;
+  }
+  btn.innerHTML = '🔍 Analyse starten';
+  btn.disabled = false;
+}
+
+// ===== WEBSITE CHECK =====
+async function checkWebsite() {
+  const urlInput = document.getElementById('wc-url').value.trim();
+  if (!urlInput) { alert('Bitte URL eingeben.'); return; }
+  let url = urlInput;
+  if (!url.startsWith('http')) url = 'https://' + url;
+
+  const btn = document.getElementById('wc-btn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const resultDiv = document.getElementById('wc-result');
+  const checksDiv = document.getElementById('wc-checks');
+  resultDiv.style.display = 'block';
+  checksDiv.innerHTML = '<div style="color:var(--s-muted);font-size:13px;padding:12px">⏳ Prüfe Website…</div>';
+
+  try {
+    // Fetch via CORS proxy (using allorigins)
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    let headers = {};
+    try {
+      const resp = await fetch(proxyUrl, { method: 'HEAD' });
+      resp.headers.forEach((v, k) => { headers[k.toLowerCase()] = v; });
+    } catch {
+      // If HEAD fails, try GET
+      const resp = await fetch(proxyUrl);
+      resp.headers.forEach((v, k) => { headers[k.toLowerCase()] = v; });
+    }
+
+    const domain = new URL(url).hostname;
+    document.getElementById('wc-domain').textContent = domain;
+
+    const checks = [
+      {
+        name: 'HTTPS',
+        icon: url.startsWith('https') ? '🔒' : '🔓',
+        pass: url.startsWith('https'),
+        value: url.startsWith('https') ? 'Verschlüsselt (TLS/SSL)' : 'Unverschlüsselt – kritisch!',
+        tip: 'HTTPS ist Pflicht. Google bestraft HTTP-Seiten im Ranking.'
+      },
+      {
+        name: 'Content-Security-Policy',
+        icon: headers['content-security-policy'] ? '✅' : '❌',
+        pass: !!headers['content-security-policy'],
+        value: headers['content-security-policy'] ? headers['content-security-policy'].substring(0,80)+'…' : 'Nicht gesetzt',
+        tip: 'CSP verhindert XSS-Angriffe.'
+      },
+      {
+        name: 'X-Frame-Options',
+        icon: headers['x-frame-options'] ? '✅' : '⚠️',
+        pass: !!headers['x-frame-options'],
+        value: headers['x-frame-options'] || 'Nicht gesetzt – Clickjacking möglich',
+        tip: 'Verhindert dass deine Seite in iframes eingebettet wird (Clickjacking).'
+      },
+      {
+        name: 'Strict-Transport-Security (HSTS)',
+        icon: headers['strict-transport-security'] ? '✅' : '⚠️',
+        pass: !!headers['strict-transport-security'],
+        value: headers['strict-transport-security'] || 'Nicht gesetzt',
+        tip: 'HSTS erzwingt HTTPS auch bei direktem HTTP-Aufruf.'
+      },
+      {
+        name: 'X-Content-Type-Options',
+        icon: headers['x-content-type-options'] ? '✅' : '⚠️',
+        pass: !!headers['x-content-type-options'],
+        value: headers['x-content-type-options'] || 'Nicht gesetzt',
+        tip: 'Verhindert MIME-Type-Sniffing.'
+      },
+      {
+        name: 'Referrer-Policy',
+        icon: headers['referrer-policy'] ? '✅' : '⚠️',
+        pass: !!headers['referrer-policy'],
+        value: headers['referrer-policy'] || 'Nicht gesetzt',
+        tip: 'Steuert welche Referrer-Infos weitergegeben werden.'
+      },
+      {
+        name: 'Permissions-Policy',
+        icon: headers['permissions-policy'] ? '✅' : '⚠️',
+        pass: !!headers['permissions-policy'],
+        value: headers['permissions-policy'] ? headers['permissions-policy'].substring(0,60)+'…' : 'Nicht gesetzt',
+        tip: 'Steuert Browser-APIs (Kamera, Mikrofon, Standort).'
+      },
+      {
+        name: 'Server-Header (Infoleakage)',
+        icon: !headers['server'] || headers['server'] === '' ? '✅' : '⚠️',
+        pass: !headers['server'] || headers['server'] === '',
+        value: headers['server'] ? '⚠️ Sichtbar: ' + headers['server'] : 'Versteckt ✓',
+        tip: 'Server-Version nicht preisgeben – gibt Angreifern Infos.'
+      }
+    ];
+
+    const passed = checks.filter(c => c.pass).length;
+    const score = Math.round((passed / checks.length) * 100);
+    const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 50 ? 'C' : score >= 30 ? 'D' : 'F';
+    const gradeColor = score >= 70 ? '#15803d' : score >= 50 ? '#d97706' : '#dc2626';
+    const barColor = score >= 70 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626';
+
+    document.getElementById('wc-grade').textContent = grade;
+    document.getElementById('wc-grade').style.color = gradeColor;
+    document.getElementById('wc-score-label').textContent = `${passed} von ${checks.length} Sicherheits-Headers gesetzt (${score}%)`;
+    const bar = document.getElementById('wc-progress');
+    bar.style.width = score + '%';
+    bar.style.background = barColor;
+
+    checksDiv.innerHTML = checks.map(c => `
+      <div class="hcheck ${c.pass ? 'pass' : 'warn'}">
+        <span class="hcheck-icon">${c.icon}</span>
+        <div style="flex:1">
+          <div class="hcheck-name">${c.name}</div>
+          <div class="hcheck-val">${c.value}</div>
+          ${!c.pass ? `<div style="font-size:11px;color:#d97706;margin-top:2px">💡 ${c.tip}</div>` : ''}
+        </div>
+      </div>`).join('');
+
+    // KI Empfehlung
+    if (passed < checks.length) {
+      const missing = checks.filter(c => !c.pass).map(c => c.name).join(', ');
+      const aiDiv = document.getElementById('wc-ai-rec');
+      aiDiv.style.display = 'block';
+      aiDiv.className = 'result-box loading';
+      aiDiv.textContent = '🤖 KI erstellt Handlungsempfehlung…';
+
+      const prompt = `Du bist ein Web-Security-Experte. Die Website ${domain} hat folgende fehlende Security-Headers:
+${missing}
+
+Erkläre in 3-4 Sätzen auf Deutsch (einfache Sprache, für Nicht-Techniker), was diese Lücken bedeuten und welche 2-3 wichtigsten Maßnahmen zuerst umgesetzt werden sollten. Sei konkret und praxisnah.`;
+
+      try {
+        const rec = await askKI(prompt);
+        aiDiv.textContent = '🤖 KI-Empfehlung:\n\n' + rec;
+        aiDiv.className = 'result-box warn';
+      } catch { aiDiv.style.display = 'none'; }
+    }
+
+  } catch(e) {
+    checksDiv.innerHTML = `<div class="result-box danger">❌ Website konnte nicht geprüft werden: ${e.message}<br><br>Mögliche Ursachen: CORS blockiert, Website offline, URL falsch.</div>`;
+  }
+
+  btn.innerHTML = '🔍 Prüfen';
+  btn.disabled = false;
+}
+
+// ===== AUDIT =====
+async function runAudit() {
+  const fields = {
+    branche: document.getElementById('a-branche').value,
+    groesse: document.getElementById('a-groesse').value,
+    '2fa': document.getElementById('a-2fa').value,
+    pw: document.getElementById('a-pw').value,
+    pwman: document.getElementById('a-pwman').value,
+    backup: document.getElementById('a-backup').value,
+    backuptest: document.getElementById('a-backuptest').value,
+    dsgvo: document.getElementById('a-dsgvo').value,
+    av: document.getElementById('a-av').value,
+    updates: document.getElementById('a-updates').value,
+    wifi: document.getElementById('a-wifi').value,
+    schulung: document.getElementById('a-schulung').value,
+    notfall: document.getElementById('a-notfall').value
+  };
+
+  const empty = Object.values(fields).filter(v => !v).length;
+  if (empty > 4) { alert('Bitte mindestens 10 Fragen beantworten.'); return; }
+
+  const btn = document.getElementById('audit-btn');
+  const result = document.getElementById('audit-result');
+  btn.innerHTML = '<span class="spinner"></span> Analysiere…';
+  btn.disabled = true;
+  result.style.display = 'block';
+  result.className = 'result-box loading';
+  result.textContent = '📊 KI erstellt Risikobericht…';
+
+  const answers = Object.entries(fields).map(([k,v]) => `${k}: ${v || 'nicht beantwortet'}`).join('\n');
+
+  const prompt = `Du bist ein IT-Security-Berater. Erstelle basierend auf diesem Sicherheits-Audit einen professionellen Risikobericht auf Deutsch.
+
+AUDIT-DATEN:
+${answers}
+
+Erstelle folgenden strukturierten Bericht:
+
+## RISIKOBEWERTUNG GESAMT
+[KRITISCH / HOCH / MITTEL / GERING] – kurze Begründung in 1-2 Sätzen
+
+## KRITISCHE LÜCKEN (sofort handeln)
+(Max. 3 wichtigste Punkte mit konkreter Maßnahme)
+
+## MITTELFRISTIGE MAßNAHMEN (1-3 Monate)
+(Max. 4 Punkte)
+
+## POSITIVE ASPEKTE
+(Was gut gemacht wird)
+
+## PRIORITÄTS-CHECKLISTE
+- [ ] Maßnahme 1 (Woche 1)
+- [ ] Maßnahme 2 (Monat 1)
+- [ ] Maßnahme 3 (Monat 2-3)
+
+## FAZIT
+(2 Sätze Zusammenfassung + Risikoeinschätzung)`;
+
+  try {
+    const text = await askKI(prompt);
+    result.textContent = text;
+    if (text.includes('KRITISCH')) result.className = 'result-box danger';
+    else if (text.includes('HOCH') || text.includes('MITTEL')) result.className = 'result-box warn';
+    else result.className = 'result-box ok';
+  } catch(e) {
+    result.className = 'result-box danger';
+    result.textContent = '❌ Fehler: ' + e.message;
+  }
+  btn.innerHTML = '📊 Risikobericht erstellen';
+  btn.disabled = false;
+}
+
+// ===== POLICY GENERATOR =====
+async function generatePolicy() {
+  const name = document.getElementById('pol-name').value.trim();
+  const branche = document.getElementById('pol-branche').value;
+  const groesse = document.getElementById('pol-groesse').value;
+  const systeme = document.getElementById('pol-systeme').value.trim();
+  const anforderungen = document.getElementById('pol-anforderungen').value.trim();
+
+  if (!name || !branche) { alert('Bitte Unternehmensname und Branche angeben.'); return; }
+
+  const btn = document.getElementById('pol-btn');
+  const result = document.getElementById('pol-result');
+  btn.innerHTML = '<span class="spinner"></span> Erstelle Policy…';
+  btn.disabled = true;
+  result.style.display = 'block';
+  result.textContent = '📝 KI erstellt Passwort-Richtlinie…';
+
+  const prompt = `Erstelle eine professionelle, vollständige IT-Passwort-Richtlinie auf Deutsch für folgendes Unternehmen:
+
+Unternehmen: ${name}
+Branche: ${branche}
+Größe: ${groesse || 'nicht angegeben'}
+Systeme: ${systeme || 'Standard-Office-Umgebung'}
+Besondere Anforderungen: ${anforderungen || 'keine'}
+
+Die Richtlinie soll:
+- Professionell und rechtssicher formuliert sein
+- Konkrete Mindestanforderungen enthalten (Länge, Komplexität, Ablauf)
+- Passend zur Branche und Größe sein
+- Praktisch umsetzbar sein (auch für wenig technikaffine Mitarbeiter)
+- Einen Gültigkeitszeitraum und Verantwortlichkeiten nennen
+
+Format: Klare Abschnitte mit Nummerierung, direkt verwendbar als Word/PDF-Vorlage.`;
+
+  try {
+    const text = await askKI(prompt);
+    result.textContent = text;
+    document.getElementById('pol-copy-btn').style.display = 'inline-flex';
+  } catch(e) {
+    result.textContent = '❌ Fehler: ' + e.message;
+  }
+  btn.innerHTML = '📝 Policy erstellen';
+  btn.disabled = false;
+}
+
+function copyPolicy() {
+  const text = document.getElementById('pol-result').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('pol-copy-btn');
+    btn.textContent = '✅ Kopiert!';
+    setTimeout(() => btn.textContent = '📋 Kopieren', 2000);
+  });
+}
+</script>
+</body>
+</html>
