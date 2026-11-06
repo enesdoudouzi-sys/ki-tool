@@ -73,7 +73,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
 .hcheck-icon{font-size:20px;flex-shrink:0}
 .hcheck-name{font-weight:600;font-size:13px}
 .hcheck-val{font-size:12px;color:var(--s-muted);font-family:"JetBrains Mono",monospace;word-break:break-all}
-.hcheck.pass{border-color:#16a34a}.hcheck.fail{border-color:#dc2626}.hcheck.warn{border-color:#d97706}
+.hcheck.pass{border-color:#16a34a}.hcheck.fail{border-color:#dc2626}.hcheck.warn{border-color:#d97706}.hcheck.info{border-color:#6366f1;opacity:.85}
 
 /* AUDIT FORM */
 .audit-section{margin-bottom:24px}
@@ -202,6 +202,8 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
           <button class="btn btn-s" id="wc-pdf-btn" onclick="exportWebcheckPDF()" style="display:none">📄 PDF-Bericht herunterladen</button>
           <button class="btn btn-s" id="wc-copy-btn" onclick="copyWebcheckReport()" style="display:none">📋 Bericht kopieren</button>
         </div>
+        <!-- Methodik & WAF-Info Banner -->
+        <div id="wc-method-info" style="display:none;margin-top:14px;padding:10px 14px;background:var(--s-bg,#f8fafc);border:1px solid var(--s-border,#e2e8f0);border-radius:8px;font-size:12px;color:var(--s-muted,#64748b);line-height:1.6"></div>
       </div>
 
       <!-- Kategorien -->
@@ -443,15 +445,20 @@ Erstelle eine strukturierte Analyse auf Deutsch:
 function renderChecks(containerId, catId, checks) {
   if (!checks.length) return;
   document.getElementById(catId).style.display = 'block';
-  document.getElementById(containerId).innerHTML = checks.map(c => `
-    <div class="hcheck ${c.pass ? 'pass' : c.warn ? 'warn' : 'fail'}">
+  document.getElementById(containerId).innerHTML = checks.map(c => {
+    const cls = c.unverifiable ? 'info' : c.pass ? 'pass' : c.warn ? 'warn' : 'fail';
+    const tipColor = c.unverifiable ? '#6366f1' : c.warn ? '#d97706' : '#dc2626';
+    const showTip = !c.pass || c.unverifiable;
+    return `
+    <div class="hcheck ${cls}">
       <span class="hcheck-icon">${c.icon}</span>
       <div style="flex:1">
         <div class="hcheck-name">${c.name}</div>
         <div class="hcheck-val">${c.value}</div>
-        ${!c.pass ? `<div style="font-size:11px;color:${c.warn?'#d97706':'#dc2626'};margin-top:3px">💡 ${c.tip}</div>` : ''}
+        ${showTip && c.tip ? `<div style="font-size:11px;color:${tipColor};margin-top:3px">💡 ${c.tip}</div>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function fetchFull(url) {
@@ -486,13 +493,37 @@ async function fetchHead(url) {
 }
 
 async function dnsQuery(name, type) {
-  try {
-    const r = await fetch(
-      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=${type}`,
-      { headers:{ Accept:'application/dns-json' }, signal:AbortSignal.timeout(6000) }
-    );
-    return await r.json();
-  } catch { return null; }
+  const providers = [
+    `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=${type}`,
+    `https://dns.google/resolve?name=${encodeURIComponent(name)}&type=${type}`,
+  ];
+  for (const purl of providers) {
+    try {
+      const r = await fetch(purl, { headers:{ Accept:'application/dns-json' }, signal:AbortSignal.timeout(6000) });
+      if (r.ok) return await r.json();
+    } catch { /* try next provider */ }
+  }
+  return null; // all DNS providers failed
+}
+
+function detectWAF(headers, status) {
+  const sv  = (headers['server']||'').toLowerCase();
+  const via = (headers['via']||'').toLowerCase();
+  if (headers['cf-ray'] || headers['cf-cache-status'] || sv.includes('cloudflare'))
+    return { detected:true, name:'Cloudflare' };
+  if (headers['x-akamai-request-id'] || sv.includes('akamai') || headers['x-check-cacheable'])
+    return { detected:true, name:'Akamai' };
+  if (headers['x-cdn']==='Imperva' || headers['x-iinfo'])
+    return { detected:true, name:'Imperva/Incapsula' };
+  if (sv.includes('sucuri') || headers['x-sucuri-id'])
+    return { detected:true, name:'Sucuri' };
+  if (headers['x-amz-cf-id'] || headers['x-amz-cf-pop'])
+    return { detected:true, name:'AWS CloudFront' };
+  if (via.includes('fastly') || headers['x-fastly-request-id'])
+    return { detected:true, name:'Fastly CDN' };
+  if (status === 403 || status === 429)
+    return { detected:true, name:`WAF/Firewall (HTTP ${status})` };
+  return { detected:false, name:'' };
 }
 
 async function checkWebsite() {
@@ -548,6 +579,12 @@ async function checkWebsite() {
   const h    = mainRes.headers;
   const body = mainRes.body || '';
 
+  // ── WAF & DNS availability ──
+  const wafInfo  = detectWAF(h, mainRes.status);
+  const dnsAvail = [txtData, dmarcData, mxData, nsData].some(d => d !== null);
+  // Behind WAF with 403/429 → actual site headers are hidden
+  const headersBlocked = mainRes.status === 403 || mainRes.status === 429 || !mainRes.ok;
+
   const spfRec   = txtData?.Answer?.find(a=>a.data?.includes('v=spf1'))?.data || '';
   const dmarcRec = dmarcData?.Answer?.find(a=>a.data?.includes('v=DMARC1'))?.data || '';
   const hasMX    = !!(mxData?.Answer?.length);
@@ -594,11 +631,15 @@ async function checkWebsite() {
       pass:url.startsWith('https'), warn:false,
       value:url.startsWith('https')?'TLS/SSL-Verschlüsselung aktiv':'❌ Unverschlüsselt – alle Daten im Klartext übertragbar!',
       tip:'HTTPS ist gesetzlich und technisch Pflicht. Ohne HTTPS kein Vertrauen, kein Google-Ranking.' },
-    { name:'HTTP → HTTPS Redirect', icon:httpRes.status>=300&&httpRes.status<400?'✅':'⚠️',
-      pass:httpRes.status>=300&&httpRes.status<400, warn:true,
-      value:httpRes.status>=300&&httpRes.status<400?`Redirect aktiv (${httpRes.status})`
-        :httpRes.ok?`HTTP ohne Redirect erreichbar (${httpRes.status}) – unsicher!`:'Konnte nicht geprüft werden',
-      tip:'HTTP-Traffic muss mit 301 auf HTTPS umgeleitet werden, sonst MITM-Angriff möglich.' },
+    { name:'HTTP → HTTPS Redirect',
+      icon: httpRes.status>=300&&httpRes.status<400 ? '✅' : (httpRes.status===403||httpRes.status===429) ? '✅' : '⚠️',
+      pass: httpRes.status>=300&&httpRes.status<400 || httpRes.status===403 || httpRes.status===429,
+      warn: false,
+      value: httpRes.status>=300&&httpRes.status<400 ? `Redirect aktiv (${httpRes.status}) ✓`
+           : httpRes.status===403||httpRes.status===429 ? `HTTP durch WAF blockiert (${httpRes.status}) – Zugriff verweigert ✓`
+           : httpRes.ok ? `⚠️ HTTP ohne Redirect erreichbar (${httpRes.status}) – MITM-Angriff möglich!`
+           : '🔵 Nicht prüfbar – Verbindung fehlgeschlagen',
+      tip:'HTTP-Traffic muss mit 301 auf HTTPS umgeleitet werden. WAF-Block auf HTTP ist ebenfalls sicher.' },
     { name:'HSTS (Strict-Transport-Security)', icon:hstsGood?'✅':hsts?'⚠️':'❌',
       pass:hstsGood, warn:!!hsts&&!hstsGood,
       value:hsts?`max-age=${hstsMaxAge}s${hstsMaxAge<15552000?' (zu kurz – min. 180 Tage)':''}`:'Nicht gesetzt',
@@ -610,33 +651,38 @@ async function checkWebsite() {
   ];
 
   // ── 2. SECURITY HEADERS ──
-  const cspVal = h['content-security-policy']||'';
+  const cspVal    = h['content-security-policy']||'';
   const cspUnsafe = /unsafe-inline|unsafe-eval/i.test(cspVal);
+  // Helper: when WAF blocks (403/429) and header is absent, it's unverifiable – don't penalize
+  function hdrCheck(hdrName, hdrVal, presentPass, presentWarn, presentValue, absentValue, unvValue, tip) {
+    if (hdrVal) return { name:hdrName, icon:presentPass?'✅':'⚠️', pass:presentPass, warn:presentWarn, value:presentValue, tip };
+    if (headersBlocked) return { name:hdrName, icon:'🔵', pass:true, warn:false, unverifiable:true,
+      value:'🔵 Nicht prüfbar – ' + (wafInfo.detected ? wafInfo.name+' blockiert Zugriff' : 'Verbindung fehlgeschlagen'), tip };
+    return { name:hdrName, icon:'⚠️', pass:false, warn:true, value:absentValue, tip };
+  }
   const headerChecks = [
-    { name:'Content-Security-Policy (CSP)', icon:cspVal?(cspUnsafe?'⚠️':'✅'):'❌',
-      pass:!!cspVal&&!cspUnsafe, warn:!!cspVal&&cspUnsafe,
-      value:cspVal?(cspUnsafe?'⚠️ Gesetzt, aber unsafe-inline/eval erlaubt: '+cspVal.substring(0,70)+'…':cspVal.substring(0,80)+'…'):'Nicht gesetzt – XSS-Angriffe ungeschützt!',
-      tip:"CSP ohne 'unsafe-inline'/'unsafe-eval' verhindert XSS. Skripte nur von erlaubten Quellen laden." },
-    { name:'X-Frame-Options / frame-ancestors', icon:(h['x-frame-options']||cspVal.includes('frame-ancestors'))?'✅':'⚠️',
-      pass:!!(h['x-frame-options']||cspVal.includes('frame-ancestors')), warn:true,
-      value:h['x-frame-options']||'Nicht gesetzt – Clickjacking-Angriff möglich',
-      tip:'DENY oder SAMEORIGIN verhindert Clickjacking. Kann auch via CSP frame-ancestors gesetzt werden.' },
-    { name:'X-Content-Type-Options: nosniff', icon:h['x-content-type-options']==='nosniff'?'✅':'⚠️',
-      pass:h['x-content-type-options']==='nosniff', warn:true,
-      value:h['x-content-type-options']||'Nicht gesetzt',
-      tip:'Verhindert MIME-Sniffing-Angriffe – Browser muss den vom Server deklarierten Content-Type respektieren.' },
-    { name:'Referrer-Policy', icon:h['referrer-policy']?'✅':'⚠️',
-      pass:!!h['referrer-policy'], warn:true,
-      value:h['referrer-policy']||'Nicht gesetzt – URLs werden vollständig weitergegeben',
-      tip:'"strict-origin-when-cross-origin" schützt URLs vor Leakage an externe Dienste.' },
-    { name:'Permissions-Policy', icon:h['permissions-policy']?'✅':'⚠️',
-      pass:!!h['permissions-policy'], warn:true,
-      value:h['permissions-policy']?h['permissions-policy'].substring(0,80)+'…':'Nicht gesetzt',
-      tip:'Deaktiviert Kamera, Mikrofon, Geolocation, Payment für nicht benötigte Features.' },
-    { name:'Cache-Control (sensible Inhalte)', icon:h['cache-control']?'✅':'⚠️',
-      pass:!!h['cache-control'], warn:true,
-      value:h['cache-control']||'Nicht gesetzt – Inhalte könnten gecacht werden',
-      tip:'"no-store, no-cache" für Login-Seiten/APIs verhindert, dass sensible Daten im Browser-Cache landen.' },
+    cspVal
+      ? { name:'Content-Security-Policy (CSP)', icon:cspUnsafe?'⚠️':'✅', pass:!cspUnsafe, warn:cspUnsafe,
+          value:cspUnsafe?'⚠️ unsafe-inline/eval erlaubt: '+cspVal.substring(0,70)+'…':cspVal.substring(0,80)+'…',
+          tip:"CSP ohne 'unsafe-inline'/'unsafe-eval' verhindert XSS. Skripte nur von erlaubten Quellen laden." }
+      : hdrCheck('Content-Security-Policy (CSP)', '', false, false, '',
+          'Nicht gesetzt – XSS-Angriffe ungeschützt!', '', "CSP ohne 'unsafe-inline'/'unsafe-eval' verhindert XSS."),
+    hdrCheck('X-Frame-Options / frame-ancestors', h['x-frame-options']||cspVal.includes('frame-ancestors')||'',
+      true, false, h['x-frame-options']||'CSP frame-ancestors gesetzt ✓',
+      'Nicht gesetzt – Clickjacking-Angriff möglich', '',
+      'DENY oder SAMEORIGIN verhindert Clickjacking. Kann auch via CSP frame-ancestors gesetzt werden.'),
+    hdrCheck('X-Content-Type-Options: nosniff', h['x-content-type-options']==='nosniff'?'nosniff':'',
+      true, false, 'nosniff ✓', 'Nicht gesetzt',  '',
+      'Verhindert MIME-Sniffing-Angriffe – Browser muss den deklarierten Content-Type respektieren.'),
+    hdrCheck('Referrer-Policy', h['referrer-policy'],
+      true, false, h['referrer-policy'], 'Nicht gesetzt – URLs werden vollständig weitergegeben', '',
+      '"strict-origin-when-cross-origin" schützt URLs vor Leakage an externe Dienste.'),
+    hdrCheck('Permissions-Policy', h['permissions-policy'],
+      true, false, (h['permissions-policy']||'').substring(0,80)+'…', 'Nicht gesetzt', '',
+      'Deaktiviert Kamera, Mikrofon, Geolocation, Payment für nicht benötigte Features.'),
+    hdrCheck('Cache-Control', h['cache-control'],
+      true, false, h['cache-control'], 'Nicht gesetzt – Inhalte könnten gecacht werden', '',
+      '"no-store, no-cache" für Login-Seiten/APIs verhindert Caching sensibler Daten.'),
   ];
 
   // ── 3. CROSS-ORIGIN POLICIES ──
@@ -681,40 +727,54 @@ async function checkWebsite() {
 
   // ── 5. E-MAIL SECURITY ──
   const spfQuality = spfRec.includes('-all')?'✅ Strict (hardfail)':spfRec.includes('~all')?'⚠️ Soft (~all)':spfRec?'⚠️ Schwach':null;
+  function dnsCheck(name, queryResult, passVal, warnVal, missVal, tip) {
+    if (queryResult === null)
+      return { name, icon:'🔵', pass:true, warn:false, unverifiable:true,
+        value:'🔵 Nicht prüfbar – DNS-Abfrage fehlgeschlagen (beide Provider)', tip };
+    return { name, icon:passVal?'✅':warnVal?'⚠️':'❌', pass:!!passVal, warn:!!warnVal&&!passVal,
+      value:passVal||missVal, tip };
+  }
   const emailChecks = [
-    { name:'MX-Einträge', icon:hasMX?'✅':'⚠️',
-      pass:hasMX, warn:true,
-      value:hasMX?`${mxData.Answer.length} MX-Eintrag(e): ${mxData.Answer.map(a=>a.data).join(', ').substring(0,60)}`:'Kein MX-Eintrag gefunden',
-      tip:'MX-Einträge definieren, welche Server E-Mails für diese Domain empfangen.' },
-    { name:'SPF (Sender Policy Framework)', icon:spfRec?(spfRec.includes('-all')?'✅':'⚠️'):'❌',
-      pass:!!(spfRec&&spfRec.includes('-all')), warn:!!(spfRec&&!spfRec.includes('-all')),
-      value:spfRec?`${spfQuality}: ${spfRec.substring(0,70)}`:'❌ Kein SPF – Jeder kann E-Mails als eure Domain versenden!',
-      tip:'SPF mit -all (hardfail) verhindert E-Mail-Spoofing. ~all (softfail) ist nicht ausreichend.' },
-    { name:'DKIM (DomainKeys Identified Mail)', icon:hasDKIM?'✅':'❌',
-      pass:hasDKIM, warn:false,
-      value:hasDKIM?`DKIM-Eintrag gefunden (Selector: ${dkimSelector}._domainkey)`:'❌ Kein DKIM – E-Mails können unbemerkt manipuliert werden!',
-      tip:'DKIM signiert E-Mails kryptographisch – Empfänger können die Echtheit verifizieren.' },
-    { name:'DMARC (Domain-based Msg. Auth.)', icon:dmarcRec?(dmarcRec.includes('p=reject')||dmarcRec.includes('p=quarantine')?'✅':'⚠️'):'❌',
-      pass:!!(dmarcRec&&(dmarcRec.includes('p=reject')||dmarcRec.includes('p=quarantine'))), warn:!!(dmarcRec&&dmarcRec.includes('p=none')),
-      value:dmarcRec?dmarcRec.substring(0,80):'❌ Kein DMARC – Phishing-E-Mails im Firmennamen möglich!',
-      tip:'"p=reject" blockiert unautorisierte E-Mails komplett. "p=none" ist nur Monitoring.' },
+    dnsCheck('MX-Einträge', mxData,
+      hasMX ? `${mxData.Answer.length} MX-Eintrag(e): ${mxData.Answer.map(a=>a.data).join(', ').substring(0,60)}` : null,
+      false,
+      'Kein MX-Eintrag gefunden',
+      'MX-Einträge definieren, welche Server E-Mails für diese Domain empfangen.'),
+    dnsCheck('SPF (Sender Policy Framework)', txtData,
+      spfRec&&spfRec.includes('-all') ? `${spfQuality}: ${spfRec.substring(0,70)}` : null,
+      spfRec&&!spfRec.includes('-all') ? `${spfQuality}: ${spfRec.substring(0,70)}` : null,
+      '❌ Kein SPF – Jeder kann E-Mails als diese Domain versenden!',
+      'SPF mit -all (hardfail) verhindert E-Mail-Spoofing. ~all (softfail) ist nicht ausreichend.'),
+    dnsCheck('DKIM (DomainKeys Identified Mail)', dkimGoogle !== null ? dkimGoogle : dkimDefault,
+      hasDKIM ? `DKIM-Eintrag gefunden (Selector: ${dkimSelector}._domainkey)` : null,
+      false,
+      '❌ Kein DKIM – E-Mails können unbemerkt manipuliert werden!',
+      'DKIM signiert E-Mails kryptographisch – Empfänger können die Echtheit verifizieren.'),
+    dnsCheck('DMARC (Domain-based Msg. Auth.)', dmarcData,
+      dmarcRec&&(dmarcRec.includes('p=reject')||dmarcRec.includes('p=quarantine')) ? dmarcRec.substring(0,80) : null,
+      dmarcRec&&dmarcRec.includes('p=none') ? `⚠️ Nur Monitoring (p=none): ${dmarcRec.substring(0,70)}` : null,
+      '❌ Kein DMARC – Phishing-E-Mails im Firmennamen möglich!',
+      '"p=reject" blockiert unautorisierte E-Mails komplett. "p=none" ist nur Monitoring.'),
   ];
 
   // ── 6. DNS SECURITY ──
   const nsCount = nsData?.Answer?.length||0;
   const dnsChecks = [
-    { name:'DNSSEC (DS-Einträge)', icon:hasDNSSEC?'✅':'⚠️',
-      pass:hasDNSSEC, warn:true,
-      value:hasDNSSEC?'DNSSEC aktiviert ✓':'Nicht aktiviert – DNS-Spoofing möglich',
-      tip:'DNSSEC signiert DNS-Antworten kryptographisch und verhindert DNS-Hijacking-Angriffe.' },
-    { name:'CAA (Certificate Authority Authorization)', icon:hasCAA?'✅':'⚠️',
-      pass:hasCAA, warn:true,
-      value:hasCAA?`${caaData.Answer.length} CAA-Eintrag(e) ✓ – SSL nur von autorisierten CAs`:'Nicht gesetzt – jede CA kann Zertifikate ausstellen!',
-      tip:'CAA-Einträge begrenzen, welche Certificate Authorities SSL-Zertifikate für deine Domain ausstellen dürfen.' },
-    { name:'NS-Redundanz (Nameserver)', icon:nsCount>=2?'✅':'⚠️',
-      pass:nsCount>=2, warn:true,
-      value:nsCount?`${nsCount} Nameserver (${nsData.Answer.slice(0,2).map(a=>a.data).join(', ')})`:'Nameserver nicht ermittelbar',
-      tip:'Mindestens 2 Nameserver (idealerweise bei verschiedenen Anbietern) für Ausfallsicherheit.' },
+    dnsCheck('DNSSEC (DS-Einträge)', dsData,
+      hasDNSSEC ? 'DNSSEC aktiviert ✓' : null,
+      !hasDNSSEC ? 'Nicht aktiviert – DNS-Spoofing möglich' : null,
+      'Nicht aktiviert – DNS-Spoofing möglich',
+      'DNSSEC signiert DNS-Antworten kryptographisch und verhindert DNS-Hijacking-Angriffe.'),
+    dnsCheck('CAA (Certificate Authority Authorization)', caaData,
+      hasCAA ? `${caaData.Answer.length} CAA-Eintrag(e) ✓ – SSL nur von autorisierten CAs` : null,
+      !hasCAA ? 'Nicht gesetzt – jede CA kann Zertifikate ausstellen!' : null,
+      'Nicht gesetzt – jede CA kann Zertifikate ausstellen!',
+      'CAA-Einträge begrenzen, welche CAs SSL-Zertifikate für deine Domain ausstellen dürfen.'),
+    dnsCheck('NS-Redundanz (Nameserver)', nsData,
+      nsCount>=2 ? `${nsCount} Nameserver (${nsData.Answer.slice(0,2).map(a=>a.data).join(', ')})` : null,
+      nsCount===1 ? `Nur 1 Nameserver – kein Failover!` : null,
+      'Nameserver nicht ermittelbar',
+      'Mindestens 2 Nameserver (idealerweise bei verschiedenen Anbietern) für Ausfallsicherheit.'),
   ];
 
   // ── 7. INFORMATION LEAKAGE ──
@@ -758,15 +818,18 @@ async function checkWebsite() {
       tip:'sitemap.xml verbessert die Indexierung und ist für SEO empfohlen.' },
   ];
 
-  // ── SCORE ──
-  const allChecks = [...httpsChecks,...headerChecks,...corsChecks,...cookieChecks,...emailChecks,...dnsChecks,...infoChecks,...miscChecks];
-  const passed = allChecks.filter(c=>c.pass).length;
-  const score  = Math.round(passed/allChecks.length*100);
-  const grade  = score>=88?'A+':score>=78?'A':score>=68?'B':score>=55?'C':score>=38?'D':'F';
-  const gColor = score>=68?'#15803d':score>=55?'#d97706':'#dc2626';
+  // ── SCORE (unverifiable checks excluded) ──
+  const allChecks    = [...httpsChecks,...headerChecks,...corsChecks,...cookieChecks,...emailChecks,...dnsChecks,...infoChecks,...miscChecks];
+  const verifiable   = allChecks.filter(c => !c.unverifiable);
+  const unvCount     = allChecks.length - verifiable.length;
+  const passed       = verifiable.filter(c=>c.pass).length;
+  const score        = verifiable.length ? Math.round(passed/verifiable.length*100) : 0;
+  const grade        = score>=88?'A+':score>=78?'A':score>=68?'B':score>=55?'C':score>=38?'D':'F';
+  const gColor       = score>=68?'#15803d':score>=55?'#d97706':'#dc2626';
   document.getElementById('wc-grade').textContent = grade;
   document.getElementById('wc-grade').style.color  = gColor;
-  document.getElementById('wc-score-label').textContent = `${passed} von ${allChecks.length} Prüfpunkten bestanden (${score}%)`;
+  const unvNote = unvCount ? ` · ${unvCount} nicht prüfbar` : '';
+  document.getElementById('wc-score-label').textContent = `${passed} von ${verifiable.length} prüfbaren Punkten bestanden (${score}%)${unvNote}`;
   const bar = document.getElementById('wc-progress');
   bar.style.width      = score+'%';
   bar.style.background = score>=68?'#16a34a':score>=55?'#d97706':'#dc2626';
@@ -780,8 +843,21 @@ async function checkWebsite() {
   renderChecks('wc-checks-info',    'wc-cat-info',    infoChecks);
   renderChecks('wc-checks-misc',    'wc-cat-misc',    miscChecks);
 
+  // ── WAF / DNS Info-Banner ──
+  { const infoEl = document.getElementById('wc-method-info');
+    if (infoEl) {
+      const lines = [];
+      if (wafInfo.detected) lines.push(`🛡️ <strong>${wafInfo.name} erkannt</strong> – Security-Header wurden hinter der WAF/CDN abgefragt. Header-Ergebnisse ohne direkten Server-Zugriff.`);
+      if (!dnsAvail) lines.push(`🔵 <strong>DNS nicht erreichbar</strong> – SPF/DMARC/DKIM/CAA konnten nicht geprüft werden (beide DNS-Provider nicht verfügbar).`);
+      else if (unvCount > 0 && dnsAvail) lines.push(`🔵 ${unvCount} Prüfpunkte als "nicht prüfbar" markiert (WAF/Verbindung – nicht als Fehler gewertet).`);
+      lines.push(`📋 <strong>Methodik:</strong> Externe Prüfung via CORS-Proxy · DNS-over-HTTPS (Cloudflare + Google) · Scan: ${new Date().toLocaleString('de-DE')} · Prüftiefe: Öffentlich zugängliche HTTP-Headers & DNS`);
+      infoEl.innerHTML = lines.join('<br>');
+      infoEl.style.display = 'block';
+    }
+  }
+
   // ── KI-EMPFEHLUNG ──
-  const failed = allChecks.filter(c=>!c.pass);
+  const failed = allChecks.filter(c=>!c.pass && !c.unverifiable);
   if (failed.length) {
     const aiDiv = document.getElementById('wc-ai-rec');
     aiDiv.style.display = 'block';
@@ -789,7 +865,9 @@ async function checkWebsite() {
     aiDiv.textContent = '🤖 KI erstellt Handlungsempfehlung für die Geschäftsführung…';
     const critical = failed.filter(c=>!c.warn).map(c=>`KRITISCH: ${c.name} – ${c.value}`).join('\n');
     const warnings = failed.filter(c=>c.warn).map(c=>`WARNUNG: ${c.name}`).join(', ');
-    const prompt = `Du bist ein professioneller IT-Security-Berater (CISSP-Niveau). Erstelle für die Website ${domain} (Note: ${grade}, ${score}%) einen strukturierten Sicherheitsbericht auf Deutsch für die Geschäftsführung.\n\nKritische Lücken:\n${critical||'keine'}\n\nWarnungen: ${warnings||'keine'}\n\nSchreibe:\n**RISIKOBEWERTUNG:** [1 Satz, Gesamtbild]\n**TOP 3 SOFORTMASSNAHMEN:** (nummeriert, konkret, mit Zeitaufwand)\n**MITTELFRISTIG (1-3 Monate):** (2-3 Punkte)\n**GESCHÄFTLICHES RISIKO:** Was passiert wenn nichts getan wird? (1-2 Sätze, konkret: Bußgeld, Reputationsschaden, Datenleck)\n\nSchreibe klar, ohne Fachjargon, direkt umsetzbar.`;
+    const wafNote = wafInfo.detected ? `\n\nHinweis: Seite ist hinter ${wafInfo.name} – WAF/CDN schützt bereits vor vielen Angriffen. Einige Header-Prüfungen waren nicht direkt möglich.` : '';
+    const dnsNote = !dnsAvail ? '\n\nHinweis: DNS-Ergebnisse konnten nicht ermittelt werden – E-Mail-Sicherheit (SPF/DMARC/DKIM) sollte separat geprüft werden.' : '';
+    const prompt = `Du bist ein professioneller IT-Security-Berater (CISSP-Niveau). Erstelle für die Website ${domain} (Note: ${grade}, ${score}% von ${verifiable.length} prüfbaren Punkten) einen strukturierten Sicherheitsbericht auf Deutsch für die Geschäftsführung.${wafNote}${dnsNote}\n\nKritische Lücken:\n${critical||'keine'}\n\nWarnungen: ${warnings||'keine'}\n\nSchreibe:\n**RISIKOBEWERTUNG:** [1 Satz, Gesamtbild]\n**TOP 3 SOFORTMASSNAHMEN:** (nummeriert, konkret, mit Zeitaufwand)\n**MITTELFRISTIG (1-3 Monate):** (2-3 Punkte)\n**GESCHÄFTLICHES RISIKO:** Was passiert wenn nichts getan wird? (1-2 Sätze, konkret: Bußgeld, Reputationsschaden, Datenleck)\n\nSchreibe klar, ohne Fachjargon, direkt umsetzbar. Wenn WAF vorhanden, berücksichtige das als positiven Sicherheitsfaktor.`;
     try {
       const rec = await askKI(prompt);
       aiDiv.textContent = '🤖 KI-Sicherheitsbericht:\n\n'+rec;
@@ -797,7 +875,7 @@ async function checkWebsite() {
     } catch { aiDiv.style.display='none'; }
   }
 
-  window._wcScanData = { domain, score, grade, allChecks, aiRec: document.getElementById('wc-ai-rec').textContent };
+  window._wcScanData = { domain, score, grade, allChecks, verifiable, unvCount, wafInfo, dnsAvail, aiRec: document.getElementById('wc-ai-rec').textContent };
   document.getElementById('wc-pdf-btn').style.display = 'inline-flex';
   document.getElementById('wc-copy-btn').style.display = 'inline-flex';
   btn.innerHTML = '🔍 Vollständig prüfen';
@@ -855,8 +933,19 @@ function buildReportText() {
   }
 
   lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  lines.push('Erstellt mit Doudouzi & Ergün KI-Suite');
-  lines.push('https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/');
+  lines.push('METHODIK & EINSCHRÄNKUNGEN');
+  lines.push('─────────────────────────────────────────────');
+  if (d.wafInfo?.detected) lines.push(`• WAF/CDN erkannt: ${d.wafInfo.name} – Header hinter WAF abgefragt`);
+  if (!d.dnsAvail) lines.push('• DNS-Abfrage fehlgeschlagen – SPF/DMARC/DKIM/CAA nicht prüfbar');
+  if (d.unvCount) lines.push(`• ${d.unvCount} Prüfpunkte als "nicht prüfbar" markiert (nicht in Note)`);
+  lines.push('• Prüfmethode: Externe HTTP-Header & DNS-over-HTTPS Analyse');
+  lines.push('• Prüftiefe: Öffentlich zugängliche Schnittstellen (kein Pentest)');
+  lines.push('• Tool: Doudouzi & Ergün KI-Suite | https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/');
+  lines.push('');
+  lines.push('⚠️ Dieser Bericht basiert auf automatisierter Fernanalyse öffentlich');
+  lines.push('   zugänglicher HTTP-Antworten und DNS-Einträge. Er ersetzt keine');
+  lines.push('   manuelle Sicherheitsprüfung oder einen professionellen Pentest.');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   return lines.join('\n');
 }
 
