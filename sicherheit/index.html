@@ -165,7 +165,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
   <div id="tab-webcheck" class="tab-panel">
     <div class="card">
       <h3>🌐 Website-Sicherheits-Check</h3>
-      <p class="sub">Domain eingeben — das Tool prüft 15+ Punkte: HTTPS, Security-Headers, E-Mail-Sicherheit (SPF/DMARC), HTTP-Redirect, security.txt und mehr.</p>
+      <p class="sub">Domain eingeben — das Tool prüft 25+ Punkte in 8 Kategorien: HTTPS, Security-Headers, Cross-Origin-Policies, Cookie-Sicherheit, E-Mail-Sicherheit (SPF/DKIM/DMARC), DNS-Sicherheit (DNSSEC/CAA), Informations-Leakage und Compliance.</p>
 
       <div class="sec-label">Website-URL oder Domain</div>
       <div style="display:flex;gap:8px">
@@ -174,11 +174,14 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       </div>
       <!-- Prüf-Kategorien als Info-Chips -->
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
-        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0">🔒 HTTPS & Redirect</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0">🔒 HTTPS & Transport</span>
         <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe">🛡️ Security-Headers</span>
-        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#faf5ff;color:#6d28d9;border:1px solid #ddd6fe">📧 E-Mail-Sicherheit (SPF/DMARC)</span>
-        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#fffbeb;color:#a16207;border:1px solid #fde68a">📄 security.txt</span>
-        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca">🤖 KI-Empfehlung</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe">🌐 Cross-Origin Policies</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa">🍪 Cookie-Sicherheit</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#faf5ff;color:#7e22ce;border:1px solid #e9d5ff">📧 SPF/DKIM/DMARC</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0">🔑 DNSSEC/CAA</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#fef9c3;color:#a16207;border:1px solid #fde68a">🕵️ Info-Leakage</span>
+        <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca">🤖 KI-Sicherheitsbericht</span>
       </div>
     </div>
 
@@ -201,26 +204,15 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
         </div>
       </div>
 
-      <!-- Kategorie: HTTPS -->
-      <div id="wc-cat-https" style="margin-bottom:16px;display:none">
-        <div class="sec-label">🔒 HTTPS & Verschlüsselung</div>
-        <div class="header-grid" id="wc-checks-https"></div>
-      </div>
-      <!-- Kategorie: Headers -->
-      <div id="wc-cat-headers" style="margin-bottom:16px;display:none">
-        <div class="sec-label">🛡️ Security-Headers</div>
-        <div class="header-grid" id="wc-checks-headers"></div>
-      </div>
-      <!-- Kategorie: E-Mail -->
-      <div id="wc-cat-email" style="margin-bottom:16px;display:none">
-        <div class="sec-label">📧 E-Mail-Sicherheit (DNS)</div>
-        <div class="header-grid" id="wc-checks-email"></div>
-      </div>
-      <!-- Kategorie: Sonstiges -->
-      <div id="wc-cat-misc" style="margin-bottom:16px;display:none">
-        <div class="sec-label">📄 Weitere Prüfungen</div>
-        <div class="header-grid" id="wc-checks-misc"></div>
-      </div>
+      <!-- Kategorien -->
+      <div id="wc-cat-https"   style="margin-bottom:16px;display:none"><div class="sec-label">🔒 HTTPS &amp; Transport-Sicherheit</div><div class="header-grid" id="wc-checks-https"></div></div>
+      <div id="wc-cat-headers" style="margin-bottom:16px;display:none"><div class="sec-label">🛡️ HTTP Security-Headers</div><div class="header-grid" id="wc-checks-headers"></div></div>
+      <div id="wc-cat-cors"    style="margin-bottom:16px;display:none"><div class="sec-label">🌐 Cross-Origin Policies</div><div class="header-grid" id="wc-checks-cors"></div></div>
+      <div id="wc-cat-cookie"  style="margin-bottom:16px;display:none"><div class="sec-label">🍪 Cookie-Sicherheit</div><div class="header-grid" id="wc-checks-cookie"></div></div>
+      <div id="wc-cat-email"   style="margin-bottom:16px;display:none"><div class="sec-label">📧 E-Mail-Sicherheit (DNS)</div><div class="header-grid" id="wc-checks-email"></div></div>
+      <div id="wc-cat-dns"     style="margin-bottom:16px;display:none"><div class="sec-label">🔑 DNS-Sicherheit</div><div class="header-grid" id="wc-checks-dns"></div></div>
+      <div id="wc-cat-info"    style="margin-bottom:16px;display:none"><div class="sec-label">🕵️ Informations-Leakage</div><div class="header-grid" id="wc-checks-info"></div></div>
+      <div id="wc-cat-misc"    style="margin-bottom:16px;display:none"><div class="sec-label">📄 Standards &amp; Compliance</div><div class="header-grid" id="wc-checks-misc"></div></div>
 
       <div id="wc-ai-rec" class="result-box" style="display:none"></div>
     </div>
@@ -245,7 +237,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       </div>
 
       <div class="audit-section">
-        <h4>🔐 Zugang & Authentifizierung</h4>
+        <h4>🔐 Zugang &amp; Authentifizierung</h4>
         <div class="audit-row">
           <div class="audit-q">Zwei-Faktor-Authentifizierung (2FA)<small>Für E-Mail, Cloud, VPN etc.</small></div>
           <select class="audit-sel" id="a-2fa"><option value="">Auswählen</option><option value="ja">✅ Ja, überall</option><option value="teilweise">⚠️ Teilweise</option><option value="nein">❌ Nein</option></select>
@@ -261,7 +253,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       </div>
 
       <div class="audit-section">
-        <h4>💾 Daten & Backups</h4>
+        <h4>💾 Daten &amp; Backups</h4>
         <div class="audit-row">
           <div class="audit-q">Regelmäßige Backups<small>Häufigkeit und Speicherort</small></div>
           <select class="audit-sel" id="a-backup"><option value="">Auswählen</option><option value="täglich">✅ Täglich / automatisch</option><option value="wöchentlich">⚠️ Wöchentlich</option><option value="selten">❌ Selten / nie</option></select>
@@ -277,7 +269,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       </div>
 
       <div class="audit-section">
-        <h4>🌐 Netzwerk & Geräte</h4>
+        <h4>🌐 Netzwerk &amp; Geräte</h4>
         <div class="audit-row">
           <div class="audit-q">Antivirensoftware / EDR<small>Auf allen Geräten</small></div>
           <select class="audit-sel" id="a-av"><option value="">Auswählen</option><option value="ja">✅ Ja, alle Geräte</option><option value="teilweise">⚠️ Teilweise</option><option value="nein">❌ Nein</option></select>
@@ -293,7 +285,7 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       </div>
 
       <div class="audit-section" style="margin-bottom:0">
-        <h4>👥 Mitarbeiter & Notfall</h4>
+        <h4>👥 Mitarbeiter &amp; Notfall</h4>
         <div class="audit-row">
           <div class="audit-q">Sicherheits-Schulungen<small>Phishing, Passwörter etc.</small></div>
           <select class="audit-sel" id="a-schulung"><option value="">Auswählen</option><option value="regelmäßig">✅ Regelmäßig</option><option value="einmal">⚠️ Einmalig</option><option value="nein">❌ Keine</option></select>
@@ -449,6 +441,7 @@ Erstelle eine strukturierte Analyse auf Deutsch:
 
 // ===== WEBSITE CHECK =====
 function renderChecks(containerId, catId, checks) {
+  if (!checks.length) return;
   document.getElementById(catId).style.display = 'block';
   document.getElementById(containerId).innerHTML = checks.map(c => `
     <div class="hcheck ${c.pass ? 'pass' : c.warn ? 'warn' : 'fail'}">
@@ -461,28 +454,42 @@ function renderChecks(containerId, catId, checks) {
     </div>`).join('');
 }
 
-async function fetchHeaders(url) {
-  // Try multiple CORS proxies as fallback
+async function fetchFull(url) {
   const proxies = [
     u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
     u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
   ];
-  for (const makeProxy of proxies) {
+  for (const p of proxies) {
     try {
-      const r = await fetch(makeProxy(url), { signal: AbortSignal.timeout(8000) });
-      const h = {};
-      r.headers.forEach((v, k) => { h[k.toLowerCase()] = v; });
-      return { headers: h, status: r.status, ok: true };
+      const r = await fetch(p(url), { signal: AbortSignal.timeout(9000) });
+      const h = {}; r.headers.forEach((v,k)=>{ h[k.toLowerCase()]=v; });
+      const body = await r.text().catch(()=>'');
+      return { headers:h, status:r.status, ok:true, body };
     } catch { /* try next */ }
   }
-  return { headers: {}, status: 0, ok: false };
+  return { headers:{}, status:0, ok:false, body:'' };
+}
+
+async function fetchHead(url) {
+  const proxies = [
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  ];
+  for (const p of proxies) {
+    try {
+      const r = await fetch(p(url), { signal: AbortSignal.timeout(7000) });
+      const h = {}; r.headers.forEach((v,k)=>{ h[k.toLowerCase()]=v; });
+      return { headers:h, status:r.status, ok:true };
+    } catch { /* try next */ }
+  }
+  return { headers:{}, status:0, ok:false };
 }
 
 async function dnsQuery(name, type) {
   try {
     const r = await fetch(
       `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=${type}`,
-      { headers: { Accept: 'application/dns-json' }, signal: AbortSignal.timeout(6000) }
+      { headers:{ Accept:'application/dns-json' }, signal:AbortSignal.timeout(6000) }
     );
     return await r.json();
   } catch { return null; }
@@ -491,235 +498,308 @@ async function dnsQuery(name, type) {
 async function checkWebsite() {
   const urlInput = document.getElementById('wc-url').value.trim();
   if (!urlInput) { alert('Bitte URL oder Domain eingeben.'); return; }
-
   let url = urlInput;
   if (!url.startsWith('http')) url = 'https://' + url;
   let domain;
   try { domain = new URL(url).hostname; } catch { alert('Ungültige URL.'); return; }
 
   const btn = document.getElementById('wc-btn');
-  btn.innerHTML = '<span class="spinner"></span> Prüfe…';
+  btn.innerHTML = '<span class="spinner"></span> Prüfe 25+ Punkte…';
   btn.disabled = true;
 
   const resultDiv = document.getElementById('wc-result');
   resultDiv.style.display = 'block';
-  ['wc-cat-https','wc-cat-headers','wc-cat-email','wc-cat-misc'].forEach(id => document.getElementById(id).style.display='none');
+  ['wc-cat-https','wc-cat-headers','wc-cat-cors','wc-cat-cookie','wc-cat-email','wc-cat-dns','wc-cat-info','wc-cat-misc']
+    .forEach(id => document.getElementById(id).style.display='none');
   document.getElementById('wc-ai-rec').style.display = 'none';
+  document.getElementById('wc-pdf-btn').style.display = 'none';
+  document.getElementById('wc-copy-btn').style.display = 'none';
   document.getElementById('wc-domain').textContent = domain;
   document.getElementById('wc-grade').textContent = '…';
-  document.getElementById('wc-score-label').textContent = 'Analyse läuft…';
+  document.getElementById('wc-grade').style.color = '#6b7280';
+  document.getElementById('wc-score-label').textContent = '⏳ Analyse läuft — bitte warten…';
   document.getElementById('wc-progress').style.width = '5%';
+  document.getElementById('wc-progress').style.background = '#6b7280';
 
-  // ── 1. HTTP-Headers + HTTPS-Redirect (parallel) ──
-  const [httpsResult, httpResult, secTxtResult, robotsResult] = await Promise.all([
-    fetchHeaders(url),
-    fetchHeaders(url.replace('https://', 'http://')),
-    fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent('https://'+domain+'/.well-known/security.txt')}`, { signal: AbortSignal.timeout(5000) }).then(r => ({ status: r.status, ok: r.ok })).catch(() => ({ ok: false, status: 0 })),
-    fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent('https://'+domain+'/robots.txt')}`, { signal: AbortSignal.timeout(5000) }).then(r => r.text()).catch(() => ''),
+  // ── PARALLEL FETCH ──
+  const [mainRes, httpRes, secTxtRes, robotsRes, sitemapRes] = await Promise.all([
+    fetchFull(url),
+    fetchHead(url.replace(/^https/, 'http')),
+    fetchHead('https://'+domain+'/.well-known/security.txt'),
+    fetchFull('https://'+domain+'/robots.txt'),
+    fetchHead('https://'+domain+'/sitemap.xml'),
   ]);
 
-  const h = httpsResult.headers;
-
-  // ── 2. DNS checks (parallel) ──
-  const [spfData, dmarcData, mxData] = await Promise.all([
+  // ── PARALLEL DNS ──
+  const [txtData, dmarcData, mxData, nsData, caaData, dsData,
+         dkimGoogle, dkimDefault, dkimMail, dkimSelector1] = await Promise.all([
     dnsQuery(domain, 'TXT'),
-    dnsQuery('_dmarc.' + domain, 'TXT'),
+    dnsQuery('_dmarc.'+domain, 'TXT'),
     dnsQuery(domain, 'MX'),
+    dnsQuery(domain, 'NS'),
+    dnsQuery(domain, 'CAA'),
+    dnsQuery(domain, 'DS'),
+    dnsQuery('google._domainkey.'+domain, 'TXT'),
+    dnsQuery('default._domainkey.'+domain, 'TXT'),
+    dnsQuery('mail._domainkey.'+domain, 'TXT'),
+    dnsQuery('selector1._domainkey.'+domain, 'TXT'),
   ]);
 
-  const spfRecord = spfData?.Answer?.find(a => a.data?.includes('v=spf1'))?.data || '';
-  const dmarcRecord = dmarcData?.Answer?.find(a => a.data?.includes('v=DMARC1'))?.data || '';
-  const hasMX = !!(mxData?.Answer?.length);
+  const h    = mainRes.headers;
+  const body = mainRes.body || '';
 
-  // ── 3. HTTPS CHECKS ──
+  const spfRec   = txtData?.Answer?.find(a=>a.data?.includes('v=spf1'))?.data || '';
+  const dmarcRec = dmarcData?.Answer?.find(a=>a.data?.includes('v=DMARC1'))?.data || '';
+  const hasMX    = !!(mxData?.Answer?.length);
+  const hasCAA   = !!(caaData?.Answer?.length);
+  const hasDNSSEC= !!(dsData?.Answer?.length);
+  const hasDKIM  = [dkimGoogle,dkimDefault,dkimMail,dkimSelector1].some(
+    d=>d?.Answer?.some(a=>a.data?.includes('v=DKIM1'))
+  );
+  const dkimSelector = [
+    ['google',dkimGoogle],['default',dkimDefault],['mail',dkimMail],['selector1',dkimSelector1]
+  ].find(([,d])=>d?.Answer?.some(a=>a.data?.includes('v=DKIM1')))?.[0] || '';
+
+  // Cookie parsing
+  const rawCookies = h['set-cookie'] || '';
+  const hasHttpOnly = /httponly/i.test(rawCookies);
+  const hasSecureCookie = /;\s*secure/i.test(rawCookies);
+  const hasSameSite = /samesite=(strict|lax)/i.test(rawCookies);
+  const hasCookies = !!rawCookies;
+
+  // CMS/Tech detection from body + headers
+  const isWP        = /wp-content|wordpress/i.test(body);
+  const isDrupal    = /drupal/i.test(body+h['x-generator']+h['x-drupal-cache']);
+  const isJoomla    = /joomla/i.test(body);
+  const isShopify   = /shopify/i.test(body+h['x-shopify-stage']);
+  const isMagento   = /mage|magento/i.test(body);
+  const generatorMeta = body.match(/<meta[^>]+name=["']generator["'][^>]+content=["']([^"']+)["']/i)?.[1] || '';
+  const hasErrorMsg = /fatal error|stack trace|exception in|at line \d|sql syntax/i.test(body);
+
+  // HTTP/2 hint
+  const isHTTP2 = h['connection'] === undefined && !!h['alt-svc'];
+
+  // HSTS quality
+  const hsts = h['strict-transport-security'] || '';
+  const hstsMaxAge = parseInt((hsts.match(/max-age=(\d+)/)||[])[1]||'0');
+  const hstsGood = hstsMaxAge >= 15552000;
+
+  // robots.txt sensitive paths
+  const robotsBody = robotsRes.body || '';
+  const robotsSensitive = /\/admin|\/wp-admin|\/phpmyadmin|\/backup|\/config|\/\.env|\/private|\/secret/i.test(robotsBody);
+
+  // ── 1. HTTPS & TRANSPORT ──
   const httpsChecks = [
-    {
-      name: 'HTTPS aktiv',
-      icon: url.startsWith('https') ? '🔒' : '🔓',
-      pass: url.startsWith('https'),
-      warn: false,
-      value: url.startsWith('https') ? 'Verschlüsselt (TLS/SSL aktiv)' : '❌ Unverschlüsselt – alle Daten übertragbar!',
-      tip: 'HTTPS ist Pflicht. Google bestraft HTTP-Seiten im Ranking.'
-    },
-    {
-      name: 'HTTP → HTTPS Weiterleitung',
-      icon: httpResult.status >= 300 && httpResult.status < 400 ? '✅' : (httpResult.ok ? '⚠️' : '⚠️'),
-      pass: httpResult.status >= 300 && httpResult.status < 400,
-      warn: true,
-      value: httpResult.status >= 300 && httpResult.status < 400
-        ? `Redirect aktiv (${httpResult.status})`
-        : httpResult.ok
-          ? `HTTP erreichbar ohne Redirect (${httpResult.status}) – unsicher!`
-          : 'Konnte nicht geprüft werden',
-      tip: 'HTTP-Aufrufe müssen automatisch auf HTTPS weitergeleitet werden (301/302).'
-    },
-    {
-      name: 'Strict-Transport-Security (HSTS)',
-      icon: h['strict-transport-security'] ? '✅' : '⚠️',
-      pass: !!h['strict-transport-security'],
-      warn: true,
-      value: h['strict-transport-security'] || 'Nicht gesetzt',
-      tip: 'HSTS erzwingt HTTPS auch bei direktem HTTP-Aufruf durch den Browser.'
-    },
+    { name:'HTTPS aktiv', icon:url.startsWith('https')?'🔒':'🔓',
+      pass:url.startsWith('https'), warn:false,
+      value:url.startsWith('https')?'TLS/SSL-Verschlüsselung aktiv':'❌ Unverschlüsselt – alle Daten im Klartext übertragbar!',
+      tip:'HTTPS ist gesetzlich und technisch Pflicht. Ohne HTTPS kein Vertrauen, kein Google-Ranking.' },
+    { name:'HTTP → HTTPS Redirect', icon:httpRes.status>=300&&httpRes.status<400?'✅':'⚠️',
+      pass:httpRes.status>=300&&httpRes.status<400, warn:true,
+      value:httpRes.status>=300&&httpRes.status<400?`Redirect aktiv (${httpRes.status})`
+        :httpRes.ok?`HTTP ohne Redirect erreichbar (${httpRes.status}) – unsicher!`:'Konnte nicht geprüft werden',
+      tip:'HTTP-Traffic muss mit 301 auf HTTPS umgeleitet werden, sonst MITM-Angriff möglich.' },
+    { name:'HSTS (Strict-Transport-Security)', icon:hstsGood?'✅':hsts?'⚠️':'❌',
+      pass:hstsGood, warn:!!hsts&&!hstsGood,
+      value:hsts?`max-age=${hstsMaxAge}s${hstsMaxAge<15552000?' (zu kurz – min. 180 Tage)':''}`:'Nicht gesetzt',
+      tip:'HSTS mit min. 180 Tagen (15.552.000s) erzwingt HTTPS dauerhaft – auch ohne Redirect.' },
+    { name:'HTTP/2 oder HTTP/3', icon:isHTTP2?'✅':'⚠️',
+      pass:isHTTP2, warn:true,
+      value:isHTTP2?'HTTP/2 Unterstützung erkannt':'HTTP/1.1 – älteres Protokoll',
+      tip:'HTTP/2 ist schneller und sicherer. Moderne Webserver (Nginx/Apache 2.4+) unterstützen es.' },
   ];
 
-  // ── 4. HEADER CHECKS ──
+  // ── 2. SECURITY HEADERS ──
+  const cspVal = h['content-security-policy']||'';
+  const cspUnsafe = /unsafe-inline|unsafe-eval/i.test(cspVal);
   const headerChecks = [
-    {
-      name: 'Content-Security-Policy (CSP)',
-      icon: h['content-security-policy'] ? '✅' : '❌',
-      pass: !!h['content-security-policy'],
-      warn: false,
-      value: h['content-security-policy'] ? h['content-security-policy'].substring(0,90)+'…' : 'Nicht gesetzt',
-      tip: 'CSP verhindert XSS-Angriffe und bösartige Script-Einbindungen.'
-    },
-    {
-      name: 'X-Frame-Options',
-      icon: h['x-frame-options'] ? '✅' : '⚠️',
-      pass: !!h['x-frame-options'],
-      warn: true,
-      value: h['x-frame-options'] || 'Nicht gesetzt – Clickjacking möglich',
-      tip: 'Verhindert, dass deine Seite in iframes eingebettet wird (Clickjacking-Schutz).'
-    },
-    {
-      name: 'X-Content-Type-Options',
-      icon: h['x-content-type-options'] === 'nosniff' ? '✅' : '⚠️',
-      pass: h['x-content-type-options'] === 'nosniff',
-      warn: true,
-      value: h['x-content-type-options'] || 'Nicht gesetzt',
-      tip: 'Verhindert MIME-Type-Sniffing – Browser darf Dateityp nicht selbst erraten.'
-    },
-    {
-      name: 'Referrer-Policy',
-      icon: h['referrer-policy'] ? '✅' : '⚠️',
-      pass: !!h['referrer-policy'],
-      warn: true,
-      value: h['referrer-policy'] || 'Nicht gesetzt',
-      tip: 'Steuert, welche URL-Infos beim Klick auf Links weitergegeben werden.'
-    },
-    {
-      name: 'Permissions-Policy',
-      icon: h['permissions-policy'] ? '✅' : '⚠️',
-      pass: !!h['permissions-policy'],
-      warn: true,
-      value: h['permissions-policy'] ? h['permissions-policy'].substring(0,70)+'…' : 'Nicht gesetzt',
-      tip: 'Deaktiviert Browser-APIs (Kamera, Mikrofon, Standort) die nicht gebraucht werden.'
-    },
-    {
-      name: 'Server-Header (Versions-Infoleakage)',
-      icon: !h['server'] ? '✅' : '⚠️',
-      pass: !h['server'],
-      warn: true,
-      value: h['server'] ? '⚠️ Sichtbar: ' + h['server'] + ' — gibt Angreifern Infos!' : 'Versteckt ✓',
-      tip: 'Server-Name und Version nicht preisgeben – erleichtert gezieltes Angreifen.'
-    },
-    {
-      name: 'X-Powered-By (Technologie-Leakage)',
-      icon: !h['x-powered-by'] ? '✅' : '⚠️',
-      pass: !h['x-powered-by'],
-      warn: true,
-      value: h['x-powered-by'] ? '⚠️ Sichtbar: ' + h['x-powered-by'] : 'Versteckt ✓',
-      tip: 'PHP/ASP.NET-Version verbergen – Angreifer nutzen bekannte Schwachstellen gezielt.'
-    },
+    { name:'Content-Security-Policy (CSP)', icon:cspVal?(cspUnsafe?'⚠️':'✅'):'❌',
+      pass:!!cspVal&&!cspUnsafe, warn:!!cspVal&&cspUnsafe,
+      value:cspVal?(cspUnsafe?'⚠️ Gesetzt, aber unsafe-inline/eval erlaubt: '+cspVal.substring(0,70)+'…':cspVal.substring(0,80)+'…'):'Nicht gesetzt – XSS-Angriffe ungeschützt!',
+      tip:"CSP ohne 'unsafe-inline'/'unsafe-eval' verhindert XSS. Skripte nur von erlaubten Quellen laden." },
+    { name:'X-Frame-Options / frame-ancestors', icon:(h['x-frame-options']||cspVal.includes('frame-ancestors'))?'✅':'⚠️',
+      pass:!!(h['x-frame-options']||cspVal.includes('frame-ancestors')), warn:true,
+      value:h['x-frame-options']||'Nicht gesetzt – Clickjacking-Angriff möglich',
+      tip:'DENY oder SAMEORIGIN verhindert Clickjacking. Kann auch via CSP frame-ancestors gesetzt werden.' },
+    { name:'X-Content-Type-Options: nosniff', icon:h['x-content-type-options']==='nosniff'?'✅':'⚠️',
+      pass:h['x-content-type-options']==='nosniff', warn:true,
+      value:h['x-content-type-options']||'Nicht gesetzt',
+      tip:'Verhindert MIME-Sniffing-Angriffe – Browser muss den vom Server deklarierten Content-Type respektieren.' },
+    { name:'Referrer-Policy', icon:h['referrer-policy']?'✅':'⚠️',
+      pass:!!h['referrer-policy'], warn:true,
+      value:h['referrer-policy']||'Nicht gesetzt – URLs werden vollständig weitergegeben',
+      tip:'"strict-origin-when-cross-origin" schützt URLs vor Leakage an externe Dienste.' },
+    { name:'Permissions-Policy', icon:h['permissions-policy']?'✅':'⚠️',
+      pass:!!h['permissions-policy'], warn:true,
+      value:h['permissions-policy']?h['permissions-policy'].substring(0,80)+'…':'Nicht gesetzt',
+      tip:'Deaktiviert Kamera, Mikrofon, Geolocation, Payment für nicht benötigte Features.' },
+    { name:'Cache-Control (sensible Inhalte)', icon:h['cache-control']?'✅':'⚠️',
+      pass:!!h['cache-control'], warn:true,
+      value:h['cache-control']||'Nicht gesetzt – Inhalte könnten gecacht werden',
+      tip:'"no-store, no-cache" für Login-Seiten/APIs verhindert, dass sensible Daten im Browser-Cache landen.' },
   ];
 
-  // ── 5. E-MAIL CHECKS ──
+  // ── 3. CROSS-ORIGIN POLICIES ──
+  const corsChecks = [
+    { name:'Cross-Origin-Opener-Policy (COOP)', icon:h['cross-origin-opener-policy']?'✅':'⚠️',
+      pass:!!h['cross-origin-opener-policy'], warn:true,
+      value:h['cross-origin-opener-policy']||'Nicht gesetzt',
+      tip:'"same-origin" verhindert, dass andere Seiten auf dein Window-Objekt zugreifen können (XS-Leaks).' },
+    { name:'Cross-Origin-Embedder-Policy (COEP)', icon:h['cross-origin-embedder-policy']?'✅':'⚠️',
+      pass:!!h['cross-origin-embedder-policy'], warn:true,
+      value:h['cross-origin-embedder-policy']||'Nicht gesetzt',
+      tip:'"require-corp" verhindert das Laden fremder Ressourcen ohne explizite Erlaubnis (Spectre-Schutz).' },
+    { name:'Cross-Origin-Resource-Policy (CORP)', icon:h['cross-origin-resource-policy']?'✅':'⚠️',
+      pass:!!h['cross-origin-resource-policy'], warn:true,
+      value:h['cross-origin-resource-policy']||'Nicht gesetzt',
+      tip:'"same-origin" verhindert, dass andere Seiten deine Ressourcen einbetten können.' },
+    { name:'Access-Control-Allow-Origin (CORS)', icon:h['access-control-allow-origin']==='*'?'❌':h['access-control-allow-origin']?'✅':'✅',
+      pass:h['access-control-allow-origin']!=='*', warn:false,
+      value:h['access-control-allow-origin']?h['access-control-allow-origin']==='*'?'⚠️ Wildcard (*) – alle Origins erlaubt!':h['access-control-allow-origin']:'Nicht gesetzt (kein öffentlicher API-Endpunkt)',
+      tip:'CORS-Wildcard (*) erlaubt jeder Website Zugriff auf deine API – nur gezielt für öffentliche APIs einsetzen.' },
+  ];
+
+  // ── 4. COOKIE SECURITY ──
+  const cookieChecks = hasCookies ? [
+    { name:'HttpOnly Flag (Cookies)', icon:hasHttpOnly?'✅':'❌',
+      pass:hasHttpOnly, warn:false,
+      value:hasHttpOnly?'HttpOnly gesetzt ✓':'❌ Fehlt – Cookies per JavaScript auslesbar (XSS-Angriff)',
+      tip:'HttpOnly verhindert, dass JavaScript-Code (z.B. via XSS) auf Session-Cookies zugreift.' },
+    { name:'Secure Flag (Cookies)', icon:hasSecureCookie?'✅':'❌',
+      pass:hasSecureCookie, warn:false,
+      value:hasSecureCookie?'Secure gesetzt ✓':'❌ Fehlt – Cookies werden auch über HTTP übertragen!',
+      tip:'Secure stellt sicher, dass Cookies nur über HTTPS gesendet werden.' },
+    { name:'SameSite Attribut (Cookies)', icon:hasSameSite?'✅':'⚠️',
+      pass:hasSameSite, warn:true,
+      value:hasSameSite?'SameSite=Strict/Lax gesetzt ✓':'Nicht gesetzt oder SameSite=None – CSRF-Risiko',
+      tip:'"SameSite=Strict" oder "Lax" verhindert CSRF-Angriffe durch Cross-Site Request Forgery.' },
+  ] : [
+    { name:'Cookies (Set-Cookie Header)', icon:'ℹ️', pass:true, warn:false,
+      value:'Keine Cookies in diesem Response erkannt',
+      tip:'Cookies werden möglicherweise nach Login gesetzt – prüfe Login-Seiten separat.' }
+  ];
+
+  // ── 5. E-MAIL SECURITY ──
+  const spfQuality = spfRec.includes('-all')?'✅ Strict (hardfail)':spfRec.includes('~all')?'⚠️ Soft (~all)':spfRec?'⚠️ Schwach':null;
   const emailChecks = [
-    {
-      name: 'MX-Eintrag (E-Mail-Server)',
-      icon: hasMX ? '✅' : '⚠️',
-      pass: hasMX,
-      warn: true,
-      value: hasMX ? `${mxData.Answer.length} MX-Eintrag(e) gefunden` : 'Kein MX-Eintrag – keine E-Mail-Infrastruktur?',
-      tip: 'MX-Einträge zeigen, wohin E-Mails für diese Domain gehen.'
-    },
-    {
-      name: 'SPF (Sender Policy Framework)',
-      icon: spfRecord ? '✅' : '❌',
-      pass: !!spfRecord,
-      warn: false,
-      value: spfRecord ? spfRecord.substring(0,80) : 'Kein SPF-Eintrag – E-Mail-Spoofing möglich!',
-      tip: 'SPF verhindert, dass Fremde E-Mails im Namen deiner Domain versenden (Spoofing).'
-    },
-    {
-      name: 'DMARC (Domain-based Msg. Auth.)',
-      icon: dmarcRecord ? (dmarcRecord.includes('p=reject') || dmarcRecord.includes('p=quarantine') ? '✅' : '⚠️') : '❌',
-      pass: !!(dmarcRecord && (dmarcRecord.includes('p=reject') || dmarcRecord.includes('p=quarantine'))),
-      warn: dmarcRecord && dmarcRecord.includes('p=none'),
-      value: dmarcRecord ? dmarcRecord.substring(0,80) : 'Kein DMARC-Eintrag – Phishing im Firmennamen möglich!',
-      tip: 'DMARC mit p=reject/quarantine blockiert E-Mails, die SPF/DKIM nicht bestehen.'
-    },
+    { name:'MX-Einträge', icon:hasMX?'✅':'⚠️',
+      pass:hasMX, warn:true,
+      value:hasMX?`${mxData.Answer.length} MX-Eintrag(e): ${mxData.Answer.map(a=>a.data).join(', ').substring(0,60)}`:'Kein MX-Eintrag gefunden',
+      tip:'MX-Einträge definieren, welche Server E-Mails für diese Domain empfangen.' },
+    { name:'SPF (Sender Policy Framework)', icon:spfRec?(spfRec.includes('-all')?'✅':'⚠️'):'❌',
+      pass:!!(spfRec&&spfRec.includes('-all')), warn:!!(spfRec&&!spfRec.includes('-all')),
+      value:spfRec?`${spfQuality}: ${spfRec.substring(0,70)}`:'❌ Kein SPF – Jeder kann E-Mails als eure Domain versenden!',
+      tip:'SPF mit -all (hardfail) verhindert E-Mail-Spoofing. ~all (softfail) ist nicht ausreichend.' },
+    { name:'DKIM (DomainKeys Identified Mail)', icon:hasDKIM?'✅':'❌',
+      pass:hasDKIM, warn:false,
+      value:hasDKIM?`DKIM-Eintrag gefunden (Selector: ${dkimSelector}._domainkey)`:'❌ Kein DKIM – E-Mails können unbemerkt manipuliert werden!',
+      tip:'DKIM signiert E-Mails kryptographisch – Empfänger können die Echtheit verifizieren.' },
+    { name:'DMARC (Domain-based Msg. Auth.)', icon:dmarcRec?(dmarcRec.includes('p=reject')||dmarcRec.includes('p=quarantine')?'✅':'⚠️'):'❌',
+      pass:!!(dmarcRec&&(dmarcRec.includes('p=reject')||dmarcRec.includes('p=quarantine'))), warn:!!(dmarcRec&&dmarcRec.includes('p=none')),
+      value:dmarcRec?dmarcRec.substring(0,80):'❌ Kein DMARC – Phishing-E-Mails im Firmennamen möglich!',
+      tip:'"p=reject" blockiert unautorisierte E-Mails komplett. "p=none" ist nur Monitoring.' },
   ];
 
-  // ── 6. SONSTIGE CHECKS ──
-  const robotsExposing = robotsResult && /\/admin|\/wp-admin|\/phpmyadmin|\/backup|\/config|\/\.env/i.test(robotsResult);
+  // ── 6. DNS SECURITY ──
+  const nsCount = nsData?.Answer?.length||0;
+  const dnsChecks = [
+    { name:'DNSSEC (DS-Einträge)', icon:hasDNSSEC?'✅':'⚠️',
+      pass:hasDNSSEC, warn:true,
+      value:hasDNSSEC?'DNSSEC aktiviert ✓':'Nicht aktiviert – DNS-Spoofing möglich',
+      tip:'DNSSEC signiert DNS-Antworten kryptographisch und verhindert DNS-Hijacking-Angriffe.' },
+    { name:'CAA (Certificate Authority Authorization)', icon:hasCAA?'✅':'⚠️',
+      pass:hasCAA, warn:true,
+      value:hasCAA?`${caaData.Answer.length} CAA-Eintrag(e) ✓ – SSL nur von autorisierten CAs`:'Nicht gesetzt – jede CA kann Zertifikate ausstellen!',
+      tip:'CAA-Einträge begrenzen, welche Certificate Authorities SSL-Zertifikate für deine Domain ausstellen dürfen.' },
+    { name:'NS-Redundanz (Nameserver)', icon:nsCount>=2?'✅':'⚠️',
+      pass:nsCount>=2, warn:true,
+      value:nsCount?`${nsCount} Nameserver (${nsData.Answer.slice(0,2).map(a=>a.data).join(', ')})`:'Nameserver nicht ermittelbar',
+      tip:'Mindestens 2 Nameserver (idealerweise bei verschiedenen Anbietern) für Ausfallsicherheit.' },
+  ];
+
+  // ── 7. INFORMATION LEAKAGE ──
+  const detectedCMS = isWP?'WordPress':isDrupal?'Drupal':isJoomla?'Joomla':isShopify?'Shopify':isMagento?'Magento':generatorMeta||null;
+  const infoChecks = [
+    { name:'Server-Header', icon:!h['server']?'✅':'⚠️',
+      pass:!h['server'], warn:true,
+      value:h['server']?`⚠️ Sichtbar: ${h['server']}`:'Versteckt ✓',
+      tip:'Server-Version nicht preisgeben – gibt Angreifern gezielte Informationen für bekannte Lücken.' },
+    { name:'X-Powered-By Header', icon:!h['x-powered-by']?'✅':'⚠️',
+      pass:!h['x-powered-by'], warn:true,
+      value:h['x-powered-by']?`⚠️ Sichtbar: ${h['x-powered-by']}`:'Versteckt ✓',
+      tip:'PHP/ASP.NET-Version verbergen. In PHP: expose_php=Off, in Nginx: server_tokens off.' },
+    { name:'CMS-Erkennung', icon:detectedCMS?'⚠️':'✅',
+      pass:!detectedCMS, warn:true,
+      value:detectedCMS?`⚠️ Erkannt: ${detectedCMS} – Version im Quellcode sichtbar`:'Kein CMS erkannt / gut versteckt',
+      tip:'CMS-Version im Code verbergen – veraltete CMS-Versionen haben bekannte Schwachstellen.' },
+    { name:'Fehler-/Debug-Ausgaben', icon:hasErrorMsg?'❌':'✅',
+      pass:!hasErrorMsg, warn:false,
+      value:hasErrorMsg?'❌ Stack Traces oder SQL-Fehlermeldungen im HTML sichtbar!':'Keine Debug-Ausgaben erkannt ✓',
+      tip:'Fehlermeldungen und Stack Traces verraten Datenbankstruktur, Pfade und Technologien an Angreifer.' },
+    { name:'Technologie-Header (Misc)', icon:!(h['x-aspnet-version']||h['x-aspnetmvc-version']||h['x-generator'])?'✅':'⚠️',
+      pass:!(h['x-aspnet-version']||h['x-aspnetmvc-version']||h['x-generator']), warn:true,
+      value:[h['x-aspnet-version']&&`ASP.NET: ${h['x-aspnet-version']}`,h['x-generator']&&`Generator: ${h['x-generator']}`].filter(Boolean).join(', ')||'Keine Technologie-Header erkannt ✓',
+      tip:'X-AspNet-Version, X-Generator etc. verraten das eingesetzte Framework inkl. Version.' },
+  ];
+
+  // ── 8. STANDARDS & COMPLIANCE ──
   const miscChecks = [
-    {
-      name: 'security.txt (/.well-known/security.txt)',
-      icon: secTxtResult.ok && secTxtResult.status === 200 ? '✅' : '⚠️',
-      pass: secTxtResult.ok && secTxtResult.status === 200,
-      warn: true,
-      value: secTxtResult.ok && secTxtResult.status === 200 ? 'Vorhanden ✓ – Sicherheitsforscher können Lücken melden' : 'Nicht vorhanden',
-      tip: 'security.txt ist ein Standard (RFC 9116): zeigt, wie Sicherheitslücken gemeldet werden können.'
-    },
-    {
-      name: 'robots.txt (sensible Pfade)',
-      icon: robotsResult && !robotsExposing ? '✅' : robotsExposing ? '⚠️' : '⚠️',
-      pass: !!robotsResult && !robotsExposing,
-      warn: true,
-      value: robotsExposing ? '⚠️ Sensible Pfade sichtbar (Admin, Backup, Config)' : robotsResult ? 'Vorhanden, keine offensichtlich sensiblen Pfade' : 'Nicht gefunden',
-      tip: 'robots.txt-Einträge verraten Angreifern, wo sensible Bereiche liegen.'
-    },
+    { name:'security.txt (RFC 9116)', icon:secTxtRes.ok&&secTxtRes.status===200?'✅':'⚠️',
+      pass:secTxtRes.ok&&secTxtRes.status===200, warn:true,
+      value:secTxtRes.ok&&secTxtRes.status===200?'Vorhanden ✓ – verantwortungsvolle Schwachstellen-Meldung möglich':'Nicht vorhanden – Sicherheitsforscher haben keinen Meldepfad',
+      tip:'security.txt (RFC 9116) ist Best Practice und in manchen Branchen Pflicht.' },
+    { name:'robots.txt (Pfad-Leakage)', icon:robotsBody&&!robotsSensitive?'✅':robotsSensitive?'⚠️':'⚠️',
+      pass:!!robotsBody&&!robotsSensitive, warn:true,
+      value:robotsSensitive?'⚠️ Sensible Pfade sichtbar (Admin, Backup, Config, .env)':robotsBody?'Vorhanden, keine offensichtlich sensiblen Pfade':'Nicht gefunden',
+      tip:'Disallow-Einträge in robots.txt verraten Angreifern, wo sensible Bereiche liegen.' },
+    { name:'sitemap.xml', icon:sitemapRes.ok&&sitemapRes.status===200?'✅':'ℹ️',
+      pass:sitemapRes.ok&&sitemapRes.status===200, warn:true,
+      value:sitemapRes.ok&&sitemapRes.status===200?'Vorhanden ✓ – hilft Suchmaschinen':'Nicht gefunden – schadet SEO',
+      tip:'sitemap.xml verbessert die Indexierung und ist für SEO empfohlen.' },
   ];
 
-  // ── 7. SCORE ──
-  const allChecks = [...httpsChecks, ...headerChecks, ...emailChecks, ...miscChecks];
-  const passed = allChecks.filter(c => c.pass).length;
-  const score = Math.round((passed / allChecks.length) * 100);
-  const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 35 ? 'D' : 'F';
-  const gradeColor = score >= 70 ? '#15803d' : score >= 55 ? '#d97706' : '#dc2626';
+  // ── SCORE ──
+  const allChecks = [...httpsChecks,...headerChecks,...corsChecks,...cookieChecks,...emailChecks,...dnsChecks,...infoChecks,...miscChecks];
+  const passed = allChecks.filter(c=>c.pass).length;
+  const score  = Math.round(passed/allChecks.length*100);
+  const grade  = score>=88?'A+':score>=78?'A':score>=68?'B':score>=55?'C':score>=38?'D':'F';
+  const gColor = score>=68?'#15803d':score>=55?'#d97706':'#dc2626';
   document.getElementById('wc-grade').textContent = grade;
-  document.getElementById('wc-grade').style.color = gradeColor;
+  document.getElementById('wc-grade').style.color  = gColor;
   document.getElementById('wc-score-label').textContent = `${passed} von ${allChecks.length} Prüfpunkten bestanden (${score}%)`;
   const bar = document.getElementById('wc-progress');
-  bar.style.width = score + '%';
-  bar.style.background = score >= 70 ? '#16a34a' : score >= 55 ? '#d97706' : '#dc2626';
+  bar.style.width      = score+'%';
+  bar.style.background = score>=68?'#16a34a':score>=55?'#d97706':'#dc2626';
 
-  // ── 8. RENDER ──
-  renderChecks('wc-checks-https', 'wc-cat-https', httpsChecks);
+  renderChecks('wc-checks-https',   'wc-cat-https',   httpsChecks);
   renderChecks('wc-checks-headers', 'wc-cat-headers', headerChecks);
-  renderChecks('wc-checks-email', 'wc-cat-email', emailChecks);
-  renderChecks('wc-checks-misc', 'wc-cat-misc', miscChecks);
+  renderChecks('wc-checks-cors',    'wc-cat-cors',    corsChecks);
+  renderChecks('wc-checks-cookie',  'wc-cat-cookie',  cookieChecks);
+  renderChecks('wc-checks-email',   'wc-cat-email',   emailChecks);
+  renderChecks('wc-checks-dns',     'wc-cat-dns',     dnsChecks);
+  renderChecks('wc-checks-info',    'wc-cat-info',    infoChecks);
+  renderChecks('wc-checks-misc',    'wc-cat-misc',    miscChecks);
 
-  // ── 9. KI-EMPFEHLUNG ──
-  const failed = allChecks.filter(c => !c.pass);
+  // ── KI-EMPFEHLUNG ──
+  const failed = allChecks.filter(c=>!c.pass);
   if (failed.length) {
     const aiDiv = document.getElementById('wc-ai-rec');
     aiDiv.style.display = 'block';
     aiDiv.className = 'result-box loading';
-    aiDiv.textContent = '🤖 KI erstellt Handlungsempfehlung…';
-    const summary = failed.map(c => `• ${c.name}: ${c.value}`).join('\n');
-    const prompt = `Du bist ein IT-Security-Berater. Die Website ${domain} hat folgende Sicherheitsprobleme:
-${summary}
-
-Erstelle auf Deutsch einen kurzen, praxisnahen Bericht für einen Nicht-Techniker (Geschäftsführer):
-1. Die 3 wichtigsten Risiken in einem Satz je
-2. Welche 2 Maßnahmen zuerst umgesetzt werden sollten (konkret, mit Begründung)
-3. Gesamteinschätzung in einem Satz
-
-Schreibe klar und ohne Fachjargon.`;
+    aiDiv.textContent = '🤖 KI erstellt Handlungsempfehlung für die Geschäftsführung…';
+    const critical = failed.filter(c=>!c.warn).map(c=>`KRITISCH: ${c.name} – ${c.value}`).join('\n');
+    const warnings = failed.filter(c=>c.warn).map(c=>`WARNUNG: ${c.name}`).join(', ');
+    const prompt = `Du bist ein professioneller IT-Security-Berater (CISSP-Niveau). Erstelle für die Website ${domain} (Note: ${grade}, ${score}%) einen strukturierten Sicherheitsbericht auf Deutsch für die Geschäftsführung.\n\nKritische Lücken:\n${critical||'keine'}\n\nWarnungen: ${warnings||'keine'}\n\nSchreibe:\n**RISIKOBEWERTUNG:** [1 Satz, Gesamtbild]\n**TOP 3 SOFORTMASSNAHMEN:** (nummeriert, konkret, mit Zeitaufwand)\n**MITTELFRISTIG (1-3 Monate):** (2-3 Punkte)\n**GESCHÄFTLICHES RISIKO:** Was passiert wenn nichts getan wird? (1-2 Sätze, konkret: Bußgeld, Reputationsschaden, Datenleck)\n\nSchreibe klar, ohne Fachjargon, direkt umsetzbar.`;
     try {
       const rec = await askKI(prompt);
-      aiDiv.textContent = '🤖 KI-Empfehlung für die Geschäftsführung:\n\n' + rec;
-      aiDiv.className = 'result-box ' + (score < 55 ? 'danger' : 'warn');
-    } catch { aiDiv.style.display = 'none'; }
+      aiDiv.textContent = '🤖 KI-Sicherheitsbericht:\n\n'+rec;
+      aiDiv.className = 'result-box '+(score<55?'danger':'warn');
+    } catch { aiDiv.style.display='none'; }
   }
 
-  // Buttons einblenden + Scan-Daten global speichern für Export
-  window._wcScanData = { domain, score, grade: document.getElementById('wc-grade').textContent, allChecks, aiRec: document.getElementById('wc-ai-rec').textContent };
+  window._wcScanData = { domain, score, grade, allChecks, aiRec: document.getElementById('wc-ai-rec').textContent };
   document.getElementById('wc-pdf-btn').style.display = 'inline-flex';
   document.getElementById('wc-copy-btn').style.display = 'inline-flex';
-
   btn.innerHTML = '🔍 Vollständig prüfen';
   btn.disabled = false;
 }
@@ -761,7 +841,7 @@ function buildReportText() {
       const icon  = row.querySelector('.hcheck-icon')?.textContent  || '';
       lines.push(`${icon} ${name}`);
       lines.push(`   ${val}`);
-      if (tip.trim()) lines.push(`   → ${tip.replace('💡 ','')}`);
+      if (tip.trim()) lines.push(`   → ${tip.replace('💡 ','')}`)
       lines.push('');
     });
   });
@@ -794,7 +874,6 @@ async function exportWebcheckPDF() {
   btn.innerHTML = '<span class="spinner"></span> Erstelle PDF…';
   btn.disabled = true;
 
-  // Lazy-load jsPDF
   if (!window.jspdf) {
     await new Promise((res, rej) => {
       const s = document.createElement('script');
@@ -805,12 +884,10 @@ async function exportWebcheckPDF() {
   }
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const d = window._wcScanData;
   const now = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
   const W = 210, margin = 18, cw = W - margin * 2;
 
-  // ── Header ──
   doc.setFillColor(21, 128, 61);
   doc.rect(0, 0, W, 32, 'F');
   doc.setTextColor(255, 255, 255);
@@ -820,7 +897,6 @@ async function exportWebcheckPDF() {
   doc.text('Doudouzi & Ergün – Prozessoptimierung & KI', margin, 20);
   doc.text(`Erstellt: ${now}`, margin, 27);
 
-  // ── Score-Box ──
   const gradeColor = d.score >= 70 ? [21,128,61] : d.score >= 55 ? [217,119,6] : [220,38,38];
   doc.setFillColor(...gradeColor);
   doc.roundedRect(W - margin - 32, 36, 32, 32, 4, 4, 'F');
@@ -835,7 +911,6 @@ async function exportWebcheckPDF() {
   doc.setTextColor(107,114,128);
   doc.text(`${d.score}% Prüfpunkte bestanden`, margin, 54);
 
-  // Progress bar
   doc.setFillColor(229,231,235);
   doc.roundedRect(margin, 60, cw - 36, 4, 2, 2, 'F');
   doc.setFillColor(...gradeColor);
@@ -843,7 +918,6 @@ async function exportWebcheckPDF() {
 
   let y = 76;
 
-  // ── Kategorien ──
   const catColors = {
     'wc-checks-https':   { label: 'HTTPS & Verschlüsselung',    r:21,  g:128, b:61  },
     'wc-checks-headers': { label: 'Security-Headers',            r:29,  g:78,  b:216 },
@@ -857,7 +931,6 @@ async function exportWebcheckPDF() {
 
     if (y > 255) { doc.addPage(); y = 20; }
 
-    // Category header
     doc.setFillColor(cfg.r, cfg.g, cfg.b);
     doc.roundedRect(margin, y, cw, 7, 2, 2, 'F');
     doc.setTextColor(255,255,255);
@@ -872,24 +945,20 @@ async function exportWebcheckPDF() {
       const name = row.querySelector('.hcheck-name')?.textContent || '';
       const val  = row.querySelector('.hcheck-val')?.textContent  || '';
 
-      // Status dot
       const dotColor = pass ? [21,128,61] : warn ? [217,119,6] : [220,38,38];
       doc.setFillColor(...dotColor);
       doc.circle(margin + 3, y + 2.5, 2, 'F');
 
-      // Name
       doc.setTextColor(31,41,55);
       doc.setFont('helvetica','bold'); doc.setFontSize(9);
       doc.text(name, margin + 8, y + 4);
 
-      // Value
       doc.setFont('helvetica','normal'); doc.setFontSize(8);
       doc.setTextColor(107,114,128);
       const valLines = doc.splitTextToSize(val, cw - 10);
       doc.text(valLines, margin + 8, y + 9);
       y += 7 + valLines.length * 4;
 
-      // Tip for failed
       if (!pass) {
         const tipEl = row.querySelectorAll('div')[2];
         if (tipEl) {
@@ -906,7 +975,6 @@ async function exportWebcheckPDF() {
     y += 4;
   }
 
-  // ── KI-Empfehlung ──
   const aiText = d.aiRec?.replace('🤖 KI-Empfehlung für die Geschäftsführung:\n\n','');
   if (aiText && !aiText.includes('KI erstellt')) {
     if (y > 220) { doc.addPage(); y = 20; }
@@ -924,7 +992,6 @@ async function exportWebcheckPDF() {
     y += aiLines.length * 4.5 + 6;
   }
 
-  // ── Footer ──
   const pages = doc.getNumberOfPages();
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
@@ -972,32 +1039,7 @@ async function runAudit() {
 
   const answers = Object.entries(fields).map(([k,v]) => `${k}: ${v || 'nicht beantwortet'}`).join('\n');
 
-  const prompt = `Du bist ein IT-Security-Berater. Erstelle basierend auf diesem Sicherheits-Audit einen professionellen Risikobericht auf Deutsch.
-
-AUDIT-DATEN:
-${answers}
-
-Erstelle folgenden strukturierten Bericht:
-
-## RISIKOBEWERTUNG GESAMT
-[KRITISCH / HOCH / MITTEL / GERING] – kurze Begründung in 1-2 Sätzen
-
-## KRITISCHE LÜCKEN (sofort handeln)
-(Max. 3 wichtigste Punkte mit konkreter Maßnahme)
-
-## MITTELFRISTIGE MAßNAHMEN (1-3 Monate)
-(Max. 4 Punkte)
-
-## POSITIVE ASPEKTE
-(Was gut gemacht wird)
-
-## PRIORITÄTS-CHECKLISTE
-- [ ] Maßnahme 1 (Woche 1)
-- [ ] Maßnahme 2 (Monat 1)
-- [ ] Maßnahme 3 (Monat 2-3)
-
-## FAZIT
-(2 Sätze Zusammenfassung + Risikoeinschätzung)`;
+  const prompt = `Du bist ein IT-Security-Berater. Erstelle basierend auf diesem Sicherheits-Audit einen professionellen Risikobericht auf Deutsch.\n\nAUDIT-DATEN:\n${answers}\n\nErstelle folgenden strukturierten Bericht:\n\n## RISIKOBEWERTUNG GESAMT\n[KRITISCH / HOCH / MITTEL / GERING] – kurze Begründung in 1-2 Sätzen\n\n## KRITISCHE LÜCKEN (sofort handeln)\n(Max. 3 wichtigste Punkte mit konkreter Maßnahme)\n\n## MITTELFRISTIGE MAßNAHMEN (1-3 Monate)\n(Max. 4 Punkte)\n\n## POSITIVE ASPEKTE\n(Was gut gemacht wird)\n\n## PRIORITÄTS-CHECKLISTE\n- [ ] Maßnahme 1 (Woche 1)\n- [ ] Maßnahme 2 (Monat 1)\n- [ ] Maßnahme 3 (Monat 2-3)\n\n## FAZIT\n(2 Sätze Zusammenfassung + Risikoeinschätzung)`;
 
   try {
     const text = await askKI(prompt);
@@ -1030,22 +1072,7 @@ async function generatePolicy() {
   result.style.display = 'block';
   result.textContent = '📝 KI erstellt Passwort-Richtlinie…';
 
-  const prompt = `Erstelle eine professionelle, vollständige IT-Passwort-Richtlinie auf Deutsch für folgendes Unternehmen:
-
-Unternehmen: ${name}
-Branche: ${branche}
-Größe: ${groesse || 'nicht angegeben'}
-Systeme: ${systeme || 'Standard-Office-Umgebung'}
-Besondere Anforderungen: ${anforderungen || 'keine'}
-
-Die Richtlinie soll:
-- Professionell und rechtssicher formuliert sein
-- Konkrete Mindestanforderungen enthalten (Länge, Komplexität, Ablauf)
-- Passend zur Branche und Größe sein
-- Praktisch umsetzbar sein (auch für wenig technikaffine Mitarbeiter)
-- Einen Gültigkeitszeitraum und Verantwortlichkeiten nennen
-
-Format: Klare Abschnitte mit Nummerierung, direkt verwendbar als Word/PDF-Vorlage.`;
+  const prompt = `Erstelle eine professionelle, vollständige IT-Passwort-Richtlinie auf Deutsch für folgendes Unternehmen:\n\nUnternehmen: ${name}\nBranche: ${branche}\nGröße: ${groesse || 'nicht angegeben'}\nSysteme: ${systeme || 'Standard-Office-Umgebung'}\nBesondere Anforderungen: ${anforderungen || 'keine'}\n\nDie Richtlinie soll:\n- Professionell und rechtssicher formuliert sein\n- Konkrete Mindestanforderungen enthalten (Länge, Komplexität, Ablauf)\n- Passend zur Branche und Größe sein\n- Praktisch umsetzbar sein (auch für wenig technikaffine Mitarbeiter)\n- Einen Gültigkeitszeitraum und Verantwortlichkeiten nennen\n\nFormat: Klare Abschnitte mit Nummerierung, direkt verwendbar als Word/PDF-Vorlage.`;
 
   try {
     const text = await askKI(prompt);
