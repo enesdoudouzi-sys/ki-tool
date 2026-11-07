@@ -74,6 +74,19 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
 .hcheck-name{font-weight:600;font-size:13px}
 .hcheck-val{font-size:12px;color:var(--s-muted);font-family:"JetBrains Mono",monospace;word-break:break-all}
 .hcheck.pass{border-color:#16a34a}.hcheck.fail{border-color:#dc2626}.hcheck.warn{border-color:#d97706}.hcheck.info{border-color:#6366f1;opacity:.85}
+.massnahme{display:grid;grid-template-columns:28px 1fr auto;gap:8px 12px;align-items:start;padding:12px 14px;border-radius:8px;border-left:3px solid;margin-bottom:8px;background:var(--s-bg,#f8fafc)}
+.massnahme.prio-kritisch{border-color:#dc2626;background:#fff5f5}
+.massnahme.prio-warnung{border-color:#d97706;background:#fffbeb}
+.massnahme.prio-info{border-color:#6366f1;background:#f5f3ff}
+.massnahme-icon{font-size:18px;margin-top:1px}
+.massnahme-title{font-weight:600;font-size:13px;color:var(--s-text,#1e293b);margin-bottom:3px}
+.massnahme-desc{font-size:12px;color:var(--s-muted,#64748b);line-height:1.5}
+.massnahme-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap;align-self:start}
+.badge-sofort{background:#fee2e2;color:#991b1b}
+.badge-kurz{background:#fef3c7;color:#92400e}
+.badge-mittel{background:#ede9fe;color:#5b21b6}
+.massnahme-meta{grid-column:2;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.massnahme-tag{font-size:10px;padding:1px 6px;border-radius:8px;background:var(--s-border,#e2e8f0);color:var(--s-muted,#64748b)}
 
 /* AUDIT FORM */
 .audit-section{margin-bottom:24px}
@@ -215,6 +228,12 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
       <div id="wc-cat-dns"     style="margin-bottom:16px;display:none"><div class="sec-label">🔑 DNS-Sicherheit</div><div class="header-grid" id="wc-checks-dns"></div></div>
       <div id="wc-cat-info"    style="margin-bottom:16px;display:none"><div class="sec-label">🕵️ Informations-Leakage</div><div class="header-grid" id="wc-checks-info"></div></div>
       <div id="wc-cat-misc"    style="margin-bottom:16px;display:none"><div class="sec-label">📄 Standards &amp; Compliance</div><div class="header-grid" id="wc-checks-misc"></div></div>
+
+      <!-- Maßnahmenplan -->
+      <div id="wc-massnahmen" style="display:none;margin-bottom:16px">
+        <div class="sec-label">🎯 Empfohlene Maßnahmen</div>
+        <div id="wc-massnahmen-body"></div>
+      </div>
 
       <div id="wc-ai-rec" class="result-box" style="display:none"></div>
     </div>
@@ -843,6 +862,9 @@ async function checkWebsite() {
   renderChecks('wc-checks-info',    'wc-cat-info',    infoChecks);
   renderChecks('wc-checks-misc',    'wc-cat-misc',    miscChecks);
 
+  // ── MASSNAHMENPLAN ──
+  renderMassnahmen(allChecks, wafInfo, dnsAvail);
+
   // ── WAF / DNS Info-Banner ──
   { const infoEl = document.getElementById('wc-method-info');
     if (infoEl) {
@@ -882,6 +904,83 @@ async function checkWebsite() {
   btn.disabled = false;
 }
 
+// ===== MASSNAHMEN =====
+const MASSNAHMEN_DB = {
+  'HTTPS aktiv':                       { prio:'kritisch', icon:'🔒', badge:'sofort', zeit:'4–8h', schwer:'Mittel', aktion:'SSL/TLS-Zertifikat installieren (Let\'s Encrypt kostenlos)', detail:'Ohne HTTPS werden alle Daten unverschlüsselt übertragen. Hoster wie All-Inkl, Strato oder cPanel bieten 1-Klick-SSL.' },
+  'HTTP → HTTPS Redirect':             { prio:'kritisch', icon:'↩️', badge:'sofort', zeit:'30 Min', schwer:'Einfach', aktion:'301-Redirect von HTTP auf HTTPS aktivieren', detail:'In .htaccess: RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L] – oder im Nginx/Apache-Vhost.' },
+  'HSTS (Strict-Transport-Security)':  { prio:'kritisch', icon:'🔐', badge:'sofort', zeit:'1h', schwer:'Einfach', aktion:'Strict-Transport-Security Header mit min. 180 Tagen setzen', detail:'Header: Strict-Transport-Security: max-age=31536000; includeSubDomains – in Webserver-Config oder WAF.' },
+  'Content-Security-Policy (CSP)':     { prio:'kritisch', icon:'🛡️', badge:'kurz', zeit:'4–16h', schwer:'Komplex', aktion:'Content-Security-Policy Header implementieren', detail:'Startwert: Content-Security-Policy: default-src \'self\'; script-src \'self\' – dann schrittweise erweitern. CSP-Builder-Tool nutzen.' },
+  'HttpOnly Flag (Cookies)':           { prio:'kritisch', icon:'🍪', badge:'sofort', zeit:'1–2h', schwer:'Einfach', aktion:'HttpOnly-Flag für alle Session-Cookies setzen', detail:'In PHP: session_set_cookie_params([\'httponly\' => true]) oder Set-Cookie Header um ; HttpOnly ergänzen.' },
+  'Secure Flag (Cookies)':             { prio:'kritisch', icon:'🔑', badge:'sofort', zeit:'1h', schwer:'Einfach', aktion:'Secure-Flag für alle Cookies setzen', detail:'Stellt sicher dass Cookies nur über HTTPS übertragen werden. Set-Cookie: name=value; Secure; HttpOnly' },
+  'SPF (Sender Policy Framework)':     { prio:'kritisch', icon:'📧', badge:'sofort', zeit:'30 Min', schwer:'Einfach', aktion:'SPF-TXT-Eintrag im DNS setzen', detail:'DNS TXT: v=spf1 include:_spf.google.com -all (bei Google Workspace) oder passend zum E-Mail-Anbieter anpassen.' },
+  'DMARC (Domain-based Msg. Auth.)':   { prio:'kritisch', icon:'🛡️', badge:'kurz', zeit:'1–2h', schwer:'Mittel', aktion:'DMARC-Richtlinie mit p=reject im DNS setzen', detail:'DNS TXT _dmarc: v=DMARC1; p=reject; rua=mailto:dmarc@domain.de – zunächst p=none zum Monitoring, dann p=reject.' },
+  'DKIM (DomainKeys Identified Mail)': { prio:'kritisch', icon:'✉️', badge:'kurz', zeit:'1–4h', schwer:'Mittel', aktion:'DKIM-Schlüsselpaar generieren und DNS-Eintrag setzen', detail:'Beim E-Mail-Provider (Google, Microsoft 365, Hetzner) DKIM aktivieren → TXT-Eintrag ins DNS kopieren.' },
+  'X-Frame-Options / frame-ancestors': { prio:'warnung', icon:'🖼️', badge:'sofort', zeit:'30 Min', schwer:'Einfach', aktion:'X-Frame-Options: SAMEORIGIN Header setzen', detail:'Verhindert Clickjacking. In Webserver: Header always set X-Frame-Options "SAMEORIGIN"' },
+  'X-Content-Type-Options: nosniff':   { prio:'warnung', icon:'📄', badge:'sofort', zeit:'15 Min', schwer:'Einfach', aktion:'X-Content-Type-Options: nosniff Header setzen', detail:'Einzeilige Ergänzung in Webserver-Config: Header always set X-Content-Type-Options "nosniff"' },
+  'Referrer-Policy':                   { prio:'warnung', icon:'🔗', badge:'kurz', zeit:'15 Min', schwer:'Einfach', aktion:'Referrer-Policy: strict-origin-when-cross-origin setzen', detail:'Verhindert URL-Leakage. Header: Referrer-Policy: strict-origin-when-cross-origin' },
+  'Permissions-Policy':                { prio:'warnung', icon:'📱', badge:'kurz', zeit:'30 Min', schwer:'Einfach', aktion:'Permissions-Policy für Kamera/Mikrofon/Geolocation setzen', detail:'Deaktiviert ungenutzte Browser-APIs. Permissions-Policy: camera=(), microphone=(), geolocation=()' },
+  'SameSite Attribut (Cookies)':       { prio:'warnung', icon:'🍪', badge:'kurz', zeit:'1h', schwer:'Einfach', aktion:'SameSite=Strict oder Lax für alle Cookies setzen', detail:'Schützt vor CSRF-Angriffen. Set-Cookie: name=value; SameSite=Strict; Secure; HttpOnly' },
+  'DNSSEC (DS-Einträge)':             { prio:'warnung', icon:'🔑', badge:'mittel', zeit:'2–4h', schwer:'Mittel', aktion:'DNSSEC beim Domain-Registrar aktivieren', detail:'Beim Registrar (z.B. IONOS, Namecheap, Hetzner) DNSSEC aktivieren – schützt vor DNS-Hijacking.' },
+  'CAA (Certificate Authority Authorization)': { prio:'warnung', icon:'📜', badge:'kurz', zeit:'30 Min', schwer:'Einfach', aktion:'CAA-DNS-Eintrag setzen um SSL-Aussteller zu begrenzen', detail:'DNS CAA: 0 issue "letsencrypt.org" – erlaubt nur Let\'s Encrypt SSL-Zertifikate.' },
+  'security.txt (RFC 9116)':           { prio:'info', icon:'📋', badge:'kurz', zeit:'30 Min', schwer:'Einfach', aktion:'security.txt unter /.well-known/security.txt erstellen', detail:'Ermöglicht Sicherheitsforschern, Lücken zu melden. Pflicht bei BSI-Konformität.' },
+};
+
+function renderMassnahmen(allChecks, wafInfo, dnsAvail) {
+  const failed = allChecks.filter(c => !c.pass && !c.unverifiable);
+  if (!failed.length) return;
+
+  const wrap = document.getElementById('wc-massnahmen');
+  const body = document.getElementById('wc-massnahmen-body');
+  if (!wrap || !body) return;
+
+  const badgeLabel = { sofort:'🔴 Sofortmaßnahme', kurz:'🟡 Kurzfristig (< 4 Wochen)', mittel:'🟣 Mittelfristig (1–3 Monate)' };
+  const groups = { sofort:[], kurz:[], mittel:[], sonstige:[] };
+
+  failed.forEach(c => {
+    const m = MASSNAHMEN_DB[c.name];
+    if (m) groups[m.badge].push({ ...m, checkName:c.name, checkVal:c.value });
+    else groups.sonstige.push({ prio:'warnung', icon:'⚠️', badge:'kurz', zeit:'variabel', schwer:'Mittel',
+      aktion:c.name + ' beheben', detail:c.value, checkName:c.name, checkVal:c.value });
+  });
+
+  let html = '';
+  if (wafInfo?.detected) {
+    html += `<div style="padding:8px 12px;border-radius:8px;background:#ecfdf5;border-left:3px solid #16a34a;font-size:12px;color:#166534;margin-bottom:10px">
+      ✅ <strong>${wafInfo.name} erkannt</strong> – WAF/CDN bietet bereits Basisschutz gegen DDoS und bekannte Angriffe.
+    </div>`;
+  }
+  if (!dnsAvail) {
+    html += `<div style="padding:8px 12px;border-radius:8px;background:#eff6ff;border-left:3px solid #3b82f6;font-size:12px;color:#1e40af;margin-bottom:10px">
+      🔵 <strong>DNS nicht geprüft</strong> – SPF/DMARC/DKIM manuell über <a href="https://mxtoolbox.com" target="_blank" style="color:#1e40af">MXToolbox</a> prüfen.
+    </div>`;
+  }
+
+  ['sofort','kurz','mittel','sonstige'].forEach(badge => {
+    const items = groups[badge];
+    if (!items.length) return;
+    const label = badgeLabel[badge] || '⚠️ Weitere Maßnahmen';
+    html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--s-muted,#64748b);margin:14px 0 6px">${label}</div>`;
+    items.forEach(m => {
+      html += `<div class="massnahme prio-${m.prio}">
+        <div class="massnahme-icon">${m.icon}</div>
+        <div>
+          <div class="massnahme-title">${m.aktion}</div>
+          <div class="massnahme-desc">${m.detail}</div>
+          <div class="massnahme-meta">
+            <span class="massnahme-tag">⏱ ${m.zeit}</span>
+            <span class="massnahme-tag">🔧 ${m.schwer}</span>
+            <span class="massnahme-tag">📌 ${m.checkName}</span>
+          </div>
+        </div>
+        <span class="massnahme-badge badge-${m.badge}">${m.prio === 'kritisch' ? '🔴 Kritisch' : m.prio === 'warnung' ? '🟡 Warnung' : '🟣 Optional'}</span>
+      </div>`;
+    });
+  });
+
+  body.innerHTML = html;
+  wrap.style.display = 'block';
+}
+
 // ===== EXPORT HELPERS =====
 function buildReportText() {
   const d = window._wcScanData;
@@ -913,16 +1012,40 @@ function buildReportText() {
     lines.push(cat.label);
     lines.push('─────────────────────────────────────────────');
     el.querySelectorAll('.hcheck').forEach(row => {
-      const name  = row.querySelector('.hcheck-name')?.textContent || '';
-      const val   = row.querySelector('.hcheck-val')?.textContent  || '';
-      const tip   = row.querySelectorAll('div')[2]?.textContent     || '';
-      const icon  = row.querySelector('.hcheck-icon')?.textContent  || '';
+      const name = row.querySelector('.hcheck-name')?.textContent || '';
+      const val  = row.querySelector('.hcheck-val')?.textContent  || '';
+      const icon = row.querySelector('.hcheck-icon')?.textContent || '';
       lines.push(`${icon} ${name}`);
       lines.push(`   ${val}`);
-      if (tip.trim()) lines.push(`   → ${tip.replace('💡 ','')}`)
       lines.push('');
     });
   });
+
+  // Maßnahmenplan
+  const failedChecks = (d.allChecks||[]).filter(c=>!c.pass&&!c.unverifiable);
+  if (failedChecks.length) {
+    lines.push('─────────────────────────────────────────────');
+    lines.push('🎯 EMPFOHLENE MASSNAHMEN');
+    lines.push('─────────────────────────────────────────────');
+    const sofort = failedChecks.filter(c=>MASSNAHMEN_DB[c.name]?.badge==='sofort');
+    const kurz   = failedChecks.filter(c=>MASSNAHMEN_DB[c.name]?.badge==='kurz');
+    const rest   = failedChecks.filter(c=>!MASSNAHMEN_DB[c.name]||MASSNAHMEN_DB[c.name]?.badge==='mittel');
+    if (sofort.length) {
+      lines.push('🔴 SOFORTMASSNAHMEN:');
+      sofort.forEach((c,i)=>{ const m=MASSNAHMEN_DB[c.name]; lines.push(`  ${i+1}. ${m.aktion} (⏱ ${m.zeit})`); });
+      lines.push('');
+    }
+    if (kurz.length) {
+      lines.push('🟡 KURZFRISTIG (< 4 Wochen):');
+      kurz.forEach((c,i)=>{ const m=MASSNAHMEN_DB[c.name]; lines.push(`  ${i+1}. ${m.aktion} (⏱ ${m.zeit})`); });
+      lines.push('');
+    }
+    if (rest.length) {
+      lines.push('🟣 MITTELFRISTIG:');
+      rest.forEach((c,i)=>{ const m=MASSNAHMEN_DB[c.name]; lines.push(`  ${i+1}. ${m?m.aktion:c.name+' beheben'}`); });
+      lines.push('');
+    }
+  }
 
   if (d.aiRec && !d.aiRec.includes('KI erstellt')) {
     lines.push('─────────────────────────────────────────────');
