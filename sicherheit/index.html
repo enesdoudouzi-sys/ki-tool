@@ -552,6 +552,8 @@ async function checkWebsite() {
   if (!url.startsWith('http')) url = 'https://' + url;
   let domain;
   try { domain = new URL(url).hostname; } catch { alert('Ungültige URL.'); return; }
+  // DNS checks need apex domain (SPF/DMARC/MX are on technogym.com, not www.technogym.com)
+  const apexDomain = domain.replace(/^www\./, '');
 
   const btn = document.getElementById('wc-btn');
   btn.innerHTML = '<span class="spinner"></span> Prüfe 25+ Punkte…';
@@ -580,19 +582,19 @@ async function checkWebsite() {
     fetchHead('https://'+domain+'/sitemap.xml'),
   ]);
 
-  // ── PARALLEL DNS ──
+  // ── PARALLEL DNS (always on apex domain, never on www.) ──
   const [txtData, dmarcData, mxData, nsData, caaData, dsData,
          dkimGoogle, dkimDefault, dkimMail, dkimSelector1] = await Promise.all([
-    dnsQuery(domain, 'TXT'),
-    dnsQuery('_dmarc.'+domain, 'TXT'),
-    dnsQuery(domain, 'MX'),
-    dnsQuery(domain, 'NS'),
-    dnsQuery(domain, 'CAA'),
-    dnsQuery(domain, 'DS'),
-    dnsQuery('google._domainkey.'+domain, 'TXT'),
-    dnsQuery('default._domainkey.'+domain, 'TXT'),
-    dnsQuery('mail._domainkey.'+domain, 'TXT'),
-    dnsQuery('selector1._domainkey.'+domain, 'TXT'),
+    dnsQuery(apexDomain, 'TXT'),
+    dnsQuery('_dmarc.'+apexDomain, 'TXT'),
+    dnsQuery(apexDomain, 'MX'),
+    dnsQuery(apexDomain, 'NS'),
+    dnsQuery(apexDomain, 'CAA'),
+    dnsQuery(apexDomain, 'DS'),
+    dnsQuery('google._domainkey.'+apexDomain, 'TXT'),
+    dnsQuery('default._domainkey.'+apexDomain, 'TXT'),
+    dnsQuery('mail._domainkey.'+apexDomain, 'TXT'),
+    dnsQuery('selector1._domainkey.'+apexDomain, 'TXT'),
   ]);
 
   const h    = mainRes.headers;
@@ -872,7 +874,8 @@ async function checkWebsite() {
       if (wafInfo.detected) lines.push(`🛡️ <strong>${wafInfo.name} erkannt</strong> – Security-Header wurden hinter der WAF/CDN abgefragt. Header-Ergebnisse ohne direkten Server-Zugriff.`);
       if (!dnsAvail) lines.push(`🔵 <strong>DNS nicht erreichbar</strong> – SPF/DMARC/DKIM/CAA konnten nicht geprüft werden (beide DNS-Provider nicht verfügbar).`);
       else if (unvCount > 0 && dnsAvail) lines.push(`🔵 ${unvCount} Prüfpunkte als "nicht prüfbar" markiert (WAF/Verbindung – nicht als Fehler gewertet).`);
-      lines.push(`📋 <strong>Methodik:</strong> Externe Prüfung via CORS-Proxy · DNS-over-HTTPS (Cloudflare + Google) · Scan: ${new Date().toLocaleString('de-DE')} · Prüftiefe: Öffentlich zugängliche HTTP-Headers & DNS`);
+      const apexNote = domain !== apexDomain ? ` · DNS-Prüfung auf ${apexDomain}` : '';
+      lines.push(`📋 <strong>Methodik:</strong> Externe Prüfung via CORS-Proxy · DNS-over-HTTPS (Cloudflare + Google)${apexNote} · Scan: ${new Date().toLocaleString('de-DE')} · Prüftiefe: Öffentlich zugängliche HTTP-Headers & DNS`);
       infoEl.innerHTML = lines.join('<br>');
       infoEl.style.display = 'block';
     }
