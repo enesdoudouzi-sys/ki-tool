@@ -121,6 +121,31 @@ body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);backgrou
 .empty{text-align:center;padding:44px;color:var(--muted);font-size:14px}
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sec-hd h2{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0}
+.stats{grid-template-columns:repeat(5,1fr)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{cursor:pointer}.stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.stat-purple::before{background:linear-gradient(90deg,#9333ea,#c084fc)}.stat-purple .num{color:#9333ea}
+.prio{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:800;letter-spacing:.02em}
+.prio-dringend{background:#df1b41;color:#fff}
+.prio-normal{background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe}
+.prio-niedrig{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+.prio-spam{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;text-decoration:line-through}
+.email-item.is-dringend{box-shadow:inset 3px 0 0 #df1b41}
+.email-ai{font-size:12px;color:#5b21b6;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-ai::before{content:'✨ ';}
+.ai-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#faf5ff,#eef2ff);border:1px solid #ddd6fe;border-radius:14px;padding:12px 16px;font-size:13px}
+.ai-bar .left{display:flex;align-items:center;gap:10px;color:#4c1d95;font-weight:600}
+.ai-progress{height:6px;width:160px;background:#ede9fe;border-radius:999px;overflow:hidden}
+.ai-progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#635bff,#00d4aa);transition:width .3s}
+.ai-engine{font-size:11px;padding:2px 8px;border-radius:999px;background:#fff;border:1px solid #ddd6fe;color:#5b21b6;font-weight:700}
+.ki-settings{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:#14532d;text-align:left;margin-top:12px}
+.ki-settings input{width:100%;padding:9px 12px;border-radius:8px;border:1px solid #bbf7d0;font-size:12px;font-family:ui-monospace,monospace;background:#fff;color:#1a1f36;margin:8px 0;outline:none}
+.ki-settings a{color:#15803d;font-weight:700}
+.modal-bg{position:fixed;inset:0;background:rgba(10,37,64,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:16px;max-width:460px;width:100%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal h3{margin:0 0 6px;font-size:17px}
 </style>
 </head>
 <body>
@@ -161,6 +186,7 @@ body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);backgrou
         <span class="sub" id="tb-status">· Nicht verbunden</span>
       </div>
       <div class="tb-actions">
+        <button class="btn-icon" onclick="openKiSettings()" title="KI-Einstellungen">⚙️</button>
         <button class="btn-icon" onclick="refreshEmails()" id="refresh-btn" style="display:none" title="Aktualisieren">🔄</button>
         <button class="btn btn-s" onclick="signOut()" id="signout-btn" style="display:none">Abmelden</button>
         <a href="/ki-tool/" class="btn btn-s">← Zurück</a>
@@ -202,6 +228,7 @@ body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);backgrou
               5. Client-ID oben speichern → Anmelden
             </div>
           </div>
+          <div class="ki-settings" id="ki-settings-login"></div>
         </div>
       </div>
 
@@ -213,16 +240,27 @@ body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);backgrou
             <span style="font-size:12px;color:var(--muted)" id="last-sync"></span>
           </div>
           <div class="stats">
-            <div class="stat stat-red"><div class="lbl">Ungelesen</div><div class="num" id="stat-unread">–</div></div>
-            <div class="stat stat-amber"><div class="lbl">Job / Bewerbung</div><div class="num" id="stat-job">–</div></div>
-            <div class="stat stat-blue"><div class="lbl">Heute</div><div class="num" id="stat-heute">–</div></div>
-            <div class="stat stat-green"><div class="lbl">Geladen</div><div class="num" id="stat-gesamt">–</div></div>
+            <div class="stat stat-red" onclick="filterEmails('dringend',null)" title="Nur dringende anzeigen"><div class="lbl">🔥 Dringend</div><div class="num" id="stat-dringend">–</div></div>
+            <div class="stat stat-purple" onclick="filterEmails('handlung',null)" title="Nur Mails mit To-do anzeigen"><div class="lbl">✅ To-do</div><div class="num" id="stat-handlung">–</div></div>
+            <div class="stat stat-blue" onclick="filterEmails('unread',null)"><div class="lbl">Ungelesen</div><div class="num" id="stat-unread">–</div></div>
+            <div class="stat stat-amber" onclick="filterEmails('job',null)"><div class="lbl">Job / Bewerbung</div><div class="num" id="stat-job">–</div></div>
+            <div class="stat stat-green" onclick="filterEmails('alle',null)"><div class="lbl">Heute / Geladen</div><div class="num"><span id="stat-heute">–</span><span style="font-size:16px;color:var(--muted)"> / <span id="stat-gesamt">–</span></span></div></div>
+          </div>
+        </div>
+        <div class="ai-bar" id="ai-bar">
+          <div class="left"><span id="ai-bar-icon">✨</span><span id="ai-bar-text">KI-Bewertung startet nach dem Laden automatisch</span></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="ai-progress"><i id="ai-progress"></i></div>
+            <span class="ai-engine" id="ai-engine">–</span>
+            <button class="btn btn-s" onclick="triageAll(true)" style="font-size:12px;padding:5px 12px">Neu bewerten</button>
           </div>
         </div>
         <div>
           <div class="sec-hd" style="margin-bottom:10px"><h2>Filter</h2></div>
           <div class="filter-row">
             <button class="filter-tab active" onclick="filterEmails('alle',this)">Alle</button>
+            <button class="filter-tab" onclick="filterEmails('dringend',this)">🔥 Dringend</button>
+            <button class="filter-tab" onclick="filterEmails('handlung',this)">✅ To-do</button>
             <button class="filter-tab" onclick="filterEmails('unread',this)">🔵 Ungelesen</button>
             <button class="filter-tab" onclick="filterEmails('wichtig',this)">⭐ Wichtig</button>
             <button class="filter-tab" onclick="filterEmails('job',this)">💼 Job</button>
@@ -262,12 +300,23 @@ body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--ink);backgrou
   </div>
 </div>
 
+<div class="modal-bg" id="ki-modal" onclick="if(event.target===this)closeKiSettings()">
+  <div class="modal">
+    <h3>⚙️ KI-Einstellungen</h3>
+    <div class="ki-settings" id="ki-settings-modal" style="margin-top:8px"></div>
+    <div style="text-align:right;margin-top:14px"><button class="btn btn-s" onclick="closeKiSettings()">Schließen</button></div>
+  </div>
+</div>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 const PROXY='https://ki-proxy.enesdoudouzi.workers.dev';
 const SCOPES='https://www.googleapis.com/auth/gmail.readonly';
 const GMAIL_API='https://gmail.googleapis.com/gmail/v1';
 const MY_EMAIL='enesdoudouzi@gmail.com';
+const GEMINI_API='https://generativelanguage.googleapis.com/v1beta/models/';
+const GEMINI_MODEL_DEFAULT='gemini-2.5-flash';
+const TRIAGE_CACHE_KEY='mail_triage_v1';
 
 let accessToken=null,emailCache=[],nextPageToken=null,currentFilter='alle',currentEmail=null;
 
@@ -278,6 +327,119 @@ function saveClientId(){
   localStorage.setItem('gmail_client_id',v);
   document.getElementById('setup-notice').innerHTML='<strong>✅ Gespeichert!</strong> Jetzt anmelden.';
 }
+
+// ── KI: Google Gemini (eigener API-Key, nur im Browser gespeichert) oder Fallback auf den Proxy ──
+function getGeminiKey(){return localStorage.getItem('gemini_api_key')||'';}
+function getGeminiModel(){return localStorage.getItem('gemini_model')||GEMINI_MODEL_DEFAULT;}
+function kiEngineLabel(){return getGeminiKey()?'Gemini · '+getGeminiModel():'Llama (Proxy)';}
+function renderKiSettings(){
+  const has=!!getGeminiKey();
+  const html=`<strong>✨ Google Gemini als KI</strong> ${has?'– <b>aktiv ✅</b>':'– optional'}<br>
+    Kostenlosen API-Key holen: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> → „API-Schlüssel erstellen“.
+    <input type="password" id="gemini-key-input" placeholder="${has?'•••••••• (gespeichert)':'AIza…'}" autocomplete="off">
+    <input type="text" id="gemini-model-input" value="${esc(getGeminiModel())}" title="Modell" style="margin-top:0">
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" onclick="saveGemini()" style="flex:1;justify-content:center">Speichern</button>
+      ${has?'<button class="btn btn-s" onclick="clearGemini()">Entfernen</button>':''}
+    </div>
+    <div style="font-size:11.5px;margin-top:8px;color:#166534">Der Schlüssel bleibt nur in diesem Browser. Für die Bewertung werden Absender, Betreff und Vorschautext an Google Gemini gesendet. Ohne Schlüssel nutzt das Dashboard den bisherigen KI-Proxy.</div>`;
+  ['ki-settings-login','ki-settings-modal'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+}
+function saveGemini(){
+  const scope=document.getElementById('ki-modal').classList.contains('open')?document.getElementById('ki-settings-modal'):document.getElementById('ki-settings-login');
+  const k=scope.querySelector('#gemini-key-input').value.trim();
+  const m=scope.querySelector('#gemini-model-input').value.trim()||GEMINI_MODEL_DEFAULT;
+  if(k){
+    if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){alert('Das sieht nicht wie ein Gemini-API-Key aus (beginnt mit „AIza…“).');return;}
+    localStorage.setItem('gemini_api_key',k);
+  }
+  localStorage.setItem('gemini_model',m);
+  localStorage.removeItem(TRIAGE_CACHE_KEY);
+  renderKiSettings();setEngineLabel();
+  if(accessToken&&emailCache.length)triageAll(true);
+}
+function clearGemini(){localStorage.removeItem('gemini_api_key');localStorage.removeItem(TRIAGE_CACHE_KEY);renderKiSettings();setEngineLabel();}
+function openKiSettings(){renderKiSettings();document.getElementById('ki-modal').classList.add('open');}
+function closeKiSettings(){document.getElementById('ki-modal').classList.remove('open');}
+function setEngineLabel(){const e=document.getElementById('ai-engine');if(e)e.textContent=kiEngineLabel();}
+
+// Ein Aufruf an die KI. json=true → Antwort als JSON erzwingen (Gemini) bzw. aus dem Text herauslösen (Proxy).
+async function aiCall(prompt,{json=false,maxTokens=600}={}){
+  const key=getGeminiKey();
+  if(key){
+    const r=await fetch(GEMINI_API+encodeURIComponent(getGeminiModel())+':generateContent',{
+      method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
+        generationConfig:Object.assign({temperature:0.2,maxOutputTokens:maxTokens},json?{responseMimeType:'application/json'}:{})})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error('Gemini '+r.status+(d.error?.message?': '+d.error.message:''));
+    const t=(d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+    if(!t)throw new Error('Gemini: leere Antwort');
+    return json?parseJsonLoose(t):t;
+  }
+  const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:maxTokens,temperature:0.2})});
+  if(!r.ok)throw new Error('KI-Proxy '+r.status);
+  const d=await r.json();
+  const t=d.choices?.[0]?.message?.content||'';
+  return json?parseJsonLoose(t):t;
+}
+function parseJsonLoose(t){
+  try{return JSON.parse(t);}catch{}
+  const m=t.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+  if(m){try{return JSON.parse(m[0]);}catch{}}
+  throw new Error('KI-Antwort war kein gültiges JSON');
+}
+
+// ── Automatische Bewertung aller geladenen Mails (in Paketen, Ergebnis wird pro Mail gecacht) ──
+function loadTriageCache(){try{return JSON.parse(localStorage.getItem(TRIAGE_CACHE_KEY)||'{}');}catch{return {};}}
+function saveTriageCache(c){
+  const keys=Object.keys(c);
+  if(keys.length>400)keys.slice(0,keys.length-400).forEach(k=>delete c[k]);
+  try{localStorage.setItem(TRIAGE_CACHE_KEY,JSON.stringify(c));}catch{}
+}
+const PRIOS=['dringend','normal','niedrig','spam'],CATS=['job','wichtig','social','werbung','updates'];
+let triageRunning=false;
+async function triageAll(force=false){
+  if(triageRunning||!emailCache.length)return;
+  triageRunning=true;setEngineLabel();
+  const cache=force?{}:loadTriageCache();
+  emailCache.forEach(e=>{if(cache[e.id])applyTriage(e,cache[e.id]);});
+  const todo=emailCache.filter(e=>!cache[e.id]);
+  const bar=document.getElementById('ai-progress'),txt=document.getElementById('ai-bar-text'),ic=document.getElementById('ai-bar-icon');
+  let done=emailCache.length-todo.length;
+  const total=emailCache.length;
+  const upd=()=>{bar.style.width=Math.round(done/total*100)+'%';};
+  upd();renderEmails();updateStats();
+  if(!todo.length){txt.textContent='Alle '+total+' Mails sind KI-bewertet';ic.textContent='✅';triageRunning=false;return;}
+  ic.innerHTML='<span class="spin"></span>';
+  const BATCH=10;
+  try{
+    for(let i=0;i<todo.length;i+=BATCH){
+      const chunk=todo.slice(i,i+BATCH);
+      txt.textContent='KI bewertet Mails… '+done+' / '+total;
+      const list=chunk.map(e=>({id:e.id,von:e.senderName+' <'+e.senderEmail+'>',betreff:e.subject,vorschau:e.snippet.substring(0,300)}));
+      const prompt='Du bist ein E-Mail-Assistent für Enes Doudouzi (Disponent/Logistik, sucht u. a. einen neuen Job). '+
+        'Bewerte JEDE der folgenden E-Mails. Antworte NUR mit einem JSON-Array, ein Objekt pro Mail, in derselben Reihenfolge:\n'+
+        '[{"id":"…","prio":"dringend|normal|niedrig|spam","kat":"job|wichtig|social|werbung|updates","todo":true|false,"kurz":"max. 12 Wörter auf Deutsch, was die Mail will"}]\n'+
+        'Regeln: dringend = Frist, Termin, Rechnung/Mahnung, Rückfrage von Arbeitgeber/Behörde/Kunde. job = Bewerbung, Stellenangebot, Vorstellungsgespräch. '+
+        'werbung = Newsletter/Angebote. spam = Betrug/Phishing. todo = true, wenn Enes antworten oder etwas tun muss.\n\nE-Mails:\n'+JSON.stringify(list);
+      const res=await aiCall(prompt,{json:true,maxTokens:1400});
+      const arr=Array.isArray(res)?res:(res.mails||res.emails||res.items||[]);
+      chunk.forEach((e,j)=>{
+        const r=arr.find(x=>x&&x.id===e.id)||arr[j];
+        if(!r)return;
+        const t={prio:PRIOS.includes(r.prio)?r.prio:'normal',kat:CATS.includes(r.kat)?r.kat:e.cat,todo:!!r.todo,kurz:String(r.kurz||'').slice(0,140)};
+        cache[e.id]=t;applyTriage(e,t);
+      });
+      done+=chunk.length;upd();saveTriageCache(cache);renderEmails();updateStats();
+    }
+    txt.textContent='Alle '+total+' Mails sind KI-bewertet';ic.textContent='✅';
+  }catch(err){
+    txt.textContent='⚠️ KI-Bewertung gestoppt: '+err.message;ic.textContent='⚠️';
+  }finally{triageRunning=false;}
+}
+function applyTriage(e,t){e.prio=t.prio;e.todo=t.todo;e.kurz=t.kurz;if(t.kat)e.cat=t.kat;}
 
 function signInWithGoogle(){
   const id=getClientId();
@@ -336,6 +498,7 @@ async function loadEmails(reset=true){
     const parsed=details.map(parseMsg);
     emailCache=reset?parsed:[...emailCache,...parsed];
     updateStats();renderEmails();
+    triageAll(false);
     document.getElementById('load-more-btn').style.display=nextPageToken?'inline-flex':'none';
     document.getElementById('last-sync').textContent='Sync '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
   }catch(e){document.getElementById('email-list').innerHTML='<div class="empty">⚠️ '+e.message+'</div>';}
@@ -368,23 +531,28 @@ function parseMsg(msg){
 function renderEmails(){
   let items=emailCache;
   if(currentFilter==='unread')items=items.filter(e=>e.isUnread);
+  else if(currentFilter==='dringend')items=items.filter(e=>e.prio==='dringend');
+  else if(currentFilter==='handlung')items=items.filter(e=>e.todo);
   else if(currentFilter!=='alle')items=items.filter(e=>e.cat===currentFilter);
+  const rank={dringend:0,normal:1,niedrig:2,spam:3};
+  items=[...items].sort((a,b)=>((rank[a.prio]??1)-(rank[b.prio]??1))||(b.date-a.date));
   if(!items.length){document.getElementById('email-list').innerHTML='<div class="empty">Keine E-Mails in dieser Kategorie.</div>';return;}
   document.getElementById('email-list').innerHTML=items.map(e=>`
-    <div class="email-item${e.isUnread?' unread':''}" onclick="openEmail('${e.id}')">
+    <div class="email-item${e.isUnread?' unread':''}${e.prio==='dringend'?' is-dringend':''}" onclick="openEmail('${e.id}')">
       ${e.isUnread?'<div class="unread-dot"></div>':'<div style="width:8px;flex-shrink:0"></div>'}
       <div class="email-avatar" style="background:${e.color}">${(e.senderName[0]||'?').toUpperCase()}</div>
       <div class="email-body">
         <div class="email-from">${esc(e.senderName)}</div>
         <div class="email-subject">${esc(e.subject)}</div>
-        <div class="email-snippet">${esc(e.snippet.substring(0,110))}</div>
+        ${e.kurz?`<div class="email-ai">${esc(e.kurz)}${e.todo?' · <b>To-do</b>':''}</div>`:`<div class="email-snippet">${esc(e.snippet.substring(0,110))}</div>`}
       </div>
       <div class="email-meta">
         <span class="email-time">${e.timeStr}</span>
-        <span class="email-cat cat-${e.cat}">${catLbl(e.cat)}</span>
+        <div style="display:flex;gap:4px">${e.prio?`<span class="prio prio-${e.prio}">${prioLbl(e.prio)}</span>`:''}<span class="email-cat cat-${e.cat}">${catLbl(e.cat)}</span></div>
       </div>
     </div>`).join('');
 }
+function prioLbl(p){return{dringend:'🔥 Dringend',normal:'Normal',niedrig:'Niedrig',spam:'Spam'}[p]||p;}
 function catLbl(c){return{job:'💼 Job',werbung:'🛒 Werbung',social:'👤 Social',wichtig:'⭐ Wichtig',updates:'📋 Updates'}[c]||c;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -394,13 +562,14 @@ function updateStats(){
   document.getElementById('stat-job').textContent=emailCache.filter(e=>e.cat==='job').length;
   document.getElementById('stat-heute').textContent=emailCache.filter(e=>e.date.toDateString()===new Date().toDateString()).length;
   document.getElementById('stat-gesamt').textContent=emailCache.length;
+  document.getElementById('stat-dringend').textContent=emailCache.some(e=>e.prio)?emailCache.filter(e=>e.prio==='dringend').length:'–';
+  document.getElementById('stat-handlung').textContent=emailCache.some(e=>e.prio)?emailCache.filter(e=>e.todo).length:'–';
   document.getElementById('sb-unread-count').textContent=u||'–';
 }
 
 function filterEmails(cat,btn){
   currentFilter=cat;
-  document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.filter-tab').forEach(b=>{b.classList.toggle('active',btn?b===btn:(b.getAttribute('onclick')||'').includes("'"+cat+"'"));});
   renderEmails();
 }
 function setFilter(cat,btn){
@@ -444,17 +613,16 @@ async function summarizeEmail(){
   const ab=document.getElementById('ai-summary');
   ab.style.display='block';ab.className='ai-box loading';ab.textContent='🤖 Analysiere E-Mail…';
   const body=(currentEmail._body||currentEmail.snippet).substring(0,2000);
-  const prompt='Analysiere diese E-Mail professionell auf Deutsch.\n\nVon: '+currentEmail.senderName+' <'+currentEmail.senderEmail+'>\nBetreff: '+currentEmail.subject+'\n\n'+body+'\n\nFormat:\n**PRIORITÄT:** Dringend / Normal / Niedrig / Spam\n**ZUSAMMENFASSUNG:** (2-3 Sätze)\n**HANDLUNG:** Ja/Nein – wenn ja, was?\n**KATEGORIE:** Job / Wichtig / Social / Werbung / Updates';
+  const prompt='Analysiere diese E-Mail professionell auf Deutsch.\n\nVon: '+currentEmail.senderName+' <'+currentEmail.senderEmail+'>\nBetreff: '+currentEmail.subject+'\n\n'+body+'\n\nFormat:\n**PRIORITÄT:** Dringend / Normal / Niedrig / Spam\n**ZUSAMMENFASSUNG:** (2-3 Sätze)\n**HANDLUNG:** Ja/Nein – wenn ja, was?\n**KATEGORIE:** Job / Wichtig / Social / Werbung / Updates\n**ANTWORT-VORSCHLAG:** (falls eine Antwort nötig ist, 2-4 Sätze, höflich)';
   try{
-    const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:380,temperature:0.2})});
-    const d=await r.json();
-    ab.textContent='🤖 KI-Analyse:\n\n'+(d.choices?.[0]?.message?.content||'–');
+    const t=await aiCall(prompt,{maxTokens:500});
+    ab.textContent='🤖 KI-Analyse ('+kiEngineLabel()+'):\n\n'+(t||'–');
     ab.className='ai-box';
   }catch(e){ab.textContent='⚠️ Fehler: '+e.message;ab.className='ai-box';}
 }
 
 window.addEventListener('load',()=>{
+  renderKiSettings();setEngineLabel();
   const saved=getClientId();
   if(saved){
     document.getElementById('client-id-input').value=saved;
