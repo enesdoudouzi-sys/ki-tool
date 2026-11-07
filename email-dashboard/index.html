@@ -336,7 +336,7 @@ function renderKiSettings(){
   const has=!!getGeminiKey();
   const html=`<strong>✨ Google Gemini als KI</strong> ${has?'– <b>aktiv ✅</b>':'– optional'}<br>
     Kostenlosen API-Key holen: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> → „API-Schlüssel erstellen“.
-    <input type="password" id="gemini-key-input" placeholder="${has?'•••••••• (gespeichert)':'AIza…'}" autocomplete="off">
+    <input type="password" id="gemini-key-input" placeholder="${has?'•••••••• (gespeichert)':'AIza… oder AQ.…'}" autocomplete="off">
     <input type="text" id="gemini-model-input" value="${esc(getGeminiModel())}" title="Modell" style="margin-top:0">
     <div style="display:flex;gap:8px">
       <button class="btn btn-p" onclick="saveGemini()" style="flex:1;justify-content:center">Speichern</button>
@@ -350,7 +350,7 @@ function saveGemini(){
   const k=scope.querySelector('#gemini-key-input').value.trim();
   const m=scope.querySelector('#gemini-model-input').value.trim()||GEMINI_MODEL_DEFAULT;
   if(k){
-    if(!/^AIza[0-9A-Za-z_\-]{20,}$/.test(k)){alert('Das sieht nicht wie ein Gemini-API-Key aus (beginnt mit „AIza…“).');return;}
+    if(!/^(AIza[0-9A-Za-z_\-]{20,}|AQ\.[0-9A-Za-z_.\-]{20,})$/.test(k)){alert('Das sieht nicht wie ein Gemini-API-Key aus (beginnt mit „AIza…“ oder „AQ.…“).');return;}
     localStorage.setItem('gemini_api_key',k);
   }
   localStorage.setItem('gemini_model',m);
