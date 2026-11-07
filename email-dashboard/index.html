@@ -377,10 +377,24 @@ async function aiCall(prompt,{json=false,maxTokens=600}={}){
     if(!t)throw new Error('Gemini: leere Antwort');
     return json?parseJsonLoose(t):t;
   }
-  const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:maxTokens,temperature:0.2})});
-  if(!r.ok)throw new Error('KI-Proxy '+r.status);
-  const d=await r.json();
+  let r,d;
+  // Freie Kontingente sind knapp (Tokens pro Minute): bei 429/413 kurz warten und erneut versuchen
+  for(let attempt=0;attempt<4;attempt++){
+    r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:maxTokens,temperature:0.2})});
+    d=await r.json().catch(()=>({}));
+    if(r.ok)break;
+    if((r.status===429||r.status===413)&&attempt<3){
+      const wait=Math.min(30,Number(r.headers.get('retry-after'))||(attempt+1)*8);
+      const t=document.getElementById('ai-bar-text');if(t)t.textContent='⏳ KI-Limit erreicht – warte '+wait+' s…';
+      await new Promise(res=>setTimeout(res,wait*1000));continue;
+    }
+    break;
+  }
+  if(!r.ok){
+    const msg=(d.error&&(d.error.message||d.error))||d.message||'';
+    throw new Error('KI-Proxy '+r.status+(msg?': '+String(msg).slice(0,140):'')+(r.status===429||r.status===413?' – Tipp: Gemini-Schlüssel unter ⚙️ eintragen':''));
+  }
   const t=d.choices?.[0]?.message?.content||'';
   return json?parseJsonLoose(t):t;
 }
@@ -413,18 +427,18 @@ async function triageAll(force=false){
   upd();renderEmails();updateStats();
   if(!todo.length){txt.textContent='Alle '+total+' Mails sind KI-bewertet';ic.textContent='✅';triageRunning=false;return;}
   ic.innerHTML='<span class="spin"></span>';
-  const BATCH=10;
+  const BATCH=getGeminiKey()?10:4; // Proxy (Groq-Gratis-Kontingent) verträgt nur kleine Pakete
   try{
     for(let i=0;i<todo.length;i+=BATCH){
       const chunk=todo.slice(i,i+BATCH);
       txt.textContent='KI bewertet Mails… '+done+' / '+total;
-      const list=chunk.map(e=>({id:e.id,von:e.senderName+' <'+e.senderEmail+'>',betreff:e.subject,vorschau:e.snippet.substring(0,300)}));
+      const list=chunk.map(e=>({id:e.id,von:e.senderName+' <'+e.senderEmail+'>',betreff:e.subject,vorschau:e.snippet.substring(0,getGeminiKey()?300:160)}));
       const prompt='Du bist ein E-Mail-Assistent für Enes Doudouzi (Disponent/Logistik, sucht u. a. einen neuen Job). '+
         'Bewerte JEDE der folgenden E-Mails. Antworte NUR mit einem JSON-Array, ein Objekt pro Mail, in derselben Reihenfolge:\n'+
         '[{"id":"…","prio":"dringend|normal|niedrig|spam","kat":"job|wichtig|social|werbung|updates","todo":true|false,"kurz":"max. 12 Wörter auf Deutsch, was die Mail will"}]\n'+
         'Regeln: dringend = Frist, Termin, Rechnung/Mahnung, Rückfrage von Arbeitgeber/Behörde/Kunde. job = Bewerbung, Stellenangebot, Vorstellungsgespräch. '+
         'werbung = Newsletter/Angebote. spam = Betrug/Phishing. todo = true, wenn Enes antworten oder etwas tun muss.\n\nE-Mails:\n'+JSON.stringify(list);
-      const res=await aiCall(prompt,{json:true,maxTokens:1400});
+      const res=await aiCall(prompt,{json:true,maxTokens:getGeminiKey()?1400:120*chunk.length});
       const arr=Array.isArray(res)?res:(res.mails||res.emails||res.items||[]);
       chunk.forEach((e,j)=>{
         const r=arr.find(x=>x&&x.id===e.id)||arr[j];
