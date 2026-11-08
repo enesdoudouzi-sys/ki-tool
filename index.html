@@ -24,7 +24,7 @@
 <meta name="description" content="KI-Tools für Unternehmen von Doudouzi & Ergün: E-Mail Dashboard, Prozess-Check, Logistik-KI, Gastro-Paket, Angebots-Generator – kostenlos, direkt im Browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#ffffff; --bg2:#fbfbfc; --ink:#0f1115; --ink-2:#2b2f36; --muted:#6b7280;
@@ -55,22 +55,39 @@
   @media(max-width:640px){ .nav a:not(.cta){display:none} }
   @media(max-width:720px){ .ueber-grid{grid-template-columns:1fr !important} }
 
-  /* Hero */
-  .hero{padding:96px 0 72px;text-align:center;position:relative;overflow:hidden}
-  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 0%, rgba(99,91,255,.08), transparent 70%);pointer-events:none}
-  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--accent);
-    background:var(--accent-soft);border:1px solid rgba(99,91,255,.28);border-radius:999px;padding:5px 13px;margin-bottom:26px}
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-2)}
-  h1{font-size:clamp(34px,6vw,60px);line-height:1.05;margin:0 auto 20px;font-weight:600;letter-spacing:-.035em;max-width:760px;color:var(--ink)}
-  .lead{font-size:clamp(16px,2.2vw,19px);color:var(--muted);max-width:560px;margin:0 auto 34px;font-weight:400}
+  /* Hero – Nacht-Skyline */
+  .hero{position:relative;overflow:hidden;min-height:520px;display:flex;flex-direction:column}
+  .hero-sky{position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 50% 40% at 20% 15%,rgba(99,102,241,.22),transparent 50%),
+      radial-gradient(ellipse 40% 30% at 75% 10%,rgba(37,99,235,.18),transparent 45%),
+      linear-gradient(to bottom,#03060f 0%,#060c1e 20%,#0a1230 35%,#0d1840 48%,#0a1230 55%,#0d0f14 56%,#0d0f14 100%)}
+  .hero-overlay{position:absolute;inset:0;
+    background:linear-gradient(to bottom,transparent 30%,rgba(5,8,18,.65) 68%,rgba(5,8,18,.88) 100%);z-index:3}
+  .hero-content{position:relative;z-index:5;text-align:center;padding:72px 0 48px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .hero-stars{position:absolute;top:0;left:0;right:0;height:55%;z-index:1;pointer-events:none}
+  .hero-skyline{position:absolute;bottom:0;left:0;width:100%;z-index:2;pointer-events:none}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 14px;margin-bottom:22px}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#818cf8}
+  h1{font-family:"Syne","Inter",system-ui,sans-serif;font-size:clamp(32px,5.5vw,56px);line-height:1.07;margin:0 auto 18px;font-weight:800;letter-spacing:-.04em;max-width:720px;color:#fff;text-wrap:balance}
+  h1 .hl{background:linear-gradient(135deg,#818cf8,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .lead{font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.68);max-width:540px;margin:0 auto 30px;font-weight:400;line-height:1.65}
   .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;border-radius:10px;padding:12px 22px;transition:.15s;border:1px solid transparent}
-  .btn-dark{background:var(--ink);color:var(--bg)}
-  .btn-dark:hover{opacity:.9;transform:translateY(-1px)}
-  .btn-ghost{background:var(--bg2);color:var(--ink);border-color:var(--line-2)}
-  .btn-ghost:hover{border-color:#c9cbd1;background:var(--bg2)}
-  .trust{margin-top:34px;display:flex;gap:22px;justify-content:center;flex-wrap:wrap;color:var(--muted);font-size:13px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;border-radius:10px;padding:12px 22px;transition:.15s;border:1px solid transparent}
+  .btn-dark{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 4px 18px rgba(99,102,241,.38)}
+  .btn-dark:hover{opacity:.92;transform:translateY(-1px)}
+  .btn-ghost{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.22);backdrop-filter:blur(6px)}
+  .btn-ghost:hover{background:rgba(255,255,255,.16)}
+  .trust{margin-top:28px;display:flex;gap:22px;justify-content:center;flex-wrap:wrap;color:rgba(255,255,255,.6);font-size:13px}
   .trust span{display:inline-flex;align-items:center;gap:6px}
+  /* Stat-Leiste */
+  .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+  .hero-stat{padding:16px 20px;border-right:1px solid var(--line);text-align:center}
+  .hero-stat:last-child{border-right:none}
+  .hero-stat .n{font-size:24px;font-weight:800;color:#6366f1;letter-spacing:-.02em}
+  .hero-stat .l{font-size:12px;color:var(--muted);margin-top:3px}
+  @media(max-width:600px){.hero-stats{grid-template-columns:1fr 1fr}.hero-stat:nth-child(2){border-right:none}.hero-stat:nth-child(3){border-top:1px solid var(--line)}}
 
   /* Section */
   .section{padding:40px 0 20px}
@@ -136,18 +153,79 @@
   </div>
 
   <header class="hero">
-    <div class="wrap">
-      <span class="eyebrow"><span class="dot"></span> <span data-i18n="hero.eyebrow">KI-Werkzeuge für Unternehmen</span></span>
-      <h1 data-i18n="hero.h1">KI-Tools, die Unternehmen wirklich voranbringen.</h1>
-      <p class="lead" data-i18n="hero.lead">E-Mail-Management, Prozessoptimierung, Logistik, Gastro & Angebote – alles per KI, direkt im Browser, ohne Installation.</p>
-      <div class="cta-row">
-        <a class="btn btn-dark" href="/ki-tool/email-dashboard/"><span data-i18n="hero.cta1">E-Mail Dashboard starten</span> <span>→</span></a>
-        <a class="btn btn-ghost" href="#tools" data-i18n="hero.cta2">Alle Tools ansehen</a>
+    <!-- Nachthimmel -->
+    <div class="hero-sky"></div>
+    <!-- Sterne -->
+    <svg class="hero-stars" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="45" cy="30" r="1.2" fill="rgba(255,255,255,.8)"/><circle cx="120" cy="15" r=".9" fill="rgba(255,255,255,.6)"/>
+      <circle cx="210" cy="45" r="1.4" fill="rgba(255,255,255,.9)"/><circle cx="310" cy="20" r=".8" fill="rgba(255,255,255,.7)"/>
+      <circle cx="420" cy="35" r="1.1" fill="rgba(255,255,255,.75)"/><circle cx="530" cy="12" r=".9" fill="rgba(255,255,255,.65)"/>
+      <circle cx="640" cy="40" r="1.3" fill="rgba(255,255,255,.85)"/><circle cx="740" cy="22" r="1" fill="rgba(255,255,255,.7)"/>
+      <circle cx="850" cy="38" r=".8" fill="rgba(255,255,255,.6)"/><circle cx="950" cy="18" r="1.2" fill="rgba(255,255,255,.8)"/>
+      <circle cx="80" cy="60" r=".8" fill="rgba(255,255,255,.5)"/><circle cx="180" cy="75" r="1" fill="rgba(255,255,255,.65)"/>
+      <circle cx="280" cy="55" r=".7" fill="rgba(255,255,255,.55)"/><circle cx="380" cy="80" r="1.1" fill="rgba(255,255,255,.7)"/>
+      <circle cx="480" cy="65" r=".9" fill="rgba(255,255,255,.6)"/><circle cx="580" cy="85" r="1.2" fill="rgba(255,255,255,.75)"/>
+      <circle cx="680" cy="58" r=".8" fill="rgba(255,255,255,.55)"/><circle cx="780" cy="72" r="1" fill="rgba(255,255,255,.65)"/>
+      <circle cx="880" cy="62" r=".7" fill="rgba(255,255,255,.5)"/><circle cx="980" cy="78" r="1.1" fill="rgba(255,255,255,.7)"/>
+      <circle cx="1050" cy="30" r="1.2" fill="rgba(255,255,255,.75)"/><circle cx="1150" cy="50" r=".9" fill="rgba(255,255,255,.6)"/>
+      <circle cx="1100" cy="15" r=".8" fill="rgba(255,255,255,.8)"/><circle cx="1180" cy="70" r="1.1" fill="rgba(255,255,255,.65)"/>
+      <!-- Mond -->
+      <circle cx="1050" cy="55" r="24" fill="#fffde7" opacity=".92"/>
+      <circle cx="1042" cy="49" r="24" fill="#031630" opacity=".35"/>
+    </svg>
+    <!-- Nacht-Skyline -->
+    <svg class="hero-skyline" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="250" width="1200" height="30" fill="#040d20" opacity=".95"/>
+      <rect x="0" y="248" width="1200" height="4" fill="rgba(100,140,220,.15)"/>
+      <rect x="0" y="160" width="55" height="90" fill="#030b1e"/><rect x="6" y="168" width="8" height="6" fill="rgba(255,220,80,.35)"/><rect x="18" y="175" width="8" height="6" fill="rgba(255,220,80,.18)"/><rect x="30" y="168" width="8" height="6" fill="rgba(100,180,255,.3)"/>
+      <rect x="50" y="110" width="65" height="140" fill="#040d22"/><rect x="54" y="118" width="10" height="8" fill="rgba(255,220,80,.4)"/><rect x="68" y="126" width="10" height="8" fill="rgba(255,220,80,.2)"/><rect x="82" y="118" width="10" height="8" fill="rgba(100,180,255,.35)"/><rect x="96" y="126" width="10" height="8" fill="rgba(255,220,80,.25)"/><rect x="54" y="142" width="10" height="8" fill="rgba(255,220,80,.18)"/><rect x="68" y="150" width="10" height="8" fill="rgba(100,180,255,.28)"/><rect x="82" y="142" width="10" height="8" fill="rgba(255,220,80,.35)"/><rect x="78" y="90" width="3" height="22" fill="#0a1830"/><rect x="73" y="109" width="13" height="2" fill="#0a1830"/>
+      <rect x="110" y="145" width="48" height="105" fill="#030b1e"/>
+      <rect x="155" y="60" width="80" height="190" fill="#04102a"/><rect x="159" y="68" width="12" height="10" fill="rgba(255,220,80,.45)"/><rect x="175" y="76" width="12" height="10" fill="rgba(255,220,80,.22)"/><rect x="191" y="68" width="12" height="10" fill="rgba(100,180,255,.4)"/><rect x="207" y="76" width="12" height="10" fill="rgba(255,220,80,.28)"/><rect x="159" y="93" width="12" height="10" fill="rgba(255,220,80,.18)"/><rect x="175" y="101" width="12" height="10" fill="rgba(100,180,255,.35)"/><rect x="191" y="93" width="12" height="10" fill="rgba(255,220,80,.4)"/><rect x="207" y="101" width="12" height="10" fill="rgba(255,220,80,.22)"/><rect x="175" y="30" width="4" height="32" fill="#0a1830"/><rect x="169" y="58" width="16" height="3" fill="#0a1830"/>
+      <rect x="230" y="120" width="55" height="130" fill="#030b1e"/>
+      <rect x="280" y="30" width="100" height="220" fill="#040e26"/><rect x="285" y="38" width="13" height="10" fill="rgba(255,220,80,.5)"/><rect x="302" y="46" width="13" height="10" fill="rgba(255,220,80,.25)"/><rect x="319" y="38" width="13" height="10" fill="rgba(100,180,255,.45)"/><rect x="336" y="46" width="13" height="10" fill="rgba(255,220,80,.3)"/><rect x="353" y="38" width="13" height="10" fill="rgba(255,220,80,.2)"/><rect x="285" y="64" width="13" height="10" fill="rgba(100,180,255,.35)"/><rect x="302" y="72" width="13" height="10" fill="rgba(255,220,80,.4)"/><rect x="319" y="64" width="13" height="10" fill="rgba(255,220,80,.22)"/><rect x="336" y="72" width="13" height="10" fill="rgba(100,180,255,.3)"/><rect x="353" y="64" width="13" height="10" fill="rgba(255,220,80,.45)"/><rect x="285" y="90" width="13" height="10" fill="rgba(255,220,80,.18)"/><rect x="319" y="90" width="13" height="10" fill="rgba(100,180,255,.28)"/><rect x="319" y="6" width="5" height="26" fill="#0a1830"/><rect x="312" y="28" width="19" height="4" fill="#0a1830"/>
+      <rect x="375" y="100" width="60" height="150" fill="#030c20"/>
+      <rect x="430" y="80" width="75" height="170" fill="#040e24"/><rect x="434" y="88" width="11" height="9" fill="rgba(255,220,80,.35)"/><rect x="449" y="96" width="11" height="9" fill="rgba(100,180,255,.28)"/><rect x="464" y="88" width="11" height="9" fill="rgba(255,220,80,.18)"/><rect x="434" y="112" width="11" height="9" fill="rgba(255,220,80,.22)"/><rect x="449" y="120" width="11" height="9" fill="rgba(255,220,80,.38)"/><rect x="464" y="112" width="11" height="9" fill="rgba(100,180,255,.2)"/>
+      <rect x="500" y="115" width="55" height="135" fill="#030c1f"/>
+      <rect x="550" y="90" width="50" height="160" fill="#04102a"/><rect x="554" y="98" width="9" height="7" fill="rgba(255,220,80,.38)"/><rect x="567" y="106" width="9" height="7" fill="rgba(100,180,255,.32)"/><rect x="580" y="98" width="9" height="7" fill="rgba(255,220,80,.2)"/><rect x="554" y="122" width="9" height="7" fill="rgba(255,220,80,.28)"/><rect x="567" y="130" width="9" height="7" fill="rgba(100,180,255,.22)"/><rect x="580" y="122" width="9" height="7" fill="rgba(255,220,80,.42)"/>
+      <rect x="595" y="130" width="45" height="120" fill="#030a1c"/>
+      <rect x="635" y="75" width="80" height="175" fill="#040f28"/><rect x="639" y="83" width="12" height="9" fill="rgba(255,220,80,.4)"/><rect x="655" y="91" width="12" height="9" fill="rgba(100,180,255,.35)"/><rect x="671" y="83" width="12" height="9" fill="rgba(255,220,80,.2)"/><rect x="687" y="91" width="12" height="9" fill="rgba(255,220,80,.28)"/><rect x="639" y="108" width="12" height="9" fill="rgba(255,220,80,.18)"/><rect x="655" y="116" width="12" height="9" fill="rgba(100,180,255,.3)"/><rect x="671" y="108" width="12" height="9" fill="rgba(255,220,80,.45)"/><rect x="639" y="133" width="12" height="9" fill="rgba(255,220,80,.25)"/><rect x="671" y="133" width="12" height="9" fill="rgba(100,180,255,.2)"/><rect x="671" y="55" width="4" height="22" fill="#0a1830"/>
+      <rect x="710" y="120" width="50" height="130" fill="#030b1e"/>
+      <rect x="755" y="95" width="65" height="155" fill="#040e24"/><rect x="759" y="103" width="11" height="8" fill="rgba(255,220,80,.35)"/><rect x="774" y="111" width="11" height="8" fill="rgba(100,180,255,.28)"/><rect x="789" y="103" width="11" height="8" fill="rgba(255,220,80,.2)"/><rect x="804" y="111" width="11" height="8" fill="rgba(255,220,80,.4)"/><rect x="759" y="127" width="11" height="8" fill="rgba(100,180,255,.22)"/><rect x="789" y="127" width="11" height="8" fill="rgba(255,220,80,.18)"/>
+      <rect x="815" y="145" width="45" height="105" fill="#030a1c"/>
+      <rect x="855" y="110" width="58" height="140" fill="#040d22"/><rect x="859" y="118" width="10" height="8" fill="rgba(255,220,80,.38)"/><rect x="873" y="126" width="10" height="8" fill="rgba(100,180,255,.3)"/><rect x="887" y="118" width="10" height="8" fill="rgba(255,220,80,.22)"/><rect x="901" y="126" width="10" height="8" fill="rgba(255,220,80,.28)"/><rect x="859" y="142" width="10" height="8" fill="rgba(100,180,255,.2)"/><rect x="887" y="142" width="10" height="8" fill="rgba(255,220,80,.42)"/>
+      <rect x="908" y="130" width="50" height="120" fill="#030c1f"/>
+      <rect x="953" y="85" width="72" height="165" fill="#04102a"/><rect x="957" y="93" width="11" height="9" fill="rgba(255,220,80,.4)"/><rect x="972" y="101" width="11" height="9" fill="rgba(100,180,255,.35)"/><rect x="987" y="93" width="11" height="9" fill="rgba(255,220,80,.2)"/><rect x="1002" y="101" width="11" height="9" fill="rgba(255,220,80,.28)"/><rect x="957" y="118" width="11" height="9" fill="rgba(100,180,255,.25)"/><rect x="987" y="118" width="11" height="9" fill="rgba(255,220,80,.4)"/><rect x="1002" y="126" width="11" height="9" fill="rgba(255,220,80,.22)"/><rect x="987" y="55" width="4" height="22" fill="#0a1830"/>
+      <rect x="1020" y="150" width="40" height="100" fill="#030a1c"/>
+      <rect x="1055" y="115" width="60" height="135" fill="#040e26"/><rect x="1059" y="123" width="10" height="8" fill="rgba(255,220,80,.35)"/><rect x="1073" y="131" width="10" height="8" fill="rgba(100,180,255,.28)"/><rect x="1087" y="123" width="10" height="8" fill="rgba(255,220,80,.2)"/><rect x="1101" y="131" width="10" height="8" fill="rgba(255,220,80,.42)"/><rect x="1059" y="147" width="10" height="8" fill="rgba(100,180,255,.22)"/><rect x="1087" y="147" width="10" height="8" fill="rgba(255,220,80,.3)"/>
+      <rect x="1110" y="140" width="45" height="110" fill="#030b1e"/>
+      <rect x="1150" y="100" width="50" height="150" fill="#040d22"/><rect x="1154" y="108" width="9" height="8" fill="rgba(255,220,80,.35)"/><rect x="1167" y="116" width="9" height="8" fill="rgba(100,180,255,.3)"/><rect x="1180" y="108" width="9" height="8" fill="rgba(255,220,80,.22)"/><rect x="1154" y="132" width="9" height="8" fill="rgba(255,220,80,.4)"/><rect x="1180" y="132" width="9" height="8" fill="rgba(100,180,255,.2)"/>
+    </svg>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="wrap">
+        <span class="eyebrow"><span class="dot"></span> <span data-i18n="hero.eyebrow">KI-Werkzeuge für Unternehmen</span></span>
+        <h1 data-i18n="hero.h1">KI-Tools, die Unternehmen<br><span class="hl">wirklich voranbringen.</span></h1>
+        <p class="lead" data-i18n="hero.lead">E-Mail-Management, Prozessoptimierung, Logistik, Gastro & Angebote – alles per KI, direkt im Browser, ohne Installation.</p>
+        <div class="cta-row">
+          <a class="btn btn-dark" href="/ki-tool/email-dashboard/"><span data-i18n="hero.cta1">E-Mail Dashboard starten</span> <span>→</span></a>
+          <a class="btn btn-ghost" href="#tools" data-i18n="hero.cta2">Alle Tools ansehen</a>
+        </div>
+        <div class="trust">
+          <span data-i18n="trust.1">🔒 DSGVO-freundlich</span>
+          <span data-i18n="trust.2">⚡ Ergebnis in Sekunden</span>
+          <span data-i18n="trust.3">💶 Kostenlos</span>
+        </div>
       </div>
-      <div class="trust">
-        <span data-i18n="trust.1">🔒 DSGVO-freundlich</span>
-        <span data-i18n="trust.2">⚡ Ergebnis in Sekunden</span>
-        <span data-i18n="trust.3">💶 Kostenlos</span>
+    </div>
+    <!-- Stat-Leiste direkt unter Skyline -->
+    <div style="position:relative;z-index:6;background:var(--bg2);border-top:1px solid var(--line)">
+      <div class="wrap">
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="n">7</div><div class="l">KI-Tools</div></div>
+          <div class="hero-stat"><div class="n">25+</div><div class="l">Security-Checks</div></div>
+          <div class="hero-stat"><div class="n">5</div><div class="l">Sprachen</div></div>
+          <div class="hero-stat"><div class="n">0€</div><div class="l">Kosten</div></div>
+        </div>
       </div>
     </div>
   </header>
