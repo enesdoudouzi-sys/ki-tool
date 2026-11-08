@@ -53,6 +53,7 @@
   .langsel{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font:inherit;font-size:12.5px;font-weight:500;padding:6px 8px;cursor:pointer}
   .langsel:hover{color:var(--ink);border-color:var(--line-2)}
   @media(max-width:640px){ .nav a:not(.cta){display:none} }
+  @media(max-width:720px){ .ueber-grid{grid-template-columns:1fr !important} }
 
   /* Hero */
   .hero{padding:96px 0 72px;text-align:center;position:relative;overflow:hidden}
@@ -216,6 +217,53 @@
         <div class="f"><b data-i18n="feat3.t">Sofort einsatzbereit</b><span data-i18n="feat3.d">Keine Installation, kein Konto, keine Kosten. Öffnen und loslegen.</span></div>
       </div>
     </section>
+
+    <!-- ÜBER UNS -->
+    <section class="section" id="ueber-uns" style="padding:48px 0 24px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center" class="ueber-grid">
+        <div>
+          <div class="sec-head" style="margin-bottom:16px">
+            <div class="k">Wer wir sind</div>
+            <h2 style="margin:8px 0 0">Doudouzi &amp; Ergün</h2>
+          </div>
+          <p style="font-size:15px;color:var(--muted);line-height:1.7;margin:0 0 16px">Wir sind ein IT- und Prozessberatungs-Team das mittelständischen Unternehmen hilft, mit KI effizienter zu arbeiten. Unsere Tools entstehen aus echten Kundenproblemen — praxisnah, direkt einsetzbar, ohne IT-Abteilung.</p>
+          <p style="font-size:15px;color:var(--muted);line-height:1.7;margin:0 0 24px">Vom Logistik-Disponenten bis zur Restaurantküche — wir bringen KI dorthin wo sie wirklich hilft.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="mailto:info@doudouzi-erguen.de" class="btn btn-dark" style="font-size:14px">📩 Demo anfragen</a>
+            <a href="https://enesdoudouzi-sys.github.io/ae-consulting-website/" class="btn btn-ghost" style="font-size:14px" target="_blank" rel="noopener">🌐 Website besuchen</a>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.05)">
+            <div style="font-size:32px;font-weight:800;color:var(--accent)">7</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">KI-Tools</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.05)">
+            <div style="font-size:32px;font-weight:800;color:var(--accent)">25+</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">Security-Checks</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.05)">
+            <div style="font-size:32px;font-weight:800;color:var(--accent)">5</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">Sprachen</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:0 1px 3px rgba(16,24,40,.05)">
+            <div style="font-size:32px;font-weight:800;color:var(--accent)">0€</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">Kosten</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KONTAKT BANNER -->
+    <section style="margin:32px 0 48px;background:linear-gradient(135deg,#635bff,#4f46e5);border-radius:18px;padding:36px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:8px">Für Ihr Unternehmen</div>
+        <h2 style="font-size:22px;font-weight:700;color:#fff;margin:0 0 8px;letter-spacing:-.02em">Bereit für eine kostenlose Demo?</h2>
+        <p style="color:rgba(255,255,255,.85);font-size:14px;margin:0">Wir zeigen Ihnen in 30 Minuten wie KI Ihr Unternehmen voranbringt.</p>
+      </div>
+      <a href="mailto:info@doudouzi-erguen.de?subject=Demo-Anfrage KI-Suite" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#635bff;font-weight:700;font-size:15px;padding:13px 24px;border-radius:11px;text-decoration:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.15);transition:.15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">📩 Demo anfragen →</a>
+    </section>
+
   </main>
 
   <footer>
