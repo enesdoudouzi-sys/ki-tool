@@ -593,10 +593,22 @@ function detectWAF(headers, status) {
 async function checkWebsite() {
   const urlInput = document.getElementById('wc-url').value.trim();
   if (!urlInput) { alert('Bitte URL oder Domain eingeben.'); return; }
-  let url = urlInput;
+
+  /* Eingabe bereinigen: nur erlaubte Zeichen (Hostname-Zeichen + :/.) */
+  const cleaned = urlInput.replace(/[^\w.\-:/?=%&]/g, '');
+  let url = cleaned;
   if (!url.startsWith('http')) url = 'https://' + url;
+
   let domain;
   try { domain = new URL(url).hostname; } catch { alert('Ungültige URL.'); return; }
+
+  /* Nur gültige öffentliche Hostnamen erlauben (kein localhost, keine IPs) */
+  const validHostname = /^[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]{0,61}[a-z0-9])?)+$/i;
+  if (!validHostname.test(domain)) { alert('Ungültige Domain. Bitte eine öffentliche Domain eingeben.'); return; }
+  if (/^(localhost|127\.|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(domain)) {
+    alert('Lokale Adressen können nicht geprüft werden.'); return;
+  }
+
   // DNS checks need apex domain (SPF/DMARC/MX are on technogym.com, not www.technogym.com)
   const apexDomain = domain.replace(/^www\./, '');
 

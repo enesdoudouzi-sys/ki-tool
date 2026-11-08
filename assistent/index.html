@@ -6,7 +6,7 @@
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; connect-src 'self' https://ki-proxy.enesdoudouzi.workers.dev; img-src 'self' data: https:; frame-ancestors 'none'; upgrade-insecure-requests;">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/ki-tool/assets/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
@@ -112,6 +112,23 @@ const chat = $('chat'), input = $('input'), sendBtn = $('send');
 let history = [{ role:"system", content:SYSTEM }];
 let busy = false;
 
+/* Rate-Limiting: max 10 Anfragen pro 60 Sekunden */
+const RL_MAX = 10, RL_WINDOW = 60000;
+let rlTimestamps = [];
+function rateLimitCheck() {
+  const now = Date.now();
+  rlTimestamps = rlTimestamps.filter(t => now - t < RL_WINDOW);
+  if (rlTimestamps.length >= RL_MAX) {
+    const wait = Math.ceil((RL_WINDOW - (now - rlTimestamps[0])) / 1000);
+    return `Zu viele Anfragen. Bitte ${wait} Sekunden warten.`;
+  }
+  rlTimestamps.push(now);
+  return null;
+}
+
+/* Input-Länge begrenzen */
+const MAX_INPUT = 2000;
+
 document.querySelectorAll('#suggest .chip').forEach(c =>
   c.addEventListener('click', () => { input.value = c.dataset.p; input.focus(); }));
 
@@ -129,8 +146,11 @@ function addError(text) {
 }
 
 async function send() {
-  const text = input.value.trim();
-  if (!text || busy) return;
+  const raw = input.value.trim();
+  if (!raw || busy) return;
+  const rlErr = rateLimitCheck();
+  if (rlErr) { addError(rlErr); return; }
+  const text = raw.substring(0, MAX_INPUT);
   busy = true; sendBtn.disabled = true; input.value = '';
   addMsg('user', text);
   history.push({ role:"user", content:text });
