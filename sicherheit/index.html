@@ -200,20 +200,33 @@ textarea:focus,input:focus,select:focus{border-color:var(--s-accent);box-shadow:
 
     <div id="wc-result" style="display:none">
       <div class="card" style="margin-bottom:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-          <div>
-            <h3 style="margin-bottom:4px" id="wc-domain">-</h3>
-            <div id="wc-score-label" style="font-size:13px;color:var(--s-muted)">-</div>
+        <!-- Score-Gauge + Domain -->
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:20px">
+          <!-- SVG Gauge -->
+          <div style="flex-shrink:0;position:relative;width:120px;height:120px">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--s-line,#e3e8ef)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" id="wc-gauge-arc"
+                stroke="#dc2626" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="314" stroke-dashoffset="314"
+                transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .8s ease,stroke .4s"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+              <div id="wc-grade" style="font-size:36px;font-weight:800;line-height:1;color:var(--s-ink)">-</div>
+              <div style="font-size:11px;color:var(--s-muted)">Note</div>
+            </div>
           </div>
-          <div style="text-align:center">
-            <div id="wc-grade" style="font-size:48px;font-weight:800;line-height:1">-</div>
-            <div style="font-size:12px;color:var(--s-muted)">Sicherheits-Note</div>
+          <!-- Domain + Score -->
+          <div style="flex:1;min-width:180px">
+            <h3 style="margin-bottom:4px" id="wc-domain">-</h3>
+            <div id="wc-score-label" style="font-size:13px;color:var(--s-muted);margin-bottom:16px">-</div>
+            <!-- Kategorie-Bars -->
+            <div id="wc-cat-bars" style="display:flex;flex-direction:column;gap:7px"></div>
           </div>
         </div>
-        <div class="progress-wrap"><div class="progress-bar" id="wc-progress" style="width:0%;background:#dc2626"></div></div>
-        <div class="btn-row" style="margin-top:14px">
-          <button class="btn btn-s" id="wc-pdf-btn" onclick="exportWebcheckPDF()" style="display:none">📄 PDF-Bericht herunterladen</button>
-          <button class="btn btn-s" id="wc-copy-btn" onclick="copyWebcheckReport()" style="display:none">📋 Bericht kopieren</button>
+        <div class="btn-row" style="margin-top:4px">
+          <button class="btn btn-s" id="wc-pdf-btn" onclick="exportWebcheckPDF()" style="display:none">📄 PDF-Bericht</button>
+          <button class="btn btn-s" id="wc-copy-btn" onclick="copyWebcheckReport()" style="display:none">📋 Kopieren</button>
         </div>
         <!-- Methodik & WAF-Info Banner -->
         <div id="wc-method-info" style="display:none;margin-top:14px;padding:10px 14px;background:var(--s-bg,#f8fafc);border:1px solid var(--s-border,#e2e8f0);border-radius:8px;font-size:12px;color:var(--s-muted,#64748b);line-height:1.6"></div>
@@ -570,8 +583,9 @@ async function checkWebsite() {
   document.getElementById('wc-grade').textContent = '…';
   document.getElementById('wc-grade').style.color = '#6b7280';
   document.getElementById('wc-score-label').textContent = '⏳ Analyse läuft — bitte warten…';
-  document.getElementById('wc-progress').style.width = '5%';
-  document.getElementById('wc-progress').style.background = '#6b7280';
+  const gaugeArc = document.getElementById('wc-gauge-arc');
+  if (gaugeArc) { gaugeArc.style.strokeDashoffset = '314'; gaugeArc.style.stroke = '#6b7280'; }
+  document.getElementById('wc-cat-bars').innerHTML = '';
 
   // ── PARALLEL FETCH ──
   const [mainRes, httpRes, secTxtRes, robotsRes, sitemapRes] = await Promise.all([
@@ -851,9 +865,39 @@ async function checkWebsite() {
   document.getElementById('wc-grade').style.color  = gColor;
   const unvNote = unvCount ? ` · ${unvCount} nicht prüfbar` : '';
   document.getElementById('wc-score-label').textContent = `${passed} von ${verifiable.length} prüfbaren Punkten bestanden (${score}%)${unvNote}`;
-  const bar = document.getElementById('wc-progress');
-  bar.style.width      = score+'%';
-  bar.style.background = score>=68?'#16a34a':score>=55?'#d97706':'#dc2626';
+
+  // SVG Gauge animieren
+  const arc = document.getElementById('wc-gauge-arc');
+  if (arc) {
+    const circumference = 314;
+    const offset = circumference - (score / 100) * circumference;
+    arc.style.strokeDashoffset = offset;
+    arc.style.stroke = gColor;
+  }
+
+  // Kategorie-Bars rendern
+  const catDefs = [
+    { id:'https',   label:'🔒 Transport',      checks: allChecks.filter(c=>['HTTPS aktiv','HSTS (Strict-Transport-Security)'].includes(c.name)) },
+    { id:'headers', label:'🛡️ Headers',         checks: allChecks.filter(c=>['Content-Security-Policy (CSP)','X-Frame-Options','X-Content-Type-Options','Referrer-Policy','Permissions-Policy'].includes(c.name)) },
+    { id:'email',   label:'📧 E-Mail-Sicherheit',checks: allChecks.filter(c=>['SPF (E-Mail)','DMARC','DKIM'].includes(c.name)) },
+    { id:'dns',     label:'🔑 DNS-Sicherheit',  checks: allChecks.filter(c=>['DNSSEC','CAA-Record'].includes(c.name)) },
+  ];
+  const barsEl = document.getElementById('wc-cat-bars');
+  barsEl.innerHTML = catDefs.map(cat => {
+    const v = cat.checks.filter(c=>!c.unverifiable);
+    if (!v.length) return '';
+    const p = v.filter(c=>c.pass).length;
+    const pct = Math.round(p/v.length*100);
+    const col = pct>=80?'#16a34a':pct>=50?'#d97706':'#dc2626';
+    return `<div style="display:flex;align-items:center;gap:8px">
+      <div style="font-size:11px;width:130px;flex-shrink:0;color:var(--s-muted)">${cat.label}</div>
+      <div style="flex:1;height:6px;background:var(--s-line,#e3e8ef);border-radius:999px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${col};border-radius:999px;transition:width .6s ease"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:${col};width:32px;text-align:right">${pct}%</div>
+    </div>`;
+  }).join('');
+
 
   renderChecks('wc-checks-https',   'wc-cat-https',   httpsChecks);
   renderChecks('wc-checks-headers', 'wc-cat-headers', headerChecks);
