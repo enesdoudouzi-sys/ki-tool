@@ -19,3 +19,52 @@ body{ background:#fff !important; }
 .phero .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--s-accent-2)}
 .phero h1{font-size:clamp(25px,4vw,37px);line-height:1.08;margin:0 0 10px;font-weight:600;letter-spacing:-.03em;max-width:700px;color:var(--s-ink)}
 .phero p{font-size:16px;color:var(--s-muted);margin:0;max-width:620px;line-height:1.55}
+
+/* ════════════════════════════════════════════════════════════════════
+   Design A · „Klar & Professionell“ – einheitlich für alle Seiten.
+   html:root schlägt die :root-Variablen der einzelnen Seiten; der
+   Dunkel-Modus (:root[data-theme=dark]) bleibt stärker und funktioniert weiter.
+   ════════════════════════════════════════════════════════════════════ */
+html:root{
+  --navy:#0a2540;
+  --ink:#1a1f36; --ink-2:#3c4257; --muted:#697386;
+  --line:#e3e8ef; --line-2:#d8dee8;
+  --bg:#f6f8fb; --bg2:#f6f8fb; --card:#ffffff;
+  --accent:#635bff; --accent-2:#4f46e5; --accent-soft:#eef0ff;
+  /* Seiten, die „green“ als Markenfarbe nutzen (Prozess-Check, E-Mail-Filter) */
+  --green:#0a2540; --green-2:#635bff; --green-3:#4f46e5; --green-soft:#eef0ff;
+  --s-ink:#1a1f36; --s-muted:#697386; --s-line:#e3e8ef; --s-bg2:#f6f8fb;
+  --s-accent:#635bff; --s-accent-2:#4f46e5; --s-accent-soft:#eef0ff;
+  --a-grad:linear-gradient(135deg,#635bff,#4f46e5);
+  --a-shadow:0 1px 3px rgba(16,24,40,.05),0 1px 2px rgba(16,24,40,.03);
+  --a-shadow-h:0 8px 24px rgba(99,91,255,.12);
+}
+html:root:not([data-theme="dark"]) body{background:#f6f8fb !important}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* Kopfzeile */
+html:root .topbar{border-bottom-color:var(--line)}
+html:root .topbar .logo .mark{border-radius:9px;box-shadow:0 2px 8px rgba(99,91,255,.3)}
+html:root .tbnav a:hover{background:var(--accent-soft);color:var(--accent)}
+html:root .tbnav a.active{color:var(--accent);font-weight:600}
+html:root .tbnav a.cta,html:root .btn-dark,html:root .hero-cta,html:root .lf-btn,html:root button.run,html:root .cta a,html:root .finalcta a{
+  background:var(--a-grad) !important;color:#fff !important;border:0 !important;border-radius:10px;
+  box-shadow:0 2px 8px rgba(99,91,255,.3);transition:transform .15s,box-shadow .15s}
+html:root .tbnav a.cta:hover,html:root .btn-dark:hover,html:root .hero-cta:hover,html:root .lf-btn:hover,html:root button.run:hover,html:root .cta a:hover,html:root .finalcta a:hover{
+  transform:translateY(-1px);box-shadow:0 6px 16px rgba(99,91,255,.38)}
+html:root .phero .eyebrow{color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:4px 11px}
+
+/* Karten */
+html:root:not([data-theme="dark"]) :is(.tool,.card,.m,.tg,.step,.bf,.method,.phase,.rec,.nl,.mail,.uc,.panel,.box,.result,.stat,.kpi){
+  background:#fff;border-color:var(--line);border-radius:14px;box-shadow:var(--a-shadow)}
+html:root :is(.tool,.card,.uc,.method){transition:transform .15s,box-shadow .15s,border-color .15s}
+html:root :is(.tool,.card,.uc,.method):hover{transform:translateY(-2px);box-shadow:var(--a-shadow-h);border-color:#c7c4ff}
+
+/* Formulare */
+html:root :is(input,select,textarea){border-radius:10px}
+html:root :is(input,select,textarea):focus{outline:none;border-color:var(--accent) !important;box-shadow:0 0 0 3px rgba(99,91,255,.15)}
+html:root :is(.btn-ghost,.btn-sec,.btn-sm,.chip){border-radius:9px}
+html:root :is(.btn-ghost,.btn-sec,.btn-sm,.chip):hover{border-color:var(--accent);color:var(--accent)}
+html:root :is(.chip.active,.chip.on,.chip[aria-pressed="true"]){background:var(--accent);border-color:var(--accent);color:#fff}
+html:root ::selection{background:rgba(99,91,255,.18)}
+html:root nav a.cta,html:root .nav a.cta{background:var(--a-grad) !important;color:#fff !important;border:0 !important;box-shadow:0 2px 8px rgba(99,91,255,.3)}
