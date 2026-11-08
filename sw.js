@@ -4,7 +4,7 @@
    - Seiten (HTML): zuerst frisch aus dem Netz, Cache nur als Offline-Ersatz.
    - CSS/JS/Bilder: sofort aus dem Cache, im Hintergrund aktualisiert.
    Bei Änderungen an dieser Datei CACHE hochzählen, dann werden alte Caches gelöscht. */
-const CACHE = 'ki-suite-v2';
+const CACHE = 'ki-suite-v3';
 const PRECACHE = [
   '/ki-tool/',
   '/ki-tool/assets/suite.css',
