@@ -1,0 +1,225 @@
+name: 🔐 Wöchentlicher Sicherheits-Scan
+
+on:
+  schedule:
+    # Jeden Montag um 08:00 Uhr (UTC+1 = 07:00 UTC)
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain zum Prüfen (z.B. doudouzi-erguen.de)'
+        required: false
+        default: ''
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: 🔍 Sicherheits-Scan durchführen
+        id: scan
+        run: |
+          # Domains die wöchentlich geprüft werden
+          DOMAINS="${{ github.event.inputs.domain }}"
+          if [ -z "$DOMAINS" ]; then
+            DOMAINS="enesdoudouzi-sys.github.io"
+          fi
+
+          REPORT=""
+          SCORE=0
+          TOTAL=0
+          PASSED=0
+          WARNINGS=""
+          CRITICALS=""
+
+          for DOMAIN in $DOMAINS; do
+            echo "Prüfe: $DOMAIN"
+            URL="https://$DOMAIN"
+
+            # HTTP Headers abrufen
+            HEADERS=$(curl -sI --max-time 10 "$URL" 2>/dev/null || echo "FEHLER")
+            HTTP_STATUS=$(curl -so /dev/null -w "%{http_code}" --max-time 10 "$URL" 2>/dev/null || echo "0")
+
+            # HTTPS Check
+            TOTAL=$((TOTAL+1))
+            if echo "$URL" | grep -q "^https"; then
+              PASSED=$((PASSED+1))
+              HTTPS_ICON="✅"
+            else
+              HTTPS_ICON="❌"
+              CRITICALS="$CRITICALS\n- HTTPS nicht aktiv"
+            fi
+
+            # HSTS Check
+            TOTAL=$((TOTAL+1))
+            HSTS=$(echo "$HEADERS" | grep -i "strict-transport-security" | head -1)
+            if [ -n "$HSTS" ]; then
+              PASSED=$((PASSED+1))
+              HSTS_ICON="✅"
+              HSTS_VAL=$(echo "$HSTS" | cut -d: -f2- | tr -d '\r')
+            else
+              HSTS_ICON="❌"
+              HSTS_VAL="Nicht gesetzt"
+              CRITICALS="$CRITICALS\n- HSTS fehlt"
+            fi
+
+            # CSP Check
+            TOTAL=$((TOTAL+1))
+            CSP=$(echo "$HEADERS" | grep -i "content-security-policy" | head -1)
+            if [ -n "$CSP" ]; then
+              PASSED=$((PASSED+1))
+              CSP_ICON="✅"
+              CSP_VAL=$(echo "$CSP" | cut -d: -f2- | cut -c1-60 | tr -d '\r')
+            else
+              CSP_ICON="⚠️"
+              CSP_VAL="Nicht gesetzt"
+              WARNINGS="$WARNINGS\n- CSP fehlt"
+            fi
+
+            # X-Frame-Options
+            TOTAL=$((TOTAL+1))
+            XFO=$(echo "$HEADERS" | grep -i "x-frame-options" | head -1)
+            if [ -n "$XFO" ]; then
+              PASSED=$((PASSED+1))
+              XFO_ICON="✅"
+              XFO_VAL=$(echo "$XFO" | cut -d: -f2- | tr -d '\r')
+            else
+              XFO_ICON="⚠️"
+              XFO_VAL="Nicht gesetzt"
+              WARNINGS="$WARNINGS\n- X-Frame-Options fehlt"
+            fi
+
+            # X-Content-Type-Options
+            TOTAL=$((TOTAL+1))
+            XCTO=$(echo "$HEADERS" | grep -i "x-content-type-options" | head -1)
+            if [ -n "$XCTO" ]; then
+              PASSED=$((PASSED+1))
+              XCTO_ICON="✅"
+            else
+              XCTO_ICON="⚠️"
+              WARNINGS="$WARNINGS\n- X-Content-Type-Options fehlt"
+            fi
+
+            # SPF DNS Check
+            TOTAL=$((TOTAL+1))
+            APEX=$(echo "$DOMAIN" | sed 's/^www\.//')
+            SPF=$(dig TXT "$APEX" +short 2>/dev/null | grep "v=spf1" | head -1)
+            if [ -n "$SPF" ]; then
+              PASSED=$((PASSED+1))
+              SPF_ICON="✅"
+              SPF_VAL=$(echo "$SPF" | cut -c1-60)
+            else
+              SPF_ICON="❌"
+              SPF_VAL="Kein SPF-Eintrag"
+              CRITICALS="$CRITICALS\n- SPF fehlt (E-Mail-Spoofing möglich)"
+            fi
+
+            # DMARC Check
+            TOTAL=$((TOTAL+1))
+            DMARC=$(dig TXT "_dmarc.$APEX" +short 2>/dev/null | grep "v=DMARC1" | head -1)
+            if [ -n "$DMARC" ]; then
+              PASSED=$((PASSED+1))
+              DMARC_ICON="✅"
+              DMARC_VAL=$(echo "$DMARC" | cut -c1-60)
+            else
+              DMARC_ICON="❌"
+              DMARC_VAL="Kein DMARC-Eintrag"
+              CRITICALS="$CRITICALS\n- DMARC fehlt (Phishing möglich)"
+            fi
+
+            # Security.txt
+            TOTAL=$((TOTAL+1))
+            SEC_TXT=$(curl -so /dev/null -w "%{http_code}" --max-time 5 "https://$DOMAIN/.well-known/security.txt" 2>/dev/null)
+            if [ "$SEC_TXT" = "200" ]; then
+              PASSED=$((PASSED+1))
+              SECTXT_ICON="✅"
+            else
+              SECTXT_ICON="⚠️"
+              WARNINGS="$WARNINGS\n- security.txt fehlt"
+            fi
+
+            # Score berechnen
+            SCORE=$(( PASSED * 100 / TOTAL ))
+            if [ "$SCORE" -ge 88 ]; then NOTE="A+"
+            elif [ "$SCORE" -ge 78 ]; then NOTE="A"
+            elif [ "$SCORE" -ge 68 ]; then NOTE="B"
+            elif [ "$SCORE" -ge 55 ]; then NOTE="C"
+            elif [ "$SCORE" -ge 38 ]; then NOTE="D"
+            else NOTE="F"
+            fi
+
+            REPORT="$REPORT
+## 🌐 $DOMAIN
+
+**Note: $NOTE** · $PASSED/$TOTAL Prüfpunkte bestanden ($SCORE%)
+
+| Prüfung | Status | Wert |
+|---------|--------|------|
+| HTTPS | $HTTPS_ICON | Aktiv |
+| HSTS | $HSTS_ICON | ${HSTS_VAL:-Nicht gesetzt} |
+| CSP | $CSP_ICON | ${CSP_VAL:-Nicht gesetzt} |
+| X-Frame-Options | $XFO_ICON | ${XFO_VAL:-Nicht gesetzt} |
+| X-Content-Type | $XCTO_ICON | - |
+| SPF (DNS) | $SPF_ICON | ${SPF_VAL:-Kein Eintrag} |
+| DMARC (DNS) | $DMARC_ICON | ${DMARC_VAL:-Kein Eintrag} |
+| security.txt | $SECTXT_ICON | HTTP $SEC_TXT |
+"
+          done
+
+          # Output für GitHub Actions
+          echo "SCORE=$SCORE" >> $GITHUB_OUTPUT
+          echo "NOTE=$NOTE" >> $GITHUB_OUTPUT
+          echo "PASSED=$PASSED" >> $GITHUB_OUTPUT
+          echo "TOTAL=$TOTAL" >> $GITHUB_OUTPUT
+
+          # Multiline output
+          {
+            echo "REPORT<<EOF_REPORT"
+            echo "$REPORT"
+            echo "EOF_REPORT"
+          } >> $GITHUB_OUTPUT
+
+          {
+            echo "CRITICALS<<EOF_CRIT"
+            printf "$CRITICALS"
+            echo ""
+            echo "EOF_CRIT"
+          } >> $GITHUB_OUTPUT
+
+      - name: 📋 GitHub Issue erstellen
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = '${{ steps.scan.outputs.SCORE }}';
+            const note  = '${{ steps.scan.outputs.NOTE }}';
+            const passed = '${{ steps.scan.outputs.PASSED }}';
+            const total  = '${{ steps.scan.outputs.TOTAL }}';
+            const report = `${{ steps.scan.outputs.REPORT }}`;
+            const criticals = `${{ steps.scan.outputs.CRITICALS }}`;
+
+            const emoji = parseInt(score) >= 68 ? '🟢' : parseInt(score) >= 55 ? '🟡' : '🔴';
+            const date  = new Date().toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+            const body = `# ${emoji} Wöchentlicher Sicherheits-Bericht — ${date}
+
+**Gesamt-Note: ${note}** · ${passed}/${total} Prüfpunkte bestanden (${score}%)
+
+${report}
+
+---
+
+${criticals ? `### 🚨 Kritische Probleme\n${criticals}\n\n` : ''}
+
+---
+*Automatisch erstellt von [Doudouzi & Ergün KI-Suite](https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/) · Für detaillierte Analyse: [Tool öffnen](https://enesdoudouzi-sys.github.io/ki-tool/sicherheit/)*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `🔐 Sicherheits-Bericht ${date} — Note ${note} (${score}%)`,
+              body:  body,
+              labels: ['security', 'automated']
+            });
