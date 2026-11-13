@@ -73,7 +73,14 @@
     <button class="btn-sec" id="copy">📋 Ergebnis kopieren</button>
   </div>
 
-  <footer>Powered by Groq · KI-Antworten bitte vor dem Veröffentlichen prüfen · <a href="/ki-tool/gastro/">← Gastro-Tools</a></footer>
+  <div class="ki-cta">
+    <h3>Bewertungsmanagement professionell einrichten?</h3>
+    <p>Wir richten KI-gestützte Antworten auf Google, TripAdvisor & Co. für Ihr Lokal ein – automatisiert, markentreu, zeitnah.</p>
+    <a class="cta-btn" href="https://enesdoudouzi-sys.github.io/ae-consulting-website/#kontakt">Kostenloses Erstgespräch →</a>
+    <div class="cta-sub">Unverbindlich · Antwort innerhalb von 24h</div>
+  </div>
+
+  <footer>Powered by Claude (Anthropic) · KI-Antworten bitte vor dem Veröffentlichen prüfen · <a href="/ki-tool/gastro/">← Gastro-Tools</a></footer>
 </div>
 
 <script>
@@ -88,17 +95,11 @@ $('sample').addEventListener('click',()=>{ $('input').value=SAMPLE; });
 
 function setStatus(m){ const s=$('status'); s.classList.add('show'); $('statusText').innerHTML=m; }
 
-async function groq(messages){
-  const MODELS=["openai/gpt-oss-120b","openai/gpt-oss-20b","llama-3.1-8b-instant"];
-  for(const model of MODELS){
-    try{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,messages,temperature:0.5,max_tokens:1400})});
-      const data=await res.json();
-      if(res.ok&&!data.error&&data.choices?.[0]?.message?.content) return data.choices[0].message.content.trim();
-      const err=(data.error&&(data.error.message||data.error))||('HTTP '+res.status);
-      if(!/model|decommission|not exist|access/i.test(String(err))) throw new Error(err);
-    }catch(e){ if(model===MODELS[MODELS.length-1]) throw e; }
-  }
+async function callClaude(messages){
+  const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages})});
+  const data=await res.json();
+  if(!res.ok||data.error) throw new Error(data.error||'HTTP '+res.status);
+  return (data.text||'').trim();
 }
 
 $('run').addEventListener('click', async ()=>{
@@ -109,7 +110,7 @@ $('run').addEventListener('click', async ()=>{
   setStatus('<span class="dots"><span></span><span></span><span></span></span> KI analysiert die Bewertungen …');
   const sys="Du bist KI-Assistent für einen Gastronomie-Betrieb. Analysiere die folgenden Gästebewertungen (durch '---' getrennt). Antworte auf Deutsch und gib EXAKT diese Struktur aus:\n\nGESAMT-STIMMUNG: (ein Satz)\n\nWAS GÄSTE LOBEN:\n- ...\n\nWAS KRITISIERT WIRD:\n- ...\n\nEMPFEHLUNGEN:\n- ...\n\nANTWORT-VORSCHLÄGE:\nBewertung 1: (kurze, höfliche öffentliche Antwort, Sie-Form)\nBewertung 2: ...\n\nHalte die Antworten freundlich, wertschätzend und konkret. Bei Kritik: entschuldigen und Besserung zusagen, ohne Ausreden.";
   try{
-    const out=await groq([{role:"system",content:sys},{role:"user",content:text}]);
+    const out=await callClaude([{role:"user",content:sys+"\n\n"+text}]);
     $('result').textContent=out; $('result').classList.add('show');
     $('status').classList.remove('show');
     window._out=out;
